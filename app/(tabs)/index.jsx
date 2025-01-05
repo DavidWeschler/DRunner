@@ -21,6 +21,17 @@ export default function App() {
           Go to Form
         </Button>
       </Link>
+
+      <Link href="/map" style={styles.link}>
+        <Button
+          mode="contained"
+          style={[styles.linkButton, { backgroundColor: colors.secondary }]}
+          contentStyle={{ height: 50, justifyContent: "center" }} // Ensures proper alignment and button height
+          labelStyle={[styles.buttonText, { fontSize: 16 }]}
+        >
+          David's Map
+        </Button>
+      </Link>
     </View>
   );
 }
