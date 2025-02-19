@@ -3,7 +3,7 @@ import { useAuth } from "@clerk/clerk-expo";
 import * as Location from "expo-location";
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
-import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator } from "react-native";
+import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import GoogleTextInput from "@/components/GoogleTextInput";
@@ -77,10 +77,14 @@ const recentRuns = [
 const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
-
   const loading = false;
-
   const { setUserLocation, setDestinationLocation } = useLocationStore();
+
+  const [length, setLength] = useState("");
+  const [startPoint, setStartPoint] = useState("");
+  const [endPoint, setEndPoint] = useState("");
+  const [difficulty, setDifficulty] = useState("");
+  const [theme, setTheme] = useState("standard");
 
   const handleSignOut = () => {
     signOut();
@@ -161,7 +165,52 @@ const Home = () => {
             <>
               <Text className="text-xl font-JakartaBold mt-5 mb-3">Your current location</Text>
               <View className="flex flex-row items-center bg-transparent h-[450px]">
-                <Map />
+                <Map theme={theme} />
+              </View>
+
+              <Text>Theme:</Text>
+              <View className="flex flex-row">
+                <TouchableOpacity onPress={() => setTheme("dark")} style={styles.radio}>
+                  <Text style={theme === "dark" ? styles.selected : styles.unselected}>Dark</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setTheme("aubergine")} style={styles.radio}>
+                  <Text style={theme === "aubergine" ? styles.selected : styles.unselected}>Aubergine</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setTheme("night")} style={styles.radio}>
+                  <Text style={theme === "night" ? styles.selected : styles.unselected}>Night</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setTheme("silver")} style={styles.radio}>
+                  <Text style={theme === "silver" ? styles.selected : styles.unselected}>Silver</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setTheme("standard")} style={styles.radio}>
+                  <Text style={theme === "standard" ? styles.selected : styles.unselected}>Standard</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View>
+                <View style={styles.form}>
+                  <Text>Length (kilometers):</Text>
+                  <TextInput style={styles.input} value={length} onChangeText={setLength} keyboardType="numeric" />
+
+                  <Text>Start Point:</Text>
+                  <TextInput style={styles.input} value={startPoint} onChangeText={setStartPoint} />
+
+                  <Text>End Point:</Text>
+                  <TextInput style={styles.input} value={endPoint} onChangeText={setEndPoint} placeholder="Optional" />
+
+                  <Text>Difficulty:</Text>
+                  <View style={styles.radioContainer}>
+                    <TouchableOpacity onPress={() => setDifficulty("easy")} style={styles.radio}>
+                      <Text style={difficulty === "easy" ? styles.selected : styles.unselected}>Easy</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setDifficulty("medium")} style={styles.radio}>
+                      <Text style={difficulty === "medium" ? styles.selected : styles.unselected}>Medium</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setDifficulty("hard")} style={styles.radio}>
+                      <Text style={difficulty === "hard" ? styles.selected : styles.unselected}>Hard</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               </View>
             </>
 
@@ -172,5 +221,34 @@ const Home = () => {
     </SafeAreaView>
   );
 };
+
+// more this to a separate file later...
+const styles = StyleSheet.create({
+  form: {
+    marginTop: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  radioContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 10,
+  },
+  radio: {
+    padding: 10,
+  },
+  selected: {
+    fontWeight: "bold",
+    color: "blue",
+  },
+  unselected: {
+    color: "black",
+  },
+});
 
 export default Home;
