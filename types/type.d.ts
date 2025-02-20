@@ -82,6 +82,13 @@ declare interface InputFieldProps extends TextInputProps {
 //   rideTime: number;
 // }
 
+type MapThemeType = "standard" | "dark" | "aubergine" | "night" | "retro" | "silver";
+
+declare interface MarkerData {
+  latitude: number;
+  longitude: number;
+}
+
 declare interface LocationStore {
   userLatitude: number | null;
   userLongitude: number | null;
@@ -89,6 +96,8 @@ declare interface LocationStore {
   destinationLatitude: number | null;
   destinationLongitude: number | null;
   destinationAddress: string | null;
+  mapTheme: MapThemeType | null; // Store the theme name, NOT the object
+  setMapTheme: (theme: MapThemeType) => void;
   setUserLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => void;
   setDestinationLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => void;
 }

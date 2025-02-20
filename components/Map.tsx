@@ -6,10 +6,21 @@ import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import mapThemes from "./MapThemes/mapThemes";
 
-const Map = ({ theme }: { theme: string }) => {
+import { MapThemeType, MarkerData } from "@/types/type";
+
+interface MapProps {
+  theme: MapThemeType;
+  pins: MarkerData[];
+  directions: any; // Ideally, define a proper type for directions
+}
+
+// redefine const map according to the new requirements
+const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
   const { userLongitude, userLatitude, destinationLatitude, destinationLongitude } = useLocationStore();
 
   const mapTheme = mapThemes[theme] || mapThemes.standard;
+
+  // next: add the pins and directions to the map
 
   return (
     <>

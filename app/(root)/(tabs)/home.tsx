@@ -3,7 +3,7 @@ import { useAuth } from "@clerk/clerk-expo";
 import * as Location from "expo-location";
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
-import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet } from "react-native";
+import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet, Button } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import GoogleTextInput from "@/components/GoogleTextInput";
@@ -78,13 +78,13 @@ const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
-  const { setUserLocation, setDestinationLocation } = useLocationStore();
+  const { setUserLocation, setDestinationLocation, setMapTheme } = useLocationStore();
 
   const [length, setLength] = useState("");
   const [startPoint, setStartPoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
   const [difficulty, setDifficulty] = useState("");
-  const [theme, setTheme] = useState("standard");
+  const [currentMapTheme, setCurrentMapTheme] = useState<"standard" | "dark" | "aubergine" | "night" | "retro" | "silver">("standard");
 
   const handleSignOut = () => {
     signOut();
@@ -128,6 +128,22 @@ const Home = () => {
     router.push("/(root)/find-run");
   };
 
+  const setMapThemeInStrored = (theme: "standard" | "dark" | "aubergine" | "night" | "retro" | "silver") => {
+    setCurrentMapTheme(theme);
+    setMapTheme(theme);
+  };
+
+  const generator = () => {
+    console.log("Generating route...");
+    // log the form inputs:
+    console.log("Length:", length);
+    console.log("Start Point:", startPoint);
+    console.log("End Point:", endPoint);
+    console.log("Difficulty:", difficulty);
+
+    router.push("/(root)/showRoute");
+  };
+
   return (
     <SafeAreaView className="bg-general-500">
       <FlatList
@@ -165,25 +181,25 @@ const Home = () => {
             <>
               <Text className="text-xl font-JakartaBold mt-5 mb-3">Your current location</Text>
               <View className="flex flex-row items-center bg-transparent h-[450px]">
-                <Map theme={theme} />
+                <Map theme={currentMapTheme} pins={[]} directions={undefined} />
               </View>
 
               <Text>Theme:</Text>
-              <View className="flex flex-row">
-                <TouchableOpacity onPress={() => setTheme("dark")} style={styles.radio}>
-                  <Text style={theme === "dark" ? styles.selected : styles.unselected}>Dark</Text>
+              <View style={styles.radioContainer}>
+                <TouchableOpacity onPress={() => setMapThemeInStrored("dark")} style={styles.radio}>
+                  <Text style={currentMapTheme === "dark" ? styles.selected : styles.unselected}>Dark</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setTheme("aubergine")} style={styles.radio}>
-                  <Text style={theme === "aubergine" ? styles.selected : styles.unselected}>Aubergine</Text>
+                <TouchableOpacity onPress={() => setMapThemeInStrored("aubergine")} style={styles.radio}>
+                  <Text style={currentMapTheme === "aubergine" ? styles.selected : styles.unselected}>Aubergine</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setTheme("night")} style={styles.radio}>
-                  <Text style={theme === "night" ? styles.selected : styles.unselected}>Night</Text>
+                <TouchableOpacity onPress={() => setMapThemeInStrored("night")} style={styles.radio}>
+                  <Text style={currentMapTheme === "night" ? styles.selected : styles.unselected}>Night</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setTheme("silver")} style={styles.radio}>
-                  <Text style={theme === "silver" ? styles.selected : styles.unselected}>Silver</Text>
+                <TouchableOpacity onPress={() => setMapThemeInStrored("silver")} style={styles.radio}>
+                  <Text style={currentMapTheme === "silver" ? styles.selected : styles.unselected}>Silver</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setTheme("standard")} style={styles.radio}>
-                  <Text style={theme === "standard" ? styles.selected : styles.unselected}>Standard</Text>
+                <TouchableOpacity onPress={() => setMapThemeInStrored("standard")} style={styles.radio}>
+                  <Text style={currentMapTheme === "standard" ? styles.selected : styles.unselected}>Standard</Text>
                 </TouchableOpacity>
               </View>
 
@@ -210,6 +226,7 @@ const Home = () => {
                       <Text style={difficulty === "hard" ? styles.selected : styles.unselected}>Hard</Text>
                     </TouchableOpacity>
                   </View>
+                  <Button title="Generate" onPress={generator} color="#C96915" />
                 </View>
               </View>
             </>
