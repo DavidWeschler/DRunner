@@ -82,6 +82,13 @@ declare interface InputFieldProps extends TextInputProps {
 //   rideTime: number;
 // }
 
+type MapThemeType = "standard" | "dark" | "aubergine" | "night" | "retro" | "silver";
+
+declare interface MarkerData {
+  latitude: number;
+  longitude: number;
+}
+
 declare interface LocationStore {
   userLatitude: number | null;
   userLongitude: number | null;
@@ -89,6 +96,22 @@ declare interface LocationStore {
   destinationLatitude: number | null;
   destinationLongitude: number | null;
   destinationAddress: string | null;
+  mapTheme: MapThemeType | null;
+
+  // algorithm inputs:
+  length: number | null;
+  startPoint: { latitude: number; longitude: number } | null;
+  endPoint: { latitude: number; longitude: number } | null;
+  difficulty: string | null;
+
+  //algorithm inputs setters:
+  setLengthInput: (length: number) => void;
+  setStartPointInput: ({ latitude, longitude }: { latitude: number; longitude: number }) => void;
+  setEndPointInput: ({ latitude, longitude }: { latitude: number; longitude: number }) => void;
+  setDifficultyInput: (difficulty: string) => void;
+  //-----------------
+
+  setMapTheme: (theme: MapThemeType) => void;
   setUserLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => void;
   setDestinationLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => void;
 }

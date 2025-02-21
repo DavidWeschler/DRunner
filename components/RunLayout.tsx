@@ -23,7 +23,7 @@ const RunLayout = ({ title, snapPoints, children }: { title: string; snapPoints?
             <Text className="text-xl font-JakartaSemiBold ml-5">{title || "Go Back"}</Text>
           </View>
 
-          <Map />
+          <Map theme={"standard"} pins={[]} directions={undefined} />
         </View>
 
         <BottomSheet ref={bottomSheetRef} snapPoints={snapPoints || ["18%", "68%"]} index={0}>
