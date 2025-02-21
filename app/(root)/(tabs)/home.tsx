@@ -74,11 +74,18 @@ const recentRuns = [
   },
 ];
 
+const getLatLngFromAddress = async (address: string) => {
+  const [result] = await Location.geocodeAsync(address);
+  console.log("Latitude:", result.latitude);
+  console.log("Longitude:", result.longitude);
+  return { latitude: result.latitude, longitude: result.longitude };
+};
+
 const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
-  const { setUserLocation, setDestinationLocation, setMapTheme } = useLocationStore();
+  const { setUserLocation, setDestinationLocation, setMapTheme, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput } = useLocationStore();
 
   const [length, setLength] = useState("");
   const [startPoint, setStartPoint] = useState("");
@@ -133,13 +140,21 @@ const Home = () => {
     setMapTheme(theme);
   };
 
-  const generator = () => {
+  const generator = async () => {
     console.log("Generating route...");
     // log the form inputs:
     console.log("Length:", length);
     console.log("Start Point:", startPoint);
     console.log("End Point:", endPoint);
     console.log("Difficulty:", difficulty);
+
+    const startLatLong = await getLatLngFromAddress(startPoint); // this turns the address into lat and long (for free)
+
+    // update the inputs in the singleton store
+    setLengthInput(parseFloat(length));
+    setStartPointInput(startLatLong);
+    endPoint && setEndPointInput({ latitude: 32.144065, longitude: 34.876698 });
+    setDifficultyInput(difficulty);
 
     router.push("/(root)/showRoute");
   };
@@ -194,6 +209,9 @@ const Home = () => {
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setMapThemeInStrored("night")} style={styles.radio}>
                   <Text style={currentMapTheme === "night" ? styles.selected : styles.unselected}>Night</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setMapThemeInStrored("retro")} style={styles.radio}>
+                  <Text style={currentMapTheme === "retro" ? styles.selected : styles.unselected}>Retro</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => setMapThemeInStrored("silver")} style={styles.radio}>
                   <Text style={currentMapTheme === "silver" ? styles.selected : styles.unselected}>Silver</Text>

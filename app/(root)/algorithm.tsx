@@ -3,7 +3,7 @@ import * as turf from "@turf/turf";
 import Constants from "expo-constants";
 import axios from "axios";
 
-const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
 
 // pins is an array of points, in the form of: {latitude, longitude}
 interface Pin {
@@ -89,19 +89,19 @@ const decodePolyline = (encoded: string): Coordinate[] => {
   return polyline;
 };
 
-// const dummy = [
-//   { latitude: 31.747829999999997, longitude: 35.2297785640655 },
-//   { latitude: 31.742684601665083, longitude: 35.22840393440912 },
-//   { latitude: 31.73950298030056, longitude: 35.22482800719663 },
-//   { latitude: 31.739507156912385, longitude: 35.22040692259369 },
-//   { latitude: 31.74269421104715, longitude: 35.21683447028687 },
-//   { latitude: 31.747841037066735, longitude: 35.21546587891893 },
-//   { latitude: 31.752983541427767, longitude: 35.21684522552989 },
-//   { latitude: 31.75616029080586, longitude: 35.22042392267836 },
-//   { latitude: 31.756149575063443, longitude: 35.224845008300804 },
-//   { latitude: 31.752957644691733, longitude: 35.22841469115308 },
-//   { latitude: 31.74783, longitude: 35.222622 }, // My home location
-// ];
+const dummy = [
+  { latitude: 31.747829999999997, longitude: 35.2297785640655 },
+  { latitude: 31.742684601665083, longitude: 35.22840393440912 },
+  { latitude: 31.73950298030056, longitude: 35.22482800719663 },
+  { latitude: 31.739507156912385, longitude: 35.22040692259369 },
+  { latitude: 31.74269421104715, longitude: 35.21683447028687 },
+  { latitude: 31.747841037066735, longitude: 35.21546587891893 },
+  { latitude: 31.752983541427767, longitude: 35.21684522552989 },
+  { latitude: 31.75616029080586, longitude: 35.22042392267836 },
+  { latitude: 31.756149575063443, longitude: 35.224845008300804 },
+  { latitude: 31.752957644691733, longitude: 35.22841469115308 },
+  { latitude: 31.74783, longitude: 35.222622 }, // My home location
+];
 
 // Function to adjust a single pin to the nearest road - using Google Roads API
 interface Coordinate {
@@ -155,15 +155,20 @@ const adjustPinsToStreetsWithGoogleAPI = async (pins: Coordinate[]): Promise<Coo
 interface AlgorithmParams {
   length: number;
   startPoint: Coordinate;
+  endPoint: Coordinate | null;
   difficulty: string;
 }
 
-const Algorithm = async ({ length, startPoint, difficulty }: AlgorithmParams) => {
+const Algorithm = async ({ length, startPoint, endPoint, difficulty }: AlgorithmParams) => {
   console.log("Starting to calculate route...");
+
+  if (!length || !startPoint || !difficulty) {
+    console.error("Missing input parameters");
+    return [];
+  }
 
   const sLatitude = startPoint.latitude;
   const sLongitude = startPoint.longitude;
-  //   const lengthKM = parseFloat(length);
   const lengthKM = length;
 
   const startingPoint = turf.point([sLongitude, sLatitude]);
@@ -190,17 +195,10 @@ const Algorithm = async ({ length, startPoint, difficulty }: AlgorithmParams) =>
     pins.push({ latitude: coord[1], longitude: coord[0] });
   }
 
-  //   // Ensure the last pin is the same as the start point
-  //   pins.push({ latitude: sLatitude, longitude: sLongitude });
-
-  //   // Add the start point as the first element
-  //   pins.unshift({ latitude: sLatitude, longitude: sLongitude });
-
   pins.forEach((pin, index) => {
     console.log(`Pin ${index + 1}: ${pin.latitude}, ${pin.longitude}`);
   });
 
-  // COMMENT OUT these 2 lines of code to save API calls in debugging!!!!!! API_KEY_1
   const adjustedPins = await adjustPinsToStreetsWithGoogleAPI(pins);
   return adjustedPins;
 };

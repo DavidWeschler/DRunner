@@ -12,6 +12,10 @@ export const useLocationStore = create<LocationStore>((set) => ({
   destinationLongitude: null,
   destinationAddress: null,
   mapTheme: null,
+  length: null,
+  startPoint: null,
+  endPoint: null,
+  difficulty: null,
 
   setUserLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => {
     set(() => ({
@@ -32,6 +36,30 @@ export const useLocationStore = create<LocationStore>((set) => ({
   setMapTheme: (theme: MapThemeType) => {
     set(() => ({
       mapTheme: theme, // Store only the theme name
+    }));
+  },
+
+  setLengthInput: (length: number) => {
+    set(() => ({
+      length,
+    }));
+  },
+
+  setStartPointInput: ({ latitude, longitude }: { latitude: number; longitude: number }) => {
+    set(() => ({
+      startPoint: { latitude, longitude },
+    }));
+  },
+
+  setEndPointInput: ({ latitude, longitude }: { latitude: number; longitude: number }) => {
+    set(() => ({
+      endPoint: { latitude, longitude },
+    }));
+  },
+
+  setDifficultyInput: (difficulty: string) => {
+    set(() => ({
+      difficulty,
     }));
   },
 }));
