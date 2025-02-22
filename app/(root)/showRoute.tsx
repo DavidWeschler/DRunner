@@ -1,47 +1,9 @@
-// import BottomSheet, { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
-// import { router } from "expo-router";
-// import React, { useRef } from "react";
-// import { Image, Text, TouchableOpacity, View } from "react-native";
-// import { GestureHandlerRootView } from "react-native-gesture-handler";
-// import { useLocationStore } from "@/store";
-
-// import Map from "@/components/Map";
-// import { icons } from "@/constants";
-
-// import { Algorithm, decodePolyline, getDirectionsBetweenPins } from "./algorithm";
-
-// const showRun = async () => {
-//   const { setUserLocation, setDestinationLocation, setMapTheme } = useLocationStore();
-
-//   // retriee map theme from store
-//   const mapTheme = useLocationStore((state) => state.mapTheme);
-
-//   console.log("mapTheme", mapTheme);
-
-//   // this is temporarally hardcoded
-//   const inputs = {
-//     length: 10,
-//     startPoint: { latitude: 32.144065, longitude: 34.876698 },
-//     difficulty: "easy",
-//   };
-
-//   const routePins = await Algorithm(inputs);
-//   console.log("routePins", routePins);
-
-//   // const routeDirections = await getDirectionsBetweenPins(routePins);
-//   const routeDirections = null;
-
-//   return <Map theme={mapTheme || "standard"} pins={routePins} directions={routeDirections} />;
-// };
-
-// export default showRun;
-//-------------------------------------------------------------------------------------------------------------------------
-
 import React, { useEffect, useState } from "react";
 import { View, ActivityIndicator, Button, StyleSheet } from "react-native";
-import { Algorithm, decodePolyline, getDirectionsBetweenPins } from "./algorithm";
+import Algorithm from "./algorithm";
 import Map from "../../components/Map";
 import { useLocationStore } from "../../store/index";
+import { Coord } from "@turf/turf";
 
 const ShowRun = () => {
   const { setUserLocation, setDestinationLocation, setMapTheme } = useLocationStore();
@@ -64,17 +26,18 @@ const ShowRun = () => {
         }
 
         const inputs = {
-          length: inpLength,
-          startPoint: inpStartPoint,
-          endPoint: inpEndPoint,
-          difficulty: inpDifficulty,
+          routeLengthKm: inpLength,
+          startPoint: [inpStartPoint.longitude, inpStartPoint.latitude], // this needs to be type 'Coord'
+          // endPoint: inpEndPoint,
+          // difficulty: inpDifficulty,
         };
 
-        const pins = await Algorithm(inputs);
-        setRoutePins(pins);
-
-        const directions = await getDirectionsBetweenPins(pins);
-        // const directions = null;
+        const result = await Algorithm(inputs);
+        if (Array.isArray(result)) {
+          throw new Error("Unexpected result format from Algorithm");
+        }
+        const { adjustedPins, directions } = result;
+        setRoutePins(adjustedPins);
         setRouteDirections(directions);
       } catch (error) {
         console.error("Error calculating route:", error);

@@ -1,22 +1,12 @@
-import { point, circle, bearingToAzimuth, destination, Units } from "@turf/turf";
-import * as turf from "@turf/turf";
-import Constants from "expo-constants";
+// Import the necessary Turf.js functions
+import { circle, destination, lineIntersect, distance, Coord, Units } from "@turf/turf";
 import axios from "axios";
 
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
 
-// pins is an array of points, in the form of: {latitude, longitude}
 interface Pin {
   latitude: number;
   longitude: number;
-}
-
-interface DirectionsResponse {
-  routes: {
-    overview_polyline: {
-      points: string;
-    };
-  }[];
 }
 
 const getDirectionsBetweenPins = async (pins: Pin[]): Promise<string[]> => {
@@ -44,66 +34,14 @@ const getDirectionsBetweenPins = async (pins: Pin[]): Promise<string[]> => {
   return directions;
 };
 
-// Function to decode the polyline response
-interface Coordinate {
-  latitude: number;
-  longitude: number;
+interface DirectionsResponse {
+  routes: {
+    overview_polyline: {
+      points: string;
+    };
+  }[];
 }
 
-const decodePolyline = (encoded: string): Coordinate[] => {
-  let polyline: Coordinate[] = [];
-  let index = 0;
-  let lat = 0;
-  let lng = 0;
-
-  while (index < encoded.length) {
-    let byte: number;
-    let shift = 0;
-    let result = 0;
-    do {
-      byte = encoded.charCodeAt(index++) - 63;
-      result |= (byte & 0x1f) << shift;
-      shift += 5;
-    } while (byte >= 0x20);
-
-    let dlat = result & 1 ? ~(result >> 1) : result >> 1;
-    lat += dlat;
-
-    shift = 0;
-    result = 0;
-    do {
-      byte = encoded.charCodeAt(index++) - 63;
-      result |= (byte & 0x1f) << shift;
-      shift += 5;
-    } while (byte >= 0x20);
-
-    let dlng = result & 1 ? ~(result >> 1) : result >> 1;
-    lng += dlng;
-
-    polyline.push({
-      latitude: lat / 1e5,
-      longitude: lng / 1e5,
-    });
-  }
-
-  return polyline;
-};
-
-const dummy = [
-  { latitude: 31.747829999999997, longitude: 35.2297785640655 },
-  { latitude: 31.742684601665083, longitude: 35.22840393440912 },
-  { latitude: 31.73950298030056, longitude: 35.22482800719663 },
-  { latitude: 31.739507156912385, longitude: 35.22040692259369 },
-  { latitude: 31.74269421104715, longitude: 35.21683447028687 },
-  { latitude: 31.747841037066735, longitude: 35.21546587891893 },
-  { latitude: 31.752983541427767, longitude: 35.21684522552989 },
-  { latitude: 31.75616029080586, longitude: 35.22042392267836 },
-  { latitude: 31.756149575063443, longitude: 35.224845008300804 },
-  { latitude: 31.752957644691733, longitude: 35.22841469115308 },
-  { latitude: 31.74783, longitude: 35.222622 }, // My home location
-];
-
-// Function to adjust a single pin to the nearest road - using Google Roads API
 interface Coordinate {
   latitude: number;
   longitude: number;
@@ -151,56 +89,122 @@ const adjustPinsToStreetsWithGoogleAPI = async (pins: Coordinate[]): Promise<Coo
   return adjustedPins;
 };
 
-// right now this calculates a circle around the starting point
-interface AlgorithmParams {
-  length: number;
-  startPoint: Coordinate;
-  endPoint: Coordinate | null;
-  difficulty: string;
+interface Coordinate {
+  latitude: number;
+  longitude: number;
 }
 
-const Algorithm = async ({ length, startPoint, endPoint, difficulty }: AlgorithmParams) => {
-  console.log("Starting to calculate route...");
+interface AlgorithmParams {
+  routeLengthKm: number;
+  //   startPoint: Coordinate;
+  startPoint: Coord;
+  //   endPoint: Coordinate | null;
+  //   difficulty: string;
+}
 
-  if (!length || !startPoint || !difficulty) {
-    console.error("Missing input parameters");
-    return [];
+/**
+ * Generates a loop route given a starting point and a desired route length.
+ * @param {Array<number>} startPoint - The starting coordinate as [longitude, latitude].
+ * @param {number} routeLengthKm - The desired total route length in kilometers.
+ * @returns {Promise<{ waypoints: Array<Array<number>>, directions: Object }>}
+ *          An object containing the waypoints (as [lng, lat] coordinates) and the Google Directions response.
+ */
+// async function Algorithm(startPoint: Coord, routeLengthKm: number): Promise<{ waypoints: Array<Array<number>>; directions: object }> {
+async function Algorithm({ routeLengthKm, startPoint }: AlgorithmParams) {
+  // Divide the route length into three segments.
+  const segmentLength = routeLengthKm / 3;
+
+  // Step 1: Compute the first stop by projecting from the startPoint a random distance.
+  // Turf's destination takes [lng, lat], a distance, and a bearing (in degrees).
+  const randomBearing = Math.random() * 360; // Random angle between 0 and 360 degrees.
+  const firstStopPoint = destination(startPoint, segmentLength, randomBearing, { units: "kilometers" });
+  const firstStop = firstStopPoint.geometry.coordinates; // [lng, lat]
+
+  // Step 2: Create two circles (polygons) centered at startPoint and firstStop.
+  const circleOptions: { steps: number; units: Units } = { steps: 64, units: "kilometers" };
+  const circleFromStart = circle(startPoint, segmentLength, circleOptions);
+  const circleFromFirst = circle(firstStop, segmentLength, circleOptions);
+
+  // Step 3: Compute the intersection points between the two circles.
+  const intersections = lineIntersect(circleFromStart, circleFromFirst);
+
+  if (!intersections.features || intersections.features.length === 0) {
+    throw new Error("No intersections found between the circles. Try again with a different bearing.");
   }
 
-  const sLatitude = startPoint.latitude;
-  const sLongitude = startPoint.longitude;
-  const lengthKM = length;
+  // Step 4: Choose the intersection whose distance from firstStop is closest to segmentLength.
+  const secondStopFeature = intersections.features.reduce((closest, feature) => {
+    const currDist = distance(firstStop, feature.geometry.coordinates, { units: "kilometers" });
+    const bestDist = closest ? distance(firstStop, closest.geometry.coordinates, { units: "kilometers" }) : Infinity;
+    return Math.abs(currDist - segmentLength) < Math.abs(bestDist - segmentLength) ? feature : closest;
+  }, intersections.features[0]);
+  const secondStop = secondStopFeature.geometry.coordinates;
 
-  const startingPoint = turf.point([sLongitude, sLatitude]);
-
-  // Convert length to radius for circular path calculation
-  const radius = lengthKM / (2 * Math.PI); // Convert perimeter to radius
-  const options = { steps: 64, units: "kilometers" as Units };
-  const circle = turf.circle(startingPoint, radius, options);
-
-  // Get the coordinates of the circle's perimeter
-  const coordinates = circle.geometry.coordinates[0];
-
-  // Number of waypoints to generate
-  const numPins = lengthKM <= 3 ? 3 : lengthKM <= 5 ? 4 : 5;
-  const step = Math.floor(coordinates.length / numPins);
-  const pins = [];
-
-  // Add the start point as the first pin
-  pins.push({ latitude: sLatitude, longitude: sLongitude });
-
-  // Select points from the perimeter for a loop
-  for (let i = 1; i < numPins; i++) {
-    const coord = coordinates[i * step];
-    pins.push({ latitude: coord[1], longitude: coord[0] });
-  }
-
-  pins.forEach((pin, index) => {
-    console.log(`Pin ${index + 1}: ${pin.latitude}, ${pin.longitude}`);
+  // Construct the waypoint array as a loop: start, first stop, second stop, then back to start.
+  const waypoints: number[][] = [startPoint, firstStop, secondStop, startPoint].map((point) => {
+    if (Array.isArray(point)) {
+      return point as number[];
+    } else if (point.type === "Feature" && point.geometry.type === "Point") {
+      return point.geometry.coordinates as number[];
+    }
+    throw new Error("Invalid coordinate format");
   });
 
-  const adjustedPins = await adjustPinsToStreetsWithGoogleAPI(pins);
-  return adjustedPins;
-};
+  // Step 5: Fetch directions from the Google Directions API.
+  // Note: Google expects coordinates in "lat,lng" format, so we flip our [lng, lat].
+  const formatCoord = (coord: Coord) => {
+    if (Array.isArray(coord)) {
+      return `${coord[1]},${coord[0]}`;
+    } else if (coord.type === "Feature" && coord.geometry.type === "Point") {
+      return `${coord.geometry.coordinates[1]},${coord.geometry.coordinates[0]}`;
+    }
+    throw new Error("Invalid coordinate format");
+  };
+  const originStr = formatCoord(startPoint);
+  const destinationStr = originStr; // To make a loop route.
 
-export { Algorithm, decodePolyline, getDirectionsBetweenPins };
+  // Waypoints for Google (skip the first and last, as they are origin/destination).
+  const waypointStr = [firstStop, secondStop].map(formatCoord).join("|");
+
+  // Replace 'YOUR_GOOGLE_MAPS_API_KEY' with your actual API key.
+  const apiKey = API_KEY;
+  const googleUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${startPoint}&destination=${startPoint}&waypoints=${waypointStr}&mode=walkingkey=${apiKey}`;
+
+  const response = await fetch(googleUrl);
+  if (!response.ok) {
+    throw new Error("Failed to fetch directions from Google API");
+  }
+
+  interface DirectionsResponse {
+    routes: Array<{
+      overview_polyline: {
+        points: string;
+      };
+    }>;
+  }
+
+  //   const directionsData: DirectionsResponse = await response.json();
+  //   const polylines: string[] = directionsData.routes.map((route) => route.overview_polyline.points);
+  //   console.log("Waypoints:", waypoints);
+  //   console.log("Google Directions Response:", polylines);
+
+  const coordinateWaypoints: Coordinate[] = waypoints.map(([longitude, latitude]) => ({ latitude, longitude }));
+  const adjustedPins = await adjustPinsToStreetsWithGoogleAPI(coordinateWaypoints);
+  const directions = await getDirectionsBetweenPins(adjustedPins);
+  return { adjustedPins, directions };
+
+  //   return { waypoints, directions: polylines };
+}
+
+export default Algorithm;
+
+// // Example usage:
+// const startPoint = [-84.5, 39.1]; // [lng, lat]
+// const desiredLengthKm = 9; // for example, a 9 km loop
+
+// generateLoopRoute(startPoint, desiredLengthKm)
+//   .then(({ waypoints, directions }) => {
+//     console.log("Waypoints:", waypoints);
+//     console.log("Google Directions Response:", directions);
+//   })
+//   .catch((error) => console.error("Error generating route:", error));

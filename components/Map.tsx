@@ -7,7 +7,7 @@ import MapViewDirections from "react-native-maps-directions";
 import mapThemes from "./MapThemes/mapThemes";
 
 import { MapThemeType, MarkerData } from "@/types/type";
-import { decodePolyline } from "../app/(root)/algorithm";
+import { decodePolyline } from "../app/(root)/algorithm_firstVersion"; // mybe creat a utils file or smthing idk
 
 const dummy = [
   { latitude: 32.144065, longitude: 34.876698 },
@@ -29,7 +29,7 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
 
   const mapTheme = mapThemes[theme] || mapThemes.standard;
 
-  console.log("in map; pins", pins);
+  // console.log("in map; pins", pins);
 
   return (
     <>
