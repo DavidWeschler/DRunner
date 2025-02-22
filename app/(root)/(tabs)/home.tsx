@@ -100,7 +100,7 @@ const Home = () => {
   };
 
   const tempFunc = ({ inp }: { inp: string }) => {
-    console.log(inp);
+    if (!inp.trim()) return;
     setHadasInp(inp);
     router.push("/(root)/(tabs)/chat");
   };
