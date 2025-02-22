@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, ActivityIndicator, Button, StyleSheet } from "react-native";
 import Algorithm from "./algorithm";
+import Line_Algorithm from "./line_algorithm";
 import Map from "../../components/Map";
 import { useLocationStore } from "../../store/index";
 import { Coord } from "@turf/turf";
@@ -25,9 +26,41 @@ const ShowRun = () => {
           throw new Error("Invalid input values");
         }
 
+        // non circular route
+        if (inpEndPoint !== null) {
+          const inputsLine = {
+            routeLengthKm: inpLength,
+            startPoint: [inpStartPoint.longitude, inpStartPoint.latitude] as [number, number],
+            endPoint: [inpEndPoint.longitude, inpEndPoint.latitude] as [number, number],
+            // difficulty: inpDifficulty,
+          };
+
+          console.log("inps start: ", inputsLine.startPoint);
+          console.log("inps end: ", inputsLine.endPoint);
+
+          const result = await Line_Algorithm(inputsLine);
+          if (Array.isArray(result)) {
+            throw new Error("Unexpected result format from Algorithm");
+          }
+          const { waypoints, directions } = result;
+
+          // Assuming Coord has properties `geometry.coordinates`
+          const formattedWaypoints = waypoints.map((wp: [number, number]) => ({
+            latitude: wp[1],
+            longitude: wp[0],
+          }));
+
+          setRoutePins(formattedWaypoints);
+          setRouteDirections(directions.split("\n"));
+
+          setLoading(false); // wtf is this
+          return;
+        }
+
+        // circular route
         const inputs = {
           routeLengthKm: inpLength,
-          startPoint: [inpStartPoint.longitude, inpStartPoint.latitude], // this needs to be type 'Coord'
+          startPoint: [inpStartPoint.longitude, inpStartPoint.latitude] as [number, number],
           // endPoint: inpEndPoint,
           // difficulty: inpDifficulty,
         };

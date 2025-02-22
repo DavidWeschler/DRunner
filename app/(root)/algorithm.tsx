@@ -9,6 +9,31 @@ interface Pin {
   longitude: number;
 }
 
+interface Coordinate {
+  latitude: number;
+  longitude: number;
+}
+interface DirectionsResponse {
+  routes: {
+    overview_polyline: {
+      points: string;
+    };
+  }[];
+}
+
+interface Coordinate {
+  latitude: number;
+  longitude: number;
+}
+
+interface SnappedPoint {
+  location: Coordinate;
+}
+
+interface NearestRoadsResponse {
+  snappedPoints: SnappedPoint[];
+}
+
 const getDirectionsBetweenPins = async (pins: Pin[]): Promise<string[]> => {
   console.log(`Setting directions between pins... Calling Google API ${pins.length} times`);
 
@@ -33,27 +58,6 @@ const getDirectionsBetweenPins = async (pins: Pin[]): Promise<string[]> => {
 
   return directions;
 };
-
-interface DirectionsResponse {
-  routes: {
-    overview_polyline: {
-      points: string;
-    };
-  }[];
-}
-
-interface Coordinate {
-  latitude: number;
-  longitude: number;
-}
-
-interface SnappedPoint {
-  location: Coordinate;
-}
-
-interface NearestRoadsResponse {
-  snappedPoints: SnappedPoint[];
-}
 
 const adjustPinToRoad = async (coord: Coordinate): Promise<Coordinate> => {
   const { latitude, longitude } = coord;
@@ -89,26 +93,12 @@ const adjustPinsToStreetsWithGoogleAPI = async (pins: Coordinate[]): Promise<Coo
   return adjustedPins;
 };
 
-interface Coordinate {
-  latitude: number;
-  longitude: number;
-}
-
 interface AlgorithmParams {
   routeLengthKm: number;
-  //   startPoint: Coordinate;
   startPoint: Coord;
-  //   endPoint: Coordinate | null;
   //   difficulty: string;
 }
 
-/**
- * Generates a loop route given a starting point and a desired route length.
- * @param {Array<number>} startPoint - The starting coordinate as [longitude, latitude].
- * @param {number} routeLengthKm - The desired total route length in kilometers.
- * @returns {Promise<{ waypoints: Array<Array<number>>, directions: Object }>}
- *          An object containing the waypoints (as [lng, lat] coordinates) and the Google Directions response.
- */
 // async function Algorithm(startPoint: Coord, routeLengthKm: number): Promise<{ waypoints: Array<Array<number>>; directions: object }> {
 async function Algorithm({ routeLengthKm, startPoint }: AlgorithmParams) {
   // Divide the route length into three segments.
@@ -150,61 +140,10 @@ async function Algorithm({ routeLengthKm, startPoint }: AlgorithmParams) {
     throw new Error("Invalid coordinate format");
   });
 
-  // Step 5: Fetch directions from the Google Directions API.
-  // Note: Google expects coordinates in "lat,lng" format, so we flip our [lng, lat].
-  const formatCoord = (coord: Coord) => {
-    if (Array.isArray(coord)) {
-      return `${coord[1]},${coord[0]}`;
-    } else if (coord.type === "Feature" && coord.geometry.type === "Point") {
-      return `${coord.geometry.coordinates[1]},${coord.geometry.coordinates[0]}`;
-    }
-    throw new Error("Invalid coordinate format");
-  };
-  const originStr = formatCoord(startPoint);
-  const destinationStr = originStr; // To make a loop route.
-
-  // Waypoints for Google (skip the first and last, as they are origin/destination).
-  const waypointStr = [firstStop, secondStop].map(formatCoord).join("|");
-
-  // Replace 'YOUR_GOOGLE_MAPS_API_KEY' with your actual API key.
-  const apiKey = API_KEY;
-  const googleUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${startPoint}&destination=${startPoint}&waypoints=${waypointStr}&mode=walkingkey=${apiKey}`;
-
-  const response = await fetch(googleUrl);
-  if (!response.ok) {
-    throw new Error("Failed to fetch directions from Google API");
-  }
-
-  interface DirectionsResponse {
-    routes: Array<{
-      overview_polyline: {
-        points: string;
-      };
-    }>;
-  }
-
-  //   const directionsData: DirectionsResponse = await response.json();
-  //   const polylines: string[] = directionsData.routes.map((route) => route.overview_polyline.points);
-  //   console.log("Waypoints:", waypoints);
-  //   console.log("Google Directions Response:", polylines);
-
   const coordinateWaypoints: Coordinate[] = waypoints.map(([longitude, latitude]) => ({ latitude, longitude }));
   const adjustedPins = await adjustPinsToStreetsWithGoogleAPI(coordinateWaypoints);
   const directions = await getDirectionsBetweenPins(adjustedPins);
   return { adjustedPins, directions };
-
-  //   return { waypoints, directions: polylines };
 }
 
 export default Algorithm;
-
-// // Example usage:
-// const startPoint = [-84.5, 39.1]; // [lng, lat]
-// const desiredLengthKm = 9; // for example, a 9 km loop
-
-// generateLoopRoute(startPoint, desiredLengthKm)
-//   .then(({ waypoints, directions }) => {
-//     console.log("Waypoints:", waypoints);
-//     console.log("Google Directions Response:", directions);
-//   })
-//   .catch((error) => console.error("Error generating route:", error));

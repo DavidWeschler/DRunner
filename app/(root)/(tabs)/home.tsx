@@ -153,7 +153,10 @@ const Home = () => {
     // update the inputs in the singleton store
     setLengthInput(parseFloat(length));
     setStartPointInput(startLatLong);
-    endPoint && setEndPointInput({ latitude: 32.144065, longitude: 34.876698 });
+    if (endPoint) {
+      const endLatLong = await getLatLngFromAddress(endPoint);
+      setEndPointInput(endLatLong);
+    }
     setDifficultyInput(difficulty);
 
     router.push("/(root)/showRoute");
