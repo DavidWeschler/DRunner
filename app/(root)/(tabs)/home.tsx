@@ -7,6 +7,7 @@ import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextI
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import GoogleTextInput from "@/components/GoogleTextInput";
+import HadasTextInput from "@/components/HadasInp";
 import Map from "@/components/Map";
 import RunCard from "@/components/RunCard";
 import { icons, images } from "@/constants";
@@ -85,7 +86,7 @@ const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
-  const { setUserLocation, setDestinationLocation, setMapTheme, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput } = useLocationStore();
+  const { setUserLocation, setDestinationLocation, setMapTheme, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp } = useLocationStore();
 
   const [length, setLength] = useState("");
   const [startPoint, setStartPoint] = useState("");
@@ -96,6 +97,12 @@ const Home = () => {
   const handleSignOut = () => {
     signOut();
     router.replace("/(auth)/sign-in");
+  };
+
+  const tempFunc = ({ inp }: { inp: string }) => {
+    console.log(inp);
+    setHadasInp(inp);
+    router.push("/(root)/(tabs)/chat");
   };
 
   const [hasPermission, setHasPermission] = useState<boolean>(false);
@@ -159,7 +166,7 @@ const Home = () => {
     }
     setDifficultyInput(difficulty);
 
-    router.push("/(root)/showRoute");
+    //router.push("/(root)/showRoute");
   };
 
   return (
@@ -194,7 +201,7 @@ const Home = () => {
               </TouchableOpacity>
             </View>
 
-            <GoogleTextInput icon={icons.search} containerStyle="bg-white shadow-md shadow-neutral-300" handlePress={handleDestinationPress} />
+            <HadasTextInput icon={icons.search} containerStyle="bg-white shadow-md shadow-neutral-300" placeholder="Use Hadas to find your next running route" handleString={tempFunc} />
 
             <>
               <Text className="text-xl font-JakartaBold mt-5 mb-3">Your current location</Text>

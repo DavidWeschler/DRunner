@@ -63,6 +63,15 @@ declare interface GoogleInputProps {
   handlePress: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => void;
 }
 
+declare interface HadasInputProps {
+  icon?: string;
+  initialLocation?: string;
+  containerStyle?: string;
+  textInputBackgroundColor?: string;
+  placeholder?: string;
+  handleString: ({ inp }: { inp: string }) => void;
+}
+
 declare interface InputFieldProps extends TextInputProps {
   label: string;
   icon?: any;
@@ -104,11 +113,15 @@ declare interface LocationStore {
   endPoint: { latitude: number; longitude: number } | null;
   difficulty: string | null;
 
+  //hadas
+  inp: string | null;
+
   //algorithm inputs setters:
   setLengthInput: (length: number) => void;
   setStartPointInput: ({ latitude, longitude }: { latitude: number; longitude: number }) => void;
   setEndPointInput: ({ latitude, longitude }: { latitude: number; longitude: number }) => void;
   setDifficultyInput: (difficulty: string) => void;
+  setHadasInp: (difficulty: string) => void;
   //-----------------
 
   setMapTheme: (theme: MapThemeType) => void;

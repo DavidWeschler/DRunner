@@ -16,6 +16,7 @@ export const useLocationStore = create<LocationStore>((set) => ({
   startPoint: null,
   endPoint: null,
   difficulty: null,
+  inp: null,
 
   setUserLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => {
     set(() => ({
@@ -60,6 +61,12 @@ export const useLocationStore = create<LocationStore>((set) => ({
   setDifficultyInput: (difficulty: string) => {
     set(() => ({
       difficulty,
+    }));
+  },
+
+  setHadasInp: (inp: string) => {
+    set(() => ({
+      inp,
     }));
   },
 }));
