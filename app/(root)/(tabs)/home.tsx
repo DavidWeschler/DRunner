@@ -142,7 +142,7 @@ const Home = () => {
         {
           text: "Save",
           onPress: () => {
-            // Add only if not already saved
+            // Add only if not already saveda
             if (!savedRuns.some((r) => r.created_at === run.created_at)) {
               setSavedRuns((prev) => [...prev, run]);
             }
