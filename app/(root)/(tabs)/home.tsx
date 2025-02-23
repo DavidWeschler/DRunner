@@ -3,7 +3,7 @@ import { useAuth } from "@clerk/clerk-expo";
 import * as Location from "expo-location";
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
-import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet, Button } from "react-native";
+import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import GoogleTextInput from "@/components/GoogleTextInput";
@@ -93,6 +93,72 @@ const Home = () => {
   const [startPoint, setStartPoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
   const [difficulty, setDifficulty] = useState("");
+  const [kind, setKind] = useState("recent");
+  const [savedRuns, setSavedRuns] = useState<Run[]>([]);
+  const [futureRuns, setFutureRuns] = useState<Run[]>([]);
+
+  const handleLongPress = (run: Run) => {
+    if (kind === "recent") {
+      Alert.alert("Manage Run", "What would you like to do with this run?", [
+        {
+          text: "Save",
+          onPress: () => {
+            // Add only if not already saved
+            if (!savedRuns.some((r) => r.created_at === run.created_at)) {
+              setSavedRuns((prev) => [...prev, run]);
+            }
+          },
+        },
+        {
+          text: "Future",
+          onPress: () => {
+            // Add only if not already in future runs
+            if (!futureRuns.some((r) => r.created_at === run.created_at)) {
+              setFutureRuns((prev) => [...prev, run]);
+            }
+          },
+        },
+        { text: "Cancel", style: "cancel" },
+      ]);
+    } else if (kind === "saved") {
+      Alert.alert("Manage Run", "What would you like to do with this run?", [
+        {
+          text: "Unsave",
+          onPress: () => setSavedRuns((prev) => prev.filter((r) => r.created_at !== run.created_at)),
+        },
+        {
+          text: "Future",
+          onPress: () => {
+            // Add only if not already in future runs
+            if (!futureRuns.some((r) => r.created_at === run.created_at)) {
+              setFutureRuns((prev) => [...prev, run]);
+            }
+          },
+        },
+        { text: "Cancel", style: "cancel" },
+      ]);
+    } else if (kind === "future") {
+      Alert.alert("Manage Run", "What would you like to do with this run?", [
+        {
+          text: "Save",
+          onPress: () => {
+            // Add only if not already saved
+            if (!savedRuns.some((r) => r.created_at === run.created_at)) {
+              setSavedRuns((prev) => [...prev, run]);
+            }
+          },
+        },
+        {
+          text: "Edit Future",
+          onPress: () => {
+            // Edit logic here
+            console.log("Edit Future selected");
+          },
+        },
+        { text: "Cancel", style: "cancel" },
+      ]);
+    }
+  };
 
   const handleSignOut = () => {
     signOut();
@@ -164,11 +230,25 @@ const Home = () => {
     //router.push("/(root)/showRoute");
   };
 
+  const viewRadio = (kind: string) => {
+    if (kind == "recent") {
+      return recentRuns?.slice(0, 3);
+    } else if (kind == "saved") {
+      return savedRuns;
+    } else if (kind == "future") {
+      return futureRuns;
+    }
+  };
+
   return (
     <SafeAreaView className="bg-general-500">
       <FlatList
-        data={recentRuns?.slice(0, 5)}
-        renderItem={({ item }) => <RunCard run={item} />}
+        data={viewRadio(kind)}
+        renderItem={({ item }) => (
+          <TouchableOpacity className="p-4 bg-white rounded-lg shadow-md mb-2" onLongPress={() => handleLongPress(item)}>
+            <RunCard run={item} />
+          </TouchableOpacity>
+        )}
         keyExtractor={(item, index) => index.toString()}
         className="px-5"
         keyboardShouldPersistTaps="handled"
@@ -179,8 +259,8 @@ const Home = () => {
           <View className="flex flex-col items-center justify-center">
             {!loading ? (
               <>
-                <Image source={images.noResult} className="w-40 h-40" alt="No recent runs found" resizeMode="contain" />
-                <Text className="text-sm">No recent runs found</Text>
+                <Image source={images.noResult} className="w-40 h-40" alt={`No ${kind} runs found`} resizeMode="contain" />
+                <Text className="text-sm">{`No ${kind} runs found`}</Text>
               </>
             ) : (
               <ActivityIndicator size="small" color="#000" />
@@ -288,8 +368,21 @@ const Home = () => {
             </>
 
             <View className="flex-1 justify-center items-center">
-              <Text className="text-xl font-JakartaBold mt-5 ">Recent Runs</Text>
               <View className="border-t border-gray-300 w-full my-4" />
+            </View>
+
+            <View className="flex flex-row justify-between items-center bg-gray-100 p-2 rounded-full w-full">
+              <TouchableOpacity className={`flex-1 p-3 rounded-full ${kind === "recent" ? "bg-blue-500" : "bg-transparent"}`} onPress={() => setKind("recent")}>
+                <Text className={`text-center font-bold ${kind === "recent" ? "text-white" : "text-gray-600"}`}>Recent</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity className={`flex-1 p-3 rounded-full ${kind === "saved" ? "bg-blue-500" : "bg-transparent"}`} onPress={() => setKind("saved")}>
+                <Text className={`text-center font-bold ${kind === "saved" ? "text-white" : "text-gray-600"}`}>Saved</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity className={`flex-1 p-3 rounded-full ${kind === "future" ? "bg-blue-500" : "bg-transparent"}`} onPress={() => setKind("future")}>
+                <Text className={`text-center font-bold ${kind === "future" ? "text-white" : "text-gray-600"}`}>Future</Text>
+              </TouchableOpacity>
             </View>
           </>
         }
