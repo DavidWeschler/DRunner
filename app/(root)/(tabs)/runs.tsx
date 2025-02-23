@@ -92,7 +92,10 @@ const Runs = () => {
         )}
         ListHeaderComponent={
           <>
-            <Text className="text-2xl font-JakartaBold my-5">Running Routes History</Text>
+            <View className="flex-1 justify-center items-center">
+              <Text className="text-2xl font-JakartaBold mt-5">Running Routes History</Text>
+              <View className="border-t border-gray-300 w-full my-4" />
+            </View>
           </>
         }
       />

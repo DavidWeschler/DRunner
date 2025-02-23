@@ -15,6 +15,7 @@ import { useFetch } from "@/lib/fetch";
 import { useLocationStore } from "@/store";
 import { Run } from "@/types/type";
 import React from "react";
+import CustomButton from "@/components/CustomButton";
 
 const recentRuns = [
   {
@@ -86,13 +87,12 @@ const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
-  const { setUserLocation, setDestinationLocation, setMapTheme, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp } = useLocationStore();
+  const { setUserLocation, setDestinationLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, seEndAddress, mapTheme } = useLocationStore();
 
   const [length, setLength] = useState("");
   const [startPoint, setStartPoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
   const [difficulty, setDifficulty] = useState("");
-  const [currentMapTheme, setCurrentMapTheme] = useState<"standard" | "dark" | "aubergine" | "night" | "retro" | "silver">("standard");
 
   const handleSignOut = () => {
     signOut();
@@ -140,11 +140,6 @@ const Home = () => {
     setDestinationLocation(location);
 
     router.push("/(root)/find-run");
-  };
-
-  const setMapThemeInStrored = (theme: "standard" | "dark" | "aubergine" | "night" | "retro" | "silver") => {
-    setCurrentMapTheme(theme);
-    setMapTheme(theme);
   };
 
   const generator = async () => {
@@ -204,62 +199,98 @@ const Home = () => {
             <HadasTextInput icon={icons.search} containerStyle="bg-white shadow-md shadow-neutral-300" placeholder="Use Hadas to find your next running route" handleString={tempFunc} />
 
             <>
-              <Text className="text-xl font-JakartaBold mt-5 mb-3">Your current location</Text>
-              <View className="flex flex-row items-center bg-transparent h-[450px]">
-                <Map theme={currentMapTheme} pins={[]} directions={undefined} />
+              <View className="flex flex-row items-center bg-transparent h-[490px] mt-4">
+                <Map theme={mapTheme || "standard"} pins={[]} directions={undefined} />
               </View>
 
-              <Text>Theme:</Text>
-              <View style={styles.radioContainer}>
-                <TouchableOpacity onPress={() => setMapThemeInStrored("dark")} style={styles.radio}>
-                  <Text style={currentMapTheme === "dark" ? styles.selected : styles.unselected}>Dark</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setMapThemeInStrored("aubergine")} style={styles.radio}>
-                  <Text style={currentMapTheme === "aubergine" ? styles.selected : styles.unselected}>Aubergine</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setMapThemeInStrored("night")} style={styles.radio}>
-                  <Text style={currentMapTheme === "night" ? styles.selected : styles.unselected}>Night</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setMapThemeInStrored("retro")} style={styles.radio}>
-                  <Text style={currentMapTheme === "retro" ? styles.selected : styles.unselected}>Retro</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setMapThemeInStrored("silver")} style={styles.radio}>
-                  <Text style={currentMapTheme === "silver" ? styles.selected : styles.unselected}>Silver</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setMapThemeInStrored("standard")} style={styles.radio}>
-                  <Text style={currentMapTheme === "standard" ? styles.selected : styles.unselected}>Standard</Text>
-                </TouchableOpacity>
-              </View>
+              <View className="mt-4">
+                <View className="flex relative rounded-xl bg-[#d6d6d6] shadow-md shadow-neutral-300 p-4">
+                  <View className="justify-left items-left">
+                    <Text className="text-black text-lg font-JakartaSemiBold">Length (km)</Text>
+                  </View>
+                  <View className="justify-center items-center">
+                    <TextInput
+                      className="flex-1 rounded-xl px-3 py-2 h-12 mt-3 w-full"
+                      style={{
+                        backgroundColor: "white",
+                        fontSize: 16,
+                        fontWeight: "600",
+                        textAlign: "left",
+                      }}
+                      keyboardType="numeric"
+                      placeholder="numbers only"
+                      placeholderTextColor="gray"
+                    />
+                  </View>
 
-              <View>
-                <View style={styles.form}>
-                  <Text>Length (kilometers):</Text>
-                  <TextInput style={styles.input} value={length} onChangeText={setLength} keyboardType="numeric" />
+                  <View className="justify-left items-left my-3">
+                    <Text className="text-black text-lg font-JakartaSemiBold">Start Point</Text>
+                  </View>
+                  <View className="justify-center items-center">
+                    <TextInput
+                      className="flex-1 rounded-xl px-3 py-2 h-12 w-full"
+                      style={{
+                        backgroundColor: "white",
+                        fontSize: 16,
+                        fontWeight: "600",
+                        textAlign: "left",
+                      }}
+                      placeholder="anywhere!"
+                      placeholderTextColor="gray"
+                      value={startAddress || startPoint}
+                      onChangeText={(text) => {
+                        setStartAddress(text); // Allow manual input
+                        setStartPointInput(null); // Reset the start point coordinates if address is changed manually
+                      }}
+                    />
+                  </View>
 
-                  <Text>Start Point:</Text>
-                  <TextInput style={styles.input} value={startPoint} onChangeText={setStartPoint} />
+                  <View className="justify-left items-left my-3">
+                    <Text className="text-black text-lg font-JakartaSemiBold">End Point</Text>
+                  </View>
+                  <View className="justify-center items-center">
+                    <TextInput
+                      className="flex-1 rounded-xl px-3 py-2 h-12 w-full"
+                      style={{
+                        backgroundColor: "white",
+                        fontSize: 16,
+                        fontWeight: "600",
+                        textAlign: "left",
+                      }}
+                      placeholder="optional"
+                      placeholderTextColor="gray"
+                      value={endAddress || endPoint}
+                      onChangeText={(text) => {
+                        seEndAddress(text); // Allow manual input
+                        setEndPointInput(null); // Reset the end point coordinates if address is changed manually
+                      }}
+                    />
+                  </View>
 
-                  <Text>End Point:</Text>
-                  <TextInput style={styles.input} value={endPoint} onChangeText={setEndPoint} placeholder="Optional" />
-
-                  <Text>Difficulty:</Text>
+                  <View className="justify-left items-left my-3">
+                    <Text className="text-black text-lg font-JakartaSemiBold">Difficulty</Text>
+                  </View>
                   <View style={styles.radioContainer}>
-                    <TouchableOpacity onPress={() => setDifficulty("easy")} style={styles.radio}>
-                      <Text style={difficulty === "easy" ? styles.selected : styles.unselected}>Easy</Text>
+                    <TouchableOpacity onPress={() => setDifficulty("easy")} style={[styles.radio, difficulty === "easy" && styles.selectedRadio]}>
+                      <Text style={[styles.radioText, difficulty === "easy" && styles.selectedText]}>Easy</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setDifficulty("medium")} style={styles.radio}>
-                      <Text style={difficulty === "medium" ? styles.selected : styles.unselected}>Medium</Text>
+                    <TouchableOpacity onPress={() => setDifficulty("medium")} style={[styles.radio, difficulty === "medium" && styles.selectedRadio]}>
+                      <Text style={[styles.radioText, difficulty === "medium" && styles.selectedText]}>Medium</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setDifficulty("hard")} style={styles.radio}>
-                      <Text style={difficulty === "hard" ? styles.selected : styles.unselected}>Hard</Text>
+                    <TouchableOpacity onPress={() => setDifficulty("hard")} style={[styles.radio, difficulty === "hard" && styles.selectedRadio]}>
+                      <Text style={[styles.radioText, difficulty === "hard" && styles.selectedText]}>Hard</Text>
                     </TouchableOpacity>
                   </View>
-                  <Button title="Generate" onPress={generator} color="#C96915" />
+
+                  <CustomButton onPress={generator} title="Generate" bgVariant="primary" textVariant="default" className="mt-4" />
                 </View>
               </View>
             </>
 
-            <Text className="text-xl font-JakartaBold mt-5 mb-3">Recent Runs</Text>
+            <View className="flex-1 justify-center items-center">
+              <Text className="text-xl font-JakartaBold mt-5 ">Recent Runs</Text>
+              <View className="border-t border-gray-300 w-full my-4" />
+            </View>
           </>
         }
       />
@@ -267,32 +298,36 @@ const Home = () => {
   );
 };
 
-// more this to a separate file later...
 const styles = StyleSheet.create({
-  form: {
-    marginTop: 20,
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
   radioContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     marginTop: 10,
+    marginBottom: 10,
   },
   radio: {
-    padding: 10,
+    backgroundColor: "#F4F4F4",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    width: "30%",
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 5,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
   },
-  selected: {
-    fontWeight: "bold",
-    color: "blue",
+  selectedRadio: {
+    backgroundColor: "#0286FF",
+    borderColor: "#0066CC",
   },
-  unselected: {
-    color: "black",
+  radioText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#6B7280",
+  },
+  selectedText: {
+    color: "white",
   },
 });
 

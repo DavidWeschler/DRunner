@@ -25,6 +25,18 @@ import { TextInputProps, TouchableOpacityProps } from "react-native";
 //   price?: string;
 // }
 
+declare interface AboutModalProps {
+  visible: boolean;
+  onClose: () => void;
+}
+
+declare interface AlertProps {
+  visible: boolean;
+  onClose: () => void;
+  onSetStart: () => void;
+  onSetEnd: () => void;
+}
+
 declare interface MapProps {
   destinationLatitude?: number;
   destinationLongitude?: number;
@@ -110,7 +122,9 @@ declare interface LocationStore {
   // algorithm inputs:
   length: number | null;
   startPoint: { latitude: number; longitude: number } | null;
+  startAddress: string | null;
   endPoint: { latitude: number; longitude: number } | null;
+  endAddress: string | null;
   difficulty: string | null;
 
   //hadas
@@ -118,9 +132,11 @@ declare interface LocationStore {
 
   //algorithm inputs setters:
   setLengthInput: (length: number) => void;
-  setStartPointInput: ({ latitude, longitude }: { latitude: number; longitude: number }) => void;
-  setEndPointInput: ({ latitude, longitude }: { latitude: number; longitude: number }) => void;
+  setStartPointInput: ({ latitude, longitude }: { latitude: number; longitude: number } | null) => void;
+  setEndPointInput: ({ latitude, longitude }: { latitude: number; longitude: number } | null) => void;
   setDifficultyInput: (difficulty: string) => void;
+  seEndAddress: (address: string) => void;
+  setStartAddress: (address: string) => void;
   setHadasInp: (difficulty: string) => void;
   //-----------------
 
