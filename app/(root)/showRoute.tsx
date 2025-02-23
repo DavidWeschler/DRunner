@@ -167,8 +167,8 @@ const ShowRun = () => {
 
       {/* Map Component */}
       {easyMap && <Map theme={mapTheme || "standard"} pins={routePinsE} directions={routeDirectionsE} />}
-      {mediumMap && <Map theme={mapTheme || "night"} pins={routePinsM} directions={routeDirectionsM} />}
-      {hardMap && <Map theme={mapTheme || "silver"} pins={routePinsH} directions={routeDirectionsH} />}
+      {mediumMap && <Map theme={mapTheme || "standard"} pins={routePinsM} directions={routeDirectionsM} />}
+      {hardMap && <Map theme={mapTheme || "standard"} pins={routePinsH} directions={routeDirectionsH} />}
 
       {/* Button Wrapper */}
       {!hideButton && (

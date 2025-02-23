@@ -77,6 +77,7 @@ const recentRuns = [
 ];
 
 const getLatLngFromAddress = async (address: string) => {
+  console.log("Getting lat and long from address:", address);
   const [result] = await Location.geocodeAsync(address);
   console.log("Latitude:", result.latitude);
   console.log("Longitude:", result.longitude);
@@ -92,6 +93,7 @@ const Home = () => {
   const [length, setLength] = useState("");
   const [startPoint, setStartPoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
+
   const [difficulty, setDifficulty] = useState("");
   const [kind, setKind] = useState("recent");
   const [savedRuns, setSavedRuns] = useState<Run[]>([]);
@@ -209,8 +211,6 @@ const Home = () => {
   };
 
   const generator = async () => {
-    console.log("Generating route...");
-
     // log the form inputs:
     console.log("Length:", length);
     console.log("Start Point:", startPoint);
@@ -228,7 +228,8 @@ const Home = () => {
       setEndPointInput(endLatLong);
     }
 
-    //router.push("/(root)/showRoute");
+    console.log("Generating route...");
+    router.push("/(root)/showRoute");
   };
 
   const viewRadio = (kind: string) => {
@@ -301,6 +302,8 @@ const Home = () => {
                       keyboardType="numeric"
                       placeholder="numbers only"
                       placeholderTextColor="gray"
+                      value={length}
+                      onChangeText={setLength}
                     />
                   </View>
 
@@ -322,6 +325,7 @@ const Home = () => {
                       onChangeText={(text) => {
                         setStartAddress(text); // Allow manual input
                         setStartPointInput(null); // Reset the start point coordinates if address is changed manually
+                        setStartPoint(text); // david added - i need to check this
                       }}
                     />
                   </View>
@@ -344,6 +348,7 @@ const Home = () => {
                       onChangeText={(text) => {
                         seEndAddress(text); // Allow manual input
                         setEndPointInput(null); // Reset the end point coordinates if address is changed manually
+                        setEndPoint(text); // david added - i need to check this
                       }}
                     />
                   </View>
