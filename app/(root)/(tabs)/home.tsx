@@ -210,6 +210,7 @@ const Home = () => {
 
   const generator = async () => {
     console.log("Generating route...");
+
     // log the form inputs:
     console.log("Length:", length);
     console.log("Start Point:", startPoint);
@@ -219,13 +220,13 @@ const Home = () => {
     const startLatLong = await getLatLngFromAddress(startPoint); // this turns the address into lat and long (for free)
 
     // update the inputs in the singleton store
+    setDifficultyInput(difficulty);
     setLengthInput(parseFloat(length));
     setStartPointInput(startLatLong);
     if (endPoint) {
       const endLatLong = await getLatLngFromAddress(endPoint);
       setEndPointInput(endLatLong);
     }
-    setDifficultyInput(difficulty);
 
     //router.push("/(root)/showRoute");
   };
