@@ -4,13 +4,48 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import HadasTextInput from "@/components/HadasInp";
 import { icons } from "@/constants";
 import { useLocationStore } from "@/store";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import axios from "axios";
+
+const OPENROUTER_API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY;
+
+const getBotReply = async (message: string) => {
+  console.log("You:", message);
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "deepseek/deepseek-r1-distill-llama-70b:free",
+      messages: [
+        {
+          role: "user",
+          content: message,
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  console.log("Full response:", JSON.stringify(data, null, 2)); // Log the full response
+
+  const messageContent = data.choices[0].message.content;
+  console.log("Message content:", messageContent);
+  return messageContent;
+};
 
 const Chat = () => {
   const { inp, setHadasInp } = useLocationStore();
   const [messages, setMessages] = useState<{ text: string; sender: "user" | "bot"; timestamp: string }[]>([]);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
-  const handleSendMessage = ({ inp }: { inp: string }) => {
+  const handleSendMessage = async ({ inp }: { inp: string }) => {
     if (!inp.trim()) return;
 
     const timestamp = new Date().toLocaleTimeString();
@@ -19,9 +54,8 @@ const Chat = () => {
     setMessages((prev) => [...prev, { text: inp, sender: "user", timestamp }]);
 
     // Simulate bot reply
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { text: inp, sender: "bot", timestamp }]);
-    }, 500);
+    const reply = await getBotReply(inp);
+    setMessages((prev) => [...prev, { text: reply, sender: "bot", timestamp }]);
   };
 
   useEffect(() => {
