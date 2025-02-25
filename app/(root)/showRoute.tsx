@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, ActivityIndicator, Button, StyleSheet } from "react-native";
+import { View, ActivityIndicator, Button, StyleSheet, Text, TouchableOpacity } from "react-native";
 import CircularAlgorithm from "./circle_algorithm";
 import Line_Algorithm from "./line_algorithm";
 import Map from "../../components/Map";
@@ -16,23 +16,24 @@ const ShowRun = () => {
   // easy route:
   const [routePinsE, setRoutePinsE] = useState<{ latitude: number; longitude: number }[]>([]);
   const [routeDirectionsE, setRouteDirectionsE] = useState<string[] | null>(null);
+  const [easyMap, setEasyMap] = useState(false);
 
   // medium route:
   const [routePinsM, setRoutePinsM] = useState<{ latitude: number; longitude: number }[]>([]);
   const [routeDirectionsM, setRouteDirectionsM] = useState<string[] | null>(null);
+  const [mediumMap, setMediumMap] = useState(false);
+  const [hardMap, setHardMap] = useState(false);
 
   // hard route:
   const [routePinsH, setRoutePinsH] = useState<{ latitude: number; longitude: number }[]>([]);
   const [routeDirectionsH, setRouteDirectionsH] = useState<string[] | null>(null);
 
   const [loading, setLoading] = useState(true);
-
-  const [easyMap, setEasyMap] = useState(false);
-  const [mediumMap, setMediumMap] = useState(false);
-  const [hardMap, setHardMap] = useState(false);
-
   const [hideHeader, setHideHeader] = useState(false);
   const [hideButton, setHideButton] = useState(false);
+
+  const [actualRouteLength, setActualRouteLength] = useState({ easy: 0, medium: 0, hard: 0 });
+  const [routeElevation, setRouteElevation] = useState({ easy: 0, medium: 0, hard: 0 });
 
   useEffect(() => {
     const straightRoute = async () => {
@@ -53,6 +54,17 @@ const ShowRun = () => {
       // If the user chose a route that is too short, the algorithm will return the same route for all difficulties
       // in this case, we will set the same route for all difficulties
       const [easyRoute, mediumRoute, hardRoute] = results.length === 1 ? [results[0], results[0], results[0]] : results;
+
+      setActualRouteLength({
+        easy: parseFloat(easyRoute.length.toFixed(2)),
+        medium: parseFloat(mediumRoute.length.toFixed(2)),
+        hard: parseFloat(hardRoute.length.toFixed(2)),
+      });
+      setRouteElevation({
+        easy: parseFloat(easyRoute.elevationGain.toFixed(2)),
+        medium: parseFloat(mediumRoute.elevationGain.toFixed(2)),
+        hard: parseFloat(hardRoute.elevationGain.toFixed(2)),
+      });
 
       setRoutePinsE(easyRoute.waypoints.map((wp: number[]) => ({ latitude: wp[1], longitude: wp[0] })));
       setRouteDirectionsE(easyRoute.directions.split("\n"));
@@ -83,6 +95,17 @@ const ShowRun = () => {
       const easyRoute = results[0];
       const mediumRoute = results[1];
       const hardRoute = results[2];
+
+      setActualRouteLength({
+        easy: parseFloat(easyRoute.length.toFixed(2)),
+        medium: parseFloat(mediumRoute.length.toFixed(2)),
+        hard: parseFloat(hardRoute.length.toFixed(2)),
+      });
+      setRouteElevation({
+        easy: parseFloat(easyRoute.elevationGain.toFixed(2)),
+        medium: parseFloat(mediumRoute.elevationGain.toFixed(2)),
+        hard: parseFloat(hardRoute.elevationGain.toFixed(2)),
+      });
 
       setRoutePinsE(easyRoute.waypoints.map((wp: number[]) => ({ latitude: wp[1], longitude: wp[0] })));
       setRouteDirectionsE(easyRoute.directions.split("\n"));
@@ -134,34 +157,49 @@ const ShowRun = () => {
       {!hideHeader && (
         <View style={styles.radioContainer}>
           <View style={styles.radioGroup}>
-            <Button
-              title="Easy"
-              color={easyMap ? "purple" : undefined}
+            <TouchableOpacity
+              style={[styles.button, easyMap && styles.selectedButton]}
               onPress={() => {
                 setEasyMap(true);
                 setMediumMap(false);
                 setHardMap(false);
               }}
-            />
-            <Button
-              title="Medium"
-              color={mediumMap ? "purple" : undefined}
+            >
+              <Text style={styles.buttonText}>Easy</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, mediumMap && styles.selectedButton]}
               onPress={() => {
                 setEasyMap(false);
                 setMediumMap(true);
                 setHardMap(false);
               }}
-            />
-            <Button
-              title="Hard"
-              color={hardMap ? "purple" : undefined}
+            >
+              <Text style={styles.buttonText}>Medium</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, hardMap && styles.selectedButton]}
               onPress={() => {
                 setEasyMap(false);
                 setMediumMap(false);
                 setHardMap(true);
               }}
-            />
+            >
+              <Text style={styles.buttonText}>Hard</Text>
+            </TouchableOpacity>
           </View>
+        </View>
+      )}
+
+      {/* Display the length and elevation of the route */}
+      {!hideButton && (
+        <View style={styles.infoContainer} className="mb-3 p-4 bg-white rounded-lg shadow-md">
+          <Text className="text-lg font-JakartaSemiBold text-gray-800" style={styles.infoText}>
+            Route Length: {actualRouteLength[easyMap ? "easy" : mediumMap ? "medium" : "hard"]} km
+          </Text>
+          <Text className="text-lg font-JakartaSemiBold text-blue-800" style={styles.infoText}>
+            Elevation Gain: {routeElevation[easyMap ? "easy" : mediumMap ? "medium" : "hard"]} m
+          </Text>
         </View>
       )}
 
@@ -191,14 +229,14 @@ export default ShowRun;
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    position: "absolute", // Ensures the button overlays the map
-    bottom: 20, // Distance from the bottom
-    left: "50%", // Center horizontally
-    transform: [{ translateX: -50 }], // Adjust for centering
-    backgroundColor: "white", // Ensure visibility
+    position: "absolute",
+    bottom: 20,
+    left: "50%",
+    transform: [{ translateX: -50 }],
+    backgroundColor: "white",
     padding: 10,
     borderRadius: 10,
-    elevation: 5, // Add shadow for Android
+    elevation: 5,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -214,5 +252,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     marginTop: 10,
+  },
+  button: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: "#f0f0f0",
+    marginHorizontal: 5,
+  },
+  selectedButton: {
+    backgroundColor: "#FF8000",
+  },
+  buttonText: {
+    color: "#000",
+    fontWeight: "bold",
+  },
+  infoContainer: {
+    flexDirection: "column",
+    justifyContent: "space-around",
+    marginTop: 10,
+  },
+  infoText: {
+    fontSize: 16,
   },
 });

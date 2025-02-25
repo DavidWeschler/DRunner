@@ -217,7 +217,7 @@ const Home = () => {
         const url = `https://api.openweathermap.org/data/2.5/weather?lat=${userLatLong?.latitude || 32.009444}&lon=${userLatLong?.longitude || 34.882778}&units=metric&appid=${process.env.EXPO_PUBLIC_OPEN_WEATHER_API_KEY}`;
         const response = await fetch(url);
         const data = await response.json();
-        console.log("Weather data:", data);
+        // console.log("Weather data:", data);
         const weatherMain = data?.weather[0]?.main || "Unknown";
         const weatherEmoji = weatherMain === "Clear" ? "☀️" : weatherMain === "Clouds" ? "☁️" : weatherMain === "Rain" ? "🌧️" : weatherMain === "Snow" ? "❄️" : weatherMain === "Thunderstorm" ? "⛈️" : "⛅";
 
@@ -305,7 +305,7 @@ const Home = () => {
             </View>
 
             <View className="mb-3 p-4 bg-white rounded-lg shadow-md">
-              <Text className="text-lg font-JakartaSemiBold text-gray-800">Today's weather in {userLocationStr}:</Text>
+              <Text className="text-lg font-JakartaSemiBold text-gray-800">Now's weather in {userLocationStr}:</Text>
               <Text className="text-xl font-JakartaBold text-blue-500">{weather}</Text>
             </View>
 
