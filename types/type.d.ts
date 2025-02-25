@@ -75,6 +75,14 @@ declare interface GoogleInputProps {
   handlePress: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => void;
 }
 
+export interface GoogleTextInputs {
+  label: string;
+  address: string;
+  setAddress: (text: string) => void;
+  setPointInput: (value: any) => void;
+  setPoint: (text: string) => void;
+}
+
 declare interface HadasInputProps {
   icon?: string;
   initialLocation?: string;
@@ -135,7 +143,7 @@ declare interface LocationStore {
   setStartPointInput: ({ latitude, longitude }: { latitude: number; longitude: number } | null) => void;
   setEndPointInput: ({ latitude, longitude }: { latitude: number; longitude: number } | null) => void;
   setDifficultyInput: (difficulty: string) => void;
-  seEndAddress: (address: string) => void;
+  setEndAddress: (address: string) => void;
   setStartAddress: (address: string) => void;
   setHadasInp: (difficulty: string) => void;
   //-----------------

@@ -132,7 +132,7 @@ async function Line_Algorithm({ routeLengthKm, startPoint, endPoint }: Algorithm
     const midPoint: number[] = [(startPoint[0] + endPoint[0]) / 2, (startPoint[1] + endPoint[1]) / 2];
 
     // Nominal perpendicular offset (dNominal) needed to reach the desired length in a symmetric scenario.
-    const halfDesired = routeLengthKm / 2;
+    const halfDesired = (0.7 * routeLengthKm) / 2;
     const halfDirect = directDistance / 2;
     const dNominal = Math.sqrt(halfDesired * halfDesired - halfDirect * halfDirect);
 

@@ -13,6 +13,8 @@ const ShowRun = () => {
   const inpEndPoint = useLocationStore((state) => state.endPoint);
   const inpDifficulty = useLocationStore((state) => state.difficulty);
 
+  const { setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput } = useLocationStore();
+
   // easy route:
   const [routePinsE, setRoutePinsE] = useState<{ latitude: number; longitude: number }[]>([]);
   const [routeDirectionsE, setRouteDirectionsE] = useState<string[] | null>(null);
@@ -124,6 +126,12 @@ const ShowRun = () => {
         console.error("Error calculating route:", error);
       } finally {
         setLoading(false);
+
+        // set inpLength, inpStartPoint, inpEndPoint, inpDifficulty to null after the route is calculated
+        setLengthInput(0);
+        setStartPointInput(null);
+        setEndPointInput(null);
+        setDifficultyInput("easy");
       }
     };
 

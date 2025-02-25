@@ -17,6 +17,8 @@ import { Run } from "@/types/type";
 import React from "react";
 import CustomButton from "@/components/CustomButton";
 
+import PointInput from "@/components/GoogleText";
+
 const recentRuns = [
   {
     run_id: "1",
@@ -88,13 +90,13 @@ const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
-  const { setUserLocation, setDestinationLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, seEndAddress, mapTheme } = useLocationStore();
+  const { setUserLocation, setDestinationLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, setEndAddress, mapTheme } = useLocationStore();
 
   const [length, setLength] = useState("");
   const [startPoint, setStartPoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
-
   const [difficulty, setDifficulty] = useState("");
+
   const [kind, setKind] = useState("recent");
   const [savedRuns, setSavedRuns] = useState<Run[]>([]);
   const [futureRuns, setFutureRuns] = useState<Run[]>([]);
@@ -252,9 +254,18 @@ const Home = () => {
     if (endPoint) {
       const endLatLong = await getLatLngFromAddress(endPoint);
       setEndPointInput(endLatLong);
+    } else {
+      setEndPointInput(null);
     }
 
     console.log("Generating route...");
+
+    // reset local variables..
+    setLength("");
+    setStartPoint("");
+    setEndPoint("");
+    setDifficulty("");
+
     router.push("/(root)/showRoute");
   };
 
@@ -338,50 +349,13 @@ const Home = () => {
                     />
                   </View>
 
-                  <View className="justify-left items-left my-3">
-                    <Text className="text-black text-lg font-JakartaSemiBold">Start Point</Text>
-                  </View>
                   <View className="justify-center items-center">
-                    <TextInput
-                      className="flex-1 rounded-xl px-3 py-2 h-12 w-full"
-                      style={{
-                        backgroundColor: "white",
-                        fontSize: 16,
-                        fontWeight: "600",
-                        textAlign: "left",
-                      }}
-                      placeholder="anywhere!"
-                      placeholderTextColor="gray"
-                      value={startAddress || startPoint}
-                      onChangeText={(text) => {
-                        setStartAddress(text); // Allow manual input
-                        setStartPointInput(null); // Reset the start point coordinates if address is changed manually
-                        setStartPoint(text); // david added - i need to check this
-                      }}
-                    />
+                    <PointInput label="Start Point" address={"e.g. Yafo 1, Jerusalem"} setAddress={setStartAddress} setPointInput={setStartPointInput} setPoint={setStartPoint} />
                   </View>
 
-                  <View className="justify-left items-left my-3">
-                    <Text className="text-black text-lg font-JakartaSemiBold">End Point</Text>
-                  </View>
+                  {/*for some reason i need to pass here "setStartAddress" instead of "setEndAddress", this makes no sense but it works only like this so what the hell*/}
                   <View className="justify-center items-center">
-                    <TextInput
-                      className="flex-1 rounded-xl px-3 py-2 h-12 w-full"
-                      style={{
-                        backgroundColor: "white",
-                        fontSize: 16,
-                        fontWeight: "600",
-                        textAlign: "left",
-                      }}
-                      placeholder="optional"
-                      placeholderTextColor="gray"
-                      value={endAddress || endPoint}
-                      onChangeText={(text) => {
-                        seEndAddress(text); // Allow manual input
-                        setEndPointInput(null); // Reset the end point coordinates if address is changed manually
-                        setEndPoint(text); // david added - i need to check this
-                      }}
-                    />
+                    <PointInput label="End Point" address={"Optional"} setAddress={setStartAddress} setPointInput={setEndPointInput} setPoint={setEndPoint} />
                   </View>
 
                   <View className="justify-left items-left my-3">
@@ -448,12 +422,12 @@ const styles = StyleSheet.create({
     borderColor: "#D1D5DB",
   },
   selectedRadio: {
-    backgroundColor: "#0286FF",
-    borderColor: "#0066CC",
+    backgroundColor: "#8c76a3",
+    borderColor: "#8c76a3",
   },
   radioText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 12,
+    fontWeight: "700",
     color: "#6B7280",
   },
   selectedText: {

@@ -244,10 +244,11 @@ async function CircularAlgorithm({ routeLengthKm, startPoint }: AlgorithmParams)
   const routes: RouteResult[] = [];
   for (let i = 0; i < 3; i++) {
     try {
-      const route = await generateCircularRoute(startPoint, routeLengthKm);
+      const route = await generateCircularRoute(startPoint, routeLengthKm * 0.6);
       routes.push(route);
     } catch (error) {
       console.error("Error generating route:", error);
+      console.log("start poiny in circular algorithm: ", startPoint);
       i--; // Try again if a route fails to generate.
     }
   }
