@@ -99,6 +99,10 @@ const Home = () => {
   const [savedRuns, setSavedRuns] = useState<Run[]>([]);
   const [futureRuns, setFutureRuns] = useState<Run[]>([]);
 
+  const [userLocationStr, setUserLocationStr] = useState("");
+  const [weather, setWeather] = useState("");
+  const [userLatLong, setUserLatLong] = useState<{ latitude: number; longitude: number } | null>(null);
+
   const handleLongPress = (run: Run) => {
     if (kind === "recent") {
       Alert.alert("Manage Run", "What would you like to do with this run?", [
@@ -199,10 +203,32 @@ const Home = () => {
       setUserLocation({
         latitude: location.coords?.latitude,
         longitude: location.coords?.longitude,
-        address: `${address[0].name}, ${address[0].region}`,
+        address: `${address[0].name}, ${address[0].region}`, // ron - i think its better to use address[0].formattedAddress for savibng the address. look at the full 'address' object and tell me wha you think
       });
+
+      setUserLocationStr(`${address[0].formattedAddress}`);
+      setUserLatLong({ latitude: location.coords?.latitude!, longitude: location.coords?.longitude! });
     })();
   }, []);
+
+  useEffect(() => {
+    const fetchWeather = async () => {
+      try {
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${userLatLong?.latitude || 32.009444}&lon=${userLatLong?.longitude || 34.882778}&units=metric&appid=${process.env.EXPO_PUBLIC_OPEN_WEATHER_API_KEY}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log("Weather data:", data);
+        const weatherMain = data?.weather[0]?.main || "Unknown";
+        const weatherEmoji = weatherMain === "Clear" ? "☀️" : weatherMain === "Clouds" ? "☁️" : weatherMain === "Rain" ? "🌧️" : weatherMain === "Snow" ? "❄️" : weatherMain === "Thunderstorm" ? "⛈️" : "⛅";
+
+        setWeather(`${data.main.temp}°C with ${data.weather[0].description} ${weatherEmoji}`);
+      } catch (error) {
+        console.error("Error fetching weather:", error);
+      }
+    };
+
+    fetchWeather();
+  }, [userLatLong]);
 
   const handleDestinationPress = (location: { latitude: number; longitude: number; address: string }) => {
     setDestinationLocation(location);
@@ -276,6 +302,11 @@ const Home = () => {
               <TouchableOpacity onPress={handleSignOut} className="justify-center items-center w-10 h-10 rounded-full absolute right-0">
                 <Image source={icons.out} className="w-4 h-4" />
               </TouchableOpacity>
+            </View>
+
+            <View className="mb-3 p-4 bg-white rounded-lg shadow-md">
+              <Text className="text-lg font-JakartaSemiBold text-gray-800">Today's weather in {userLocationStr}:</Text>
+              <Text className="text-xl font-JakartaBold text-blue-500">{weather}</Text>
             </View>
 
             <HadasTextInput icon={icons.search} containerStyle="bg-white shadow-md shadow-neutral-300" placeholder="Use Hadas to find your next running route" handleString={tempFunc} />
