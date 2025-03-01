@@ -66,7 +66,7 @@ export const useLocationStore = create<LocationStore>((set) => ({
     }));
   },
 
-  seEndAddress: (address: string) => {
+  setEndAddress: (address: string) => {
     set(() => ({
       endAddress: address,
     }));
