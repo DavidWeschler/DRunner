@@ -1,5 +1,5 @@
 {
-  "name": "uber",
+  "name": "run-route-generator",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
