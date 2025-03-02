@@ -103,69 +103,6 @@ const Chat = () => {
     return messageContent;
   };
 
-  const getBotReply = async (message: string) => {
-    console.log("You:", message);
-
-    if (msgCounter === 0) {
-      setMsgCounter(1);
-      return `${generateStartingMessage()}\n\nWhould you like me to help you plan a route or are you here just for a chat?`;
-    }
-
-    if (msgCounter === 1) {
-      setMsgCounter(2);
-      const instructions = "deepseek, reply using 'answer_0' or 'answer_1' only and nothing else. from the following sentenence, reply 'answer_1' if it implies that whoever wrote it wants help with planning a route, and reply with 'answer_0' otherwhise.";
-      const userWantsToPlanRoute = await askAi(instructions, message);
-      if (userWantsToPlanRoute.includes("answer_1")) {
-        setIsPlanningRoute(true);
-        return "Great! Let's start planning your route. What's the starting point?";
-      } else {
-        return "Alright! I'm here to chat. What's on your mind?";
-      }
-    }
-
-    if (isPlanningRoute) {
-      const instructionsAddress = "reply with the address of the starting point in the form of: address_<here>. put the reply with nothing else there. do this only if theres an address in the users message.";
-      const instructionsLength = "reply with the length of the route in kilometers in the form of: length_<length in number here>. put the reply with nothing else there. do this only if theres a length in the users message.";
-      const instructionsDifficulty = "reply with the difficulty level of the route in the form of: difficulty_<easy | medium | hard>. put the reply with nothing else there. decide if the user wants easy, medium or hard accourding to what's closest to what they want. do this only if theres a difficulty level in the users message.";
-
-      if (!start) {
-        const userStart = await askAi(instructionsAddress, message);
-        const address = userStart.includes("address_") ? userStart.split("address_")[1] : null;
-        setStart(address);
-        return address ? "Got it! What's the ending point?" : "Sorry, I didn't get that. Can you please provide the starting point again?";
-      }
-
-      if (!end) {
-        const userEnd = await askAi(instructionsAddress, message);
-        const address = userEnd.includes("address_") ? userEnd.split("address_")[1] : null;
-        setEnd(message);
-        return "Nice! What's the length of the route?";
-      }
-
-      if (!len) {
-        const userLen = await askAi(instructionsLength, message);
-        const length = userLen.includes("length_") ? userLen.split("length_")[1] : null;
-        setLen(Number(length));
-        return length ? "Awesome! What's the difficulty level of the route?" : "Sorry, I didn't get that. Can you please provide the length of the route again?";
-      }
-
-      if (!difficulty) {
-        const diffLevels = ["easy", "medium", "hard"];
-        const userDiffic = await askAi(instructionsDifficulty, message);
-        const diffic = userDiffic.includes("difficulty_") ? userDiffic.split("difficulty_")[1] : null;
-        if (!diffLevels.includes(diffic)) {
-          return "Sorry, I didn't get that. Can you please provide the difficulty level of the route again?";
-        }
-        setDifficulty(diffic.toLowerCase());
-        setIsPlanningRoute(false);
-
-        return `Alright! I'll plan a ${len} km ${diffic} route starting at ${start} and ending at ${end}.\n\nEnjoy your run!`;
-      }
-    }
-
-    return askAi("answer shortly:", message);
-  };
-
   interface RouteDetails {
     start?: string;
     end?: string;
@@ -178,21 +115,11 @@ const Chat = () => {
     content: string;
   }
 
-  interface ApiResponse {
-    choices: Array<{
-      message: {
-        content: string;
-      };
-    }>;
-  }
-
   const extractRouteDetails = async (userInput: string): Promise<RouteDetails | null> => {
     const apiUrl = "https://openrouter.ai/api/v1/chat/completions";
     const headers = {
       Authorization: `Bearer ${OPENROUTER_API_KEY}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": "YOUR_DOMAIN",
-      "X-Title": "Your App Name",
     };
 
     const systemPrompt: ApiMessage = {
