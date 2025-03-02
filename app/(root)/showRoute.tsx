@@ -11,6 +11,7 @@ const ShowRun = () => {
   const inpLength = useLocationStore((state) => state.length);
   const inpStartPoint = useLocationStore((state) => state.startPoint);
   const inpEndPoint = useLocationStore((state) => state.endPoint);
+
   const inpDifficulty = useLocationStore((state) => state.difficulty);
 
   const { setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput } = useLocationStore();
@@ -24,11 +25,11 @@ const ShowRun = () => {
   const [routePinsM, setRoutePinsM] = useState<{ latitude: number; longitude: number }[]>([]);
   const [routeDirectionsM, setRouteDirectionsM] = useState<string[] | null>(null);
   const [mediumMap, setMediumMap] = useState(false);
-  const [hardMap, setHardMap] = useState(false);
 
   // hard route:
   const [routePinsH, setRoutePinsH] = useState<{ latitude: number; longitude: number }[]>([]);
   const [routeDirectionsH, setRouteDirectionsH] = useState<string[] | null>(null);
+  const [hardMap, setHardMap] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [hideHeader, setHideHeader] = useState(false);
@@ -131,7 +132,7 @@ const ShowRun = () => {
         setLengthInput(0);
         setStartPointInput(null);
         setEndPointInput(null);
-        setDifficultyInput("easy");
+        // setDifficultyInput("easy");  // this does problems
       }
     };
 
@@ -140,6 +141,8 @@ const ShowRun = () => {
 
   // useEffect to set the difficulty, according the the input stired in the store
   useEffect(() => {
+    console.log("inpDifficulty:", inpDifficulty);
+
     if (inpDifficulty === "easy") {
       setEasyMap(true);
       setMediumMap(false);

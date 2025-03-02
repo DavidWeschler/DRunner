@@ -42,6 +42,9 @@ const Chat = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const [msgCounter, setMsgCounter] = useState(0);
+
+  const [isGreeting, setIsGreeting] = useState(true);
+  const [isChatting, setIsChatting] = useState(false);
   const [isPlanningRoute, setIsPlanningRoute] = useState(false);
   const [start, setStart] = useState<string | null>(null);
   const [end, setEnd] = useState<string | null>(null);
@@ -77,10 +80,16 @@ const Chat = () => {
         model: "deepseek/deepseek-r1-distill-llama-70b:free",
         messages: [
           {
+            role: "system",
+            content: instructions,
+          },
+          {
             role: "user",
-            content: `${instructions} ${message}`,
+            content: message,
           },
         ],
+        temperature: 0.3, // Reduce creativity for better compliance
+        // max_tokens: 100, // Maximum number of tokens to generate
       }),
     });
 
@@ -104,7 +113,7 @@ const Chat = () => {
 
     if (msgCounter === 1) {
       setMsgCounter(2);
-      const instructions = "deepseek, reply using 'answer_0' or 'answer_1' only and nothing else. from the following sentenence, reply 'answer_1' if it implies that whoever wrote it wants help with planning a route, and reply with 'answer_0' otherwhise. put the reply in choices[0].message.content with nothing else there. the sentence is:";
+      const instructions = "deepseek, reply using 'answer_0' or 'answer_1' only and nothing else. from the following sentenence, reply 'answer_1' if it implies that whoever wrote it wants help with planning a route, and reply with 'answer_0' otherwhise.";
       const userWantsToPlanRoute = await askAi(instructions, message);
       if (userWantsToPlanRoute.includes("answer_1")) {
         setIsPlanningRoute(true);
@@ -115,9 +124,9 @@ const Chat = () => {
     }
 
     if (isPlanningRoute) {
-      const instructionsAddress = "reply with the address of the starting point in the form of: address_<here>. put the reply with nothing else there. do this only if theres an address in the users message. The message is:";
-      const instructionsLength = "reply with the length of the route in kilometers in the form of: length_<length in number here>. put the reply with nothing else there. do this only if theres a length in the users message The message is:";
-      const instructionsDifficulty = "reply with the difficulty level of the route in the form of: difficulty_<easy | medium | hard>. put the reply with nothing else there. decide if the user wants easy, medium or hard accourding to what's closest to what they want. do this only if theres a difficulty level in the users message The message is:";
+      const instructionsAddress = "reply with the address of the starting point in the form of: address_<here>. put the reply with nothing else there. do this only if theres an address in the users message.";
+      const instructionsLength = "reply with the length of the route in kilometers in the form of: length_<length in number here>. put the reply with nothing else there. do this only if theres a length in the users message.";
+      const instructionsDifficulty = "reply with the difficulty level of the route in the form of: difficulty_<easy | medium | hard>. put the reply with nothing else there. decide if the user wants easy, medium or hard accourding to what's closest to what they want. do this only if theres a difficulty level in the users message.";
 
       if (!start) {
         const userStart = await askAi(instructionsAddress, message);
@@ -192,7 +201,8 @@ const Chat = () => {
     1. Respond ONLY with valid JSON using these keys: start, end, len, difficulty
     2. Use "unknown" for missing values
     3. Never include explanations, thoughts, or markdown
-    4. Format example:
+    4. Difficulty must be one of: easy, medium, hard. you may choose the closest one
+    5. Format example:
     ${JSON.stringify({ start: "unknown", end: "unknown", len: "5", difficulty: "unknown" })}
     
     Current request:`,
@@ -206,25 +216,7 @@ const Chat = () => {
     let rawContent = "";
 
     try {
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          model: "deepseek/deepseek-r1-distill-llama-70b:free",
-          messages: [systemPrompt, userMessage],
-          temperature: 0.3, // Reduce creativity for better compliance
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
-      }
-
-      const data: ApiResponse = await response.json();
-      rawContent = data.choices[0]?.message?.content;
-
-      // log data
-      console.log("Full response:", JSON.stringify(data, null, 2));
+      rawContent = await askAi(systemPrompt.content, userMessage.content);
 
       // Extract JSON from response text using regex
       const jsonString = rawContent?.match(/\{[\s\S]*\}/)?.[0] || "";
@@ -259,9 +251,6 @@ const Chat = () => {
   const handleSendMessage = async ({ inp }: { inp: string }) => {
     if (!inp.trim()) return;
     const timestamp = new Date().toLocaleTimeString();
-
-    // get length, startAddress, endAddress, difficulty from useLocationStore
-
     const algoInputs = {
       len: useLocationStore.getState().length,
       start: useLocationStore.getState().startAddress,
@@ -274,42 +263,78 @@ const Chat = () => {
     // Add user message
     setMessages((prev) => [...prev, { text: inp, sender: "user", timestamp }]);
 
-    // Simulate bot reply
-    // const reply = await getBotReply(inp);
-    const reply = await extractRouteDetails(inp);
+    // Greet the user
+    if (msgCounter === 0) {
+      setMsgCounter(1);
+      const botAnswer = `${generateStartingMessage()}\n\nWhould you like me to help you plan a route or are you here just for a chat?`;
+      setMessages((prev) => [...prev, { text: botAnswer, sender: "bot", timestamp }]);
+      return;
+    }
+    if (msgCounter === 1) {
+      setMsgCounter(2);
+      const instructions = "deepseek, reply using 'answer_0' or 'answer_1' only and nothing else. from the following sentenence, reply 'answer_1' if it implies that whoever wrote it wants help with planning a route, and reply with 'answer_0' otherwhise. put the reply in with nothing else there. the sentence is:";
+      const userWantsToPlanRoute = await askAi(instructions, inp);
+      let botAnswer = "";
+      if (userWantsToPlanRoute.includes("answer_1")) {
+        setIsPlanningRoute(true);
+        botAnswer = "Great! Let's start planning your route. What's the starting point?";
+      } else {
+        botAnswer = "Alright! I'm here to chat. What's on your mind?";
+      }
+      setMessages((prev) => [...prev, { text: botAnswer, sender: "bot", timestamp }]);
+      return;
+    }
 
-    console.log("Reply:", reply);
+    if (isPlanningRoute) {
+      const reply = await extractRouteDetails(inp);
+      console.log("Reply:", reply);
+      if (reply?.start && reply.start !== "unknown") setStartAddress(reply.start);
+      if (reply?.end && reply.end !== "unknown") setEndAddress(reply.end);
+      if (reply?.len && reply.len !== "unknown") setLengthInput(Number(reply.len));
+      if (reply?.difficulty && ["easy", "medium", "hard"].includes(reply.difficulty)) setDifficultyInput(reply.difficulty as "easy" | "medium" | "hard");
 
-    if (reply?.start && reply.start !== "unknown") setStartAddress(reply.start);
-    if (reply?.end && reply.end !== "unknown") setEndAddress(reply.end);
-    if (reply?.len && reply.len !== "unknown") setLengthInput(Number(reply.len));
-    if (reply?.difficulty && ["easy", "medium", "hard"].includes(reply.difficulty)) setDifficultyInput(reply.difficulty as "easy" | "medium" | "hard");
-    setMessages((prev) => [...prev, { text: `${JSON.stringify(algoInputs)}`, sender: "bot", timestamp }]);
+      //for debug
+      const currentInputs = {
+        len: useLocationStore.getState().length,
+        start: useLocationStore.getState().startAddress,
+        end: useLocationStore.getState().endAddress,
+        difficulty: useLocationStore.getState().difficulty,
+      };
 
-    // if all inputs are ready, call the algorithm
-    if (algoInputs.len && algoInputs.start && algoInputs.end && algoInputs.difficulty) {
-      //turn start and end to coordinates
-      console.log("generating route now that i have all that i need");
-      const startCoords = await getLatLngFromAddress(algoInputs.start);
-      const endCoords = await getLatLngFromAddress(algoInputs.end);
-      setStartPointInput(startCoords);
-      setEndPointInput(endCoords);
+      setMessages((prev) => [...prev, { text: `${JSON.stringify(currentInputs)}`, sender: "bot", timestamp }]);
+    } else {
+      // User just wants to chat
+      const reply = await askAi("answer shortly:", inp);
+      setMessages((prev) => [...prev, { text: reply, sender: "bot", timestamp }]);
     }
   };
 
   const generateRoute = async () => {
-    const everyThingIsOk = true;
+    const s = useLocationStore.getState().startAddress; // || users current location
+    const e = useLocationStore.getState().endAddress; // || users current location
+    const l = useLocationStore.getState().length || 5;
+    const d = useLocationStore.getState().difficulty || "easy";
+    let startCoords = null;
+    let endCoords = null;
 
-    if (everyThingIsOk) {
-      router.push("/(root)/showRoute");
+    if (s) {
+      startCoords = await getLatLngFromAddress(s);
+      setStartPointInput(startCoords);
     }
+    if (e) {
+      endCoords = await getLatLngFromAddress(e);
+      if (endCoords !== startCoords) setEndPointInput(endCoords); // this is supposed to help with creating a circular route
+    }
+    setLengthInput(l);
+    setDifficultyInput(d as "easy" | "medium" | "hard");
+    router.push("/(root)/showRoute");
   };
 
   return (
     <SafeAreaView className="flex-1 p-4">
       <View className="justify-center items-center">
         {/*a button that triggers a function called generateRoute() */}
-        <Button title="Generate Route" onPress={generateRoute} />
+        {isPlanningRoute && <Button title="Generate Route" onPress={generateRoute} />}
 
         <Text className="text-2xl font-JakartaBold mt-5">Chatting With Hadas AI</Text>
         <View className="border-t border-gray-300 w-full my-4" />
