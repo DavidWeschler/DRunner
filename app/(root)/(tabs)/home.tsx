@@ -248,6 +248,7 @@ const Home = () => {
 
     // bug: we need this value but we get stuck on this line. idk why.
     // const s = useLocationStore((state) => state.startAddress);
+    // const { startAddress } = useLocationStore();
 
     let startLatLong = null;
     if (!startPoint) {

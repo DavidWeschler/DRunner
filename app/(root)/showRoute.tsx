@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, ActivityIndicator, Button, StyleSheet, Text, TouchableOpacity } from "react-native";
 import CircularAlgorithm from "./circle_algorithm";
 import Line_Algorithm from "./line_algorithm";
@@ -37,6 +37,12 @@ const ShowRun = () => {
 
   const [actualRouteLength, setActualRouteLength] = useState({ easy: 0, medium: 0, hard: 0 });
   const [routeElevation, setRouteElevation] = useState({ easy: 0, medium: 0, hard: 0 });
+
+  // Stopwatch state
+  const [isRunning, setIsRunning] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
     const straightRoute = async () => {
@@ -158,6 +164,40 @@ const ShowRun = () => {
     }
   }, [inpDifficulty]);
 
+  useEffect(() => {
+    if (isRunning) {
+      startTimeRef.current = performance.now() - elapsedTime; // Adjust start time for resuming
+      intervalRef.current = setInterval(() => {
+        setElapsedTime(performance.now() - startTimeRef.current!);
+      }, 10);
+    } else if (!isRunning && intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isRunning]);
+
+  const handleStartPause = () => {
+    setIsRunning((prev) => !prev);
+  };
+
+  const handleStop = () => {
+    setIsRunning(false);
+    setElapsedTime(0);
+  };
+
+  const formatTime = (milliseconds: number) => {
+    const mins = Math.floor(milliseconds / 60000);
+    const secs = Math.floor((milliseconds % 60000) / 1000);
+    const millis = Math.floor((milliseconds % 1000) / 10); // Keep only two digits
+
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}:${millis.toString().padStart(2, "0")}`;
+  };
+
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
@@ -213,6 +253,15 @@ const ShowRun = () => {
           </Text>
         </View>
       )}
+
+      {/* Stopwatch */}
+      <View style={styles.stopwatchContainer}>
+        <Text style={styles.stopwatchText}>{formatTime(elapsedTime)}</Text>
+        <View style={styles.stopwatchButtons}>
+          <Button title={isRunning ? "Pause" : "Start"} onPress={handleStartPause} />
+          <Button title="Stop" onPress={handleStop} />
+        </View>
+      </View>
 
       {/* Map Component */}
       {easyMap && <Map theme={mapTheme || "standard"} pins={routePinsE} directions={routeDirectionsE} />}
@@ -285,5 +334,20 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 16,
+  },
+  stopwatchContainer: {
+    alignItems: "center",
+    marginVertical: 10,
+    justifyContent: "center",
+  },
+  stopwatchText: {
+    fontSize: 30,
+    fontWeight: "bold",
+  },
+  stopwatchButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "60%",
+    marginTop: 10,
   },
 });
