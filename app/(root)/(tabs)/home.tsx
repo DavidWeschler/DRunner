@@ -239,6 +239,16 @@ const Home = () => {
     router.push("/(root)/find-run");
   };
 
+  // useEffect to setStartPoint
+  useEffect(() => {
+    if (startAddress) {
+      setStartPoint(startAddress);
+    }
+    if (endAddress) {
+      setEndPoint(endAddress);
+    }
+  }, [startAddress, endAddress]);
+
   const generator = async () => {
     // log the form inputs:
     console.log("Length:", length);
@@ -247,8 +257,6 @@ const Home = () => {
     console.log("Difficulty:", difficulty);
 
     // bug: we need this value but we get stuck on this line. idk why.
-    // const s = useLocationStore((state) => state.startAddress);
-    // const { startAddress } = useLocationStore();
 
     let startLatLong = null;
     if (!startPoint) {
