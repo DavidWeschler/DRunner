@@ -89,7 +89,7 @@ const getGoogleGeocode = async (latitude: number, longitude: number) => {
 };
 
 const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
-  const { startPoint, endPoint, setStartPointInput, setEndPointInput, setStartAddress, seEndAddress } = useLocationStore();
+  const { startPoint, endPoint, setStartPointInput, setEndPointInput, setStartAddress, setEndAddress } = useLocationStore();
   const [isAlertVisible, setAlertVisible] = useState(false);
   const [locationData, setLocationData] = useState({ latitude: 0, longitude: 0, address: "" });
 
@@ -108,7 +108,7 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
       setStartAddress(address);
     } else {
       setEndPointInput({ latitude, longitude });
-      seEndAddress(address);
+      setEndAddress(address);
     }
     setAlertVisible(false); // Close the custom alert after setting location
   };

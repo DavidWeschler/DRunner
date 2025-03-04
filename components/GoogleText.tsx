@@ -1,10 +1,27 @@
 import { View, Text } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { GoogleTextInputs } from "@/types/type"; // Ensure this type includes required props
+import { useLocationStore } from "../store/index";
 
 const googlePlacesApiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY; // Ensure this key is set
 
-const PointInput = ({ label, address, setAddress, setPointInput, setPoint }: GoogleTextInputs) => {
+const PointInput = ({ label, placeholder, setAddress, setPointInput, setPoint }: GoogleTextInputs) => {
+  const start = useLocationStore((state) => state.startAddress);
+  const end = useLocationStore((state) => state.endAddress);
+
+  const [inpValue, setInpValue] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (label.includes("Start") && start) {
+      console.log("start sdf:", start);
+      setInpValue(start);
+    } else if (label.includes("End") && end) {
+      console.log("end sdf:", end);
+      setInpValue(end);
+    }
+  }, [start, end]);
+
   return (
     <View>
       {/* Label */}
@@ -16,7 +33,7 @@ const PointInput = ({ label, address, setAddress, setPointInput, setPoint }: Goo
       <View className="justify-center items-center w-full">
         <GooglePlacesAutocomplete
           fetchDetails={true}
-          placeholder={address || ""}
+          placeholder={placeholder || ""}
           debounce={200}
           query={{
             key: googlePlacesApiKey,
@@ -53,6 +70,11 @@ const PointInput = ({ label, address, setAddress, setPointInput, setPoint }: Goo
           }}
           textInputProps={{
             placeholderTextColor: "gray",
+            value: inpValue || "",
+            onChange(e) {
+              setInpValue(e.nativeEvent.text);
+              setAddress(e.nativeEvent.text);
+            },
           }}
         />
       </View>

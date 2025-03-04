@@ -87,6 +87,7 @@ const getLatLngFromAddress = async (address: string) => {
 };
 
 const Home = () => {
+  console.log("Home screen rendered");
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
@@ -245,6 +246,12 @@ const Home = () => {
     console.log("End Point:", endPoint);
     console.log("Difficulty:", difficulty);
 
+    if (!startPoint) {
+      // later on we will put here a default value.
+      Alert.alert("Missing Start Point", "Please enter a start point. \n\n(later on we will put here a default value)");
+      return;
+    }
+
     const startLatLong = await getLatLngFromAddress(startPoint); // this turns the address into lat and long (for free)
 
     // update the inputs in the singleton store
@@ -350,12 +357,11 @@ const Home = () => {
                   </View>
 
                   <View className="justify-center items-center">
-                    <PointInput label="Start Point" address={"e.g. Yafo 1, Jerusalem"} setAddress={setStartAddress} setPointInput={setStartPointInput} setPoint={setStartPoint} />
+                    <PointInput label="Start Point" placeholder={"e.g. Yafo 1, Jerusalem"} setAddress={setStartAddress} setPointInput={setStartPointInput} setPoint={setStartPoint} />
                   </View>
 
-                  {/*for some reason i need to pass here "setStartAddress" instead of "setEndAddress", this makes no sense but it works only like this so what the hell*/}
                   <View className="justify-center items-center">
-                    <PointInput label="End Point" address={"Optional"} setAddress={setStartAddress} setPointInput={setEndPointInput} setPoint={setEndPoint} />
+                    <PointInput label="End Point" placeholder={"Optional"} setAddress={setEndAddress} setPointInput={setEndPointInput} setPoint={setEndPoint} />
                   </View>
 
                   <View className="justify-left items-left my-3">

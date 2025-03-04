@@ -77,7 +77,7 @@ declare interface GoogleInputProps {
 
 export interface GoogleTextInputs {
   label: string;
-  address: string;
+  placeholder: string;
   setAddress: (text: string) => void;
   setPointInput: (value: any) => void;
   setPoint: (text: string) => void;
