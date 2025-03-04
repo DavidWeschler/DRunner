@@ -64,7 +64,6 @@ const PointInput = ({ label, placeholder, setAddress, setPointInput, setPoint }:
           onPress={(data, details = null) => {
             if (details) {
               setAddress(data.description);
-              setPointInput(details.geometry.location);
               setPointInput({ latitude: details.geometry.location.lat, longitude: details.geometry.location.lng });
               setPoint(data.description);
             }
