@@ -104,6 +104,7 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
 
   const handleSetLocation = (latitude: number, longitude: number, address: string, isStart: boolean) => {
     if (isStart) {
+      console.log("setting start point from map");
       setStartPointInput({ latitude, longitude });
       setStartAddress(address);
     } else {

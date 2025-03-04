@@ -59,22 +59,28 @@ const Profile = () => {
 
         <View style={styles.radioContainer}>
           <TouchableOpacity onPress={() => setMapThemeInStrored("dark")} style={[styles.radio, currentMapTheme === "dark" && styles.selected]}>
-            <Text style={[styles.radioText, currentMapTheme === "dark" ? styles.selectedText : styles.unselectedText]}>Dark</Text>
+            <Image source={require("@/assets/MapImages/dark.png")} style={styles.radioImage} />
+            {/* <Text style={[styles.radioText, currentMapTheme === "dark" ? styles.selectedText : styles.unselectedText]}>Dark</Text> */}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setMapThemeInStrored("aubergine")} style={[styles.radio, currentMapTheme === "aubergine" && styles.selected]}>
-            <Text style={[styles.radioText, currentMapTheme === "aubergine" ? styles.selectedText : styles.unselectedText]}>Aubergine</Text>
+            <Image source={require("@/assets/MapImages/aubergine.png")} style={styles.radioImage} />
+            {/* <Text style={[styles.radioText, currentMapTheme === "aubergine" ? styles.selectedText : styles.unselectedText]}>Aubergine</Text> */}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setMapThemeInStrored("night")} style={[styles.radio, currentMapTheme === "night" && styles.selected]}>
-            <Text style={[styles.radioText, currentMapTheme === "night" ? styles.selectedText : styles.unselectedText]}>Night</Text>
+            <Image source={require("@/assets/MapImages/night.png")} style={styles.radioImage} />
+            {/* <Text style={[styles.radioText, currentMapTheme === "night" ? styles.selectedText : styles.unselectedText]}>Night</Text> */}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setMapThemeInStrored("retro")} style={[styles.radio, currentMapTheme === "retro" && styles.selected]}>
-            <Text style={[styles.radioText, currentMapTheme === "retro" ? styles.selectedText : styles.unselectedText]}>Retro</Text>
+            <Image source={require("@/assets/MapImages/retro.png")} style={styles.radioImage} />
+            {/* <Text style={[styles.radioText, currentMapTheme === "retro" ? styles.selectedText : styles.unselectedText]}>Retro</Text> */}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setMapThemeInStrored("silver")} style={[styles.radio, currentMapTheme === "silver" && styles.selected]}>
-            <Text style={[styles.radioText, currentMapTheme === "silver" ? styles.selectedText : styles.unselectedText]}>Silver</Text>
+            <Image source={require("@/assets/MapImages/silver.png")} style={styles.radioImage} />
+            {/* <Text style={[styles.radioText, currentMapTheme === "silver" ? styles.selectedText : styles.unselectedText]}>Silver</Text> */}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setMapThemeInStrored("standard")} style={[styles.radio, currentMapTheme === "standard" && styles.selected]}>
-            <Text style={[styles.radioText, currentMapTheme === "standard" ? styles.selectedText : styles.unselectedText]}>Standard</Text>
+            <Image source={require("@/assets/MapImages/standard.png")} style={styles.radioImage} />
+            {/* <Text style={[styles.radioText, currentMapTheme === "standard" ? styles.selectedText : styles.unselectedText]}>Standard</Text> */}
           </TouchableOpacity>
         </View>
 
@@ -102,21 +108,20 @@ const styles = StyleSheet.create({
   },
   radio: {
     backgroundColor: "#F4F4F4",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     borderRadius: 20,
     width: "30%",
     alignItems: "center",
     justifyContent: "center",
-    marginHorizontal: 5,
-    marginBottom: 10,
-    borderWidth: 1,
+    // marginHorizontal: 5,
+    // marginBottom: 10,
+    // borderWidth: 1,
     borderColor: "#D1D5DB",
     overflow: "hidden",
   },
   selected: {
-    backgroundColor: "#0286FF",
-    borderColor: "#0066CC",
+    backgroundColor: "#9cc8f0",
   },
   unselected: {
     color: "#6B7280",
@@ -144,5 +149,13 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontWeight: "bold",
+  },
+  radioImage: {
+    width: "100%",
+    height: 50,
+    resizeMode: "cover",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
   },
 });

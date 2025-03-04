@@ -246,17 +246,21 @@ const Home = () => {
     console.log("End Point:", endPoint);
     console.log("Difficulty:", difficulty);
 
+    // bug: we need this value but we get stuck on this line. idk why.
+    // const s = useLocationStore((state) => state.startAddress);
+
+    let startLatLong = null;
     if (!startPoint) {
       // later on we will put here a default value.
-      Alert.alert("Missing Start Point", "Please enter a start point. \n\n(later on we will put here a default value)");
-      return;
+      Alert.alert("Missing Start Point!\n", "Calculating with your current \nlocation.");
+      startLatLong = userLatLong;
+    } else {
+      startLatLong = await getLatLngFromAddress(startPoint); // this turns the address into lat and long (for free)
     }
 
-    const startLatLong = await getLatLngFromAddress(startPoint); // this turns the address into lat and long (for free)
-
     // update the inputs in the singleton store
-    setDifficultyInput(difficulty);
-    setLengthInput(parseFloat(length));
+    setDifficultyInput(difficulty || "easy");
+    setLengthInput(parseFloat(length) || 3);
     setStartPointInput(startLatLong);
     if (endPoint) {
       const endLatLong = await getLatLngFromAddress(endPoint);
