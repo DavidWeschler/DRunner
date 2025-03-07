@@ -93,6 +93,7 @@ declare interface HadasInputProps {
   textInputBackgroundColor?: string;
   placeholder?: string;
   handleString: ({ inp }: { inp: string }) => void;
+  editable?: boolean;
 }
 
 declare interface InputFieldProps extends TextInputProps {

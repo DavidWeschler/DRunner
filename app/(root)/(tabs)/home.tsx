@@ -181,7 +181,7 @@ const Home = () => {
     router.replace("/(auth)/sign-in");
   };
 
-  const tempFunc = ({ inp }: { inp: string }) => {
+  const hadasInit = ({ inp }: { inp: string }) => {
     if (!inp.trim()) return;
     setHadasInp(inp);
     router.push("/(root)/(tabs)/chat");
@@ -318,7 +318,7 @@ const Home = () => {
     setEndPoint("");
     setDifficulty("");
 
-    router.push("/(root)/showRoute");
+    router.push("/(root)/ronsShowRoute");
   };
 
   const viewRadio = (kind: string) => {
@@ -383,7 +383,7 @@ const Home = () => {
               <Text className="text-xl font-JakartaBold text-blue-500">{weather}</Text>
             </View>
 
-            <HadasTextInput icon={icons.search} containerStyle="bg-white shadow-md shadow-neutral-300" placeholder="Use Hadas to find your next running route" handleString={tempFunc} />
+            <HadasTextInput icon={icons.search} containerStyle="bg-white shadow-md shadow-neutral-300" placeholder="Use Hadas to find your next running route" handleString={hadasInit} editable={true} />
 
             <>
               <View className="flex flex-row items-center bg-transparent h-[490px] mt-4">
