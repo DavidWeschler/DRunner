@@ -3,7 +3,7 @@ import { useAuth } from "@clerk/clerk-expo";
 import * as Location from "expo-location";
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
-import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet, Alert } from "react-native";
+import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet, Alert, Platform, Button } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GoogleTextInput from "@/components/GoogleTextInput";
 import HadasTextInput from "@/components/HadasInp";
@@ -101,74 +101,79 @@ const Home = () => {
   const [difficulty, setDifficulty] = useState("");
 
   const [kind, setKind] = useState("recent");
-  const [savedRuns, setSavedRuns] = useState<Run[]>([]);
-  const [futureRuns, setFutureRuns] = useState<Run[]>([]);
 
   const [userLocationStr, setUserLocationStr] = useState("");
   const [weather, setWeather] = useState("");
   const [userLatLong, setUserLatLong] = useState<{ latitude: number; longitude: number } | null>(null);
 
+  const [hasPermission, setHasPermission] = useState<boolean>(false);
+
+  const [recentRunRoutes, setRecentRunRoutes] = useState<Run[]>([]);
+  const [savedRunsRoutes, setSavedRunsRoutes] = useState<Run[]>([]);
+  const [futureRunsRoutes, setFutureRunsRoutes] = useState<Run[]>([]);
+
   const handleLongPress = (run: Run) => {
-    if (kind === "recent") {
-      Alert.alert("Manage Run", "What would you like to do with this run?", [
-        {
-          text: "Save",
-          onPress: () => {
-            // Add only if not already saved
-            if (!savedRuns.some((r) => r.created_at === run.created_at)) {
-              setSavedRuns((prev) => [...prev, run]);
-            }
-          },
-        },
-        {
-          text: "Future",
-          onPress: () => {
-            // Add only if not already in future runs
-            if (!futureRuns.some((r) => r.created_at === run.created_at)) {
-              setFutureRuns((prev) => [...prev, run]);
-            }
-          },
-        },
-        { text: "Cancel", style: "cancel" },
-      ]);
-    } else if (kind === "saved") {
-      Alert.alert("Manage Run", "What would you like to do with this run?", [
-        {
-          text: "Unsave",
-          onPress: () => setSavedRuns((prev) => prev.filter((r) => r.created_at !== run.created_at)),
-        },
-        {
-          text: "Future",
-          onPress: () => {
-            // Add only if not already in future runs
-            if (!futureRuns.some((r) => r.created_at === run.created_at)) {
-              setFutureRuns((prev) => [...prev, run]);
-            }
-          },
-        },
-        { text: "Cancel", style: "cancel" },
-      ]);
-    } else if (kind === "future") {
-      Alert.alert("Manage Run", "What would you like to do with this run?", [
-        {
-          text: "Save",
-          onPress: () => {
-            // Add only if not already saveda
-            if (!savedRuns.some((r) => r.created_at === run.created_at)) {
-              setSavedRuns((prev) => [...prev, run]);
-            }
-          },
-        },
-        {
-          text: "Edit Future",
-          onPress: () => {
-            // Edit logic here
-            console.log("Edit Future selected");
-          },
-        },
-        { text: "Cancel", style: "cancel" },
-      ]);
-    }
+    return;
+    // if (kind === "recent") {
+    //   Alert.alert("Manage Run", "What would you like to do with this run?", [
+    //     {
+    //       text: "Save",
+    //       onPress: () => {
+    //         // Add only if not already saved
+    //         if (!savedRuns.some((r) => r.created_at === run.created_at)) {
+    //           setSavedRuns((prev) => [...prev, run]);
+    //         }
+    //       },
+    //     },
+    //     {
+    //       text: "Future",
+    //       onPress: () => {
+    //         // Add only if not already in future runs
+    //         if (!futureRuns.some((r) => r.created_at === run.created_at)) {
+    //           setFutureRuns((prev) => [...prev, run]);
+    //         }
+    //       },
+    //     },
+    //     { text: "Cancel", style: "cancel" },
+    //   ]);
+    // } else if (kind === "saved") {
+    //   Alert.alert("Manage Run", "What would you like to do with this run?", [
+    //     {
+    //       text: "Unsave",
+    //       onPress: () => setSavedRuns((prev) => prev.filter((r) => r.created_at !== run.created_at)),
+    //     },
+    //     {
+    //       text: "Future",
+    //       onPress: () => {
+    //         // Add only if not already in future runs
+    //         if (!futureRuns.some((r) => r.created_at === run.created_at)) {
+    //           setFutureRuns((prev) => [...prev, run]);
+    //         }
+    //       },
+    //     },
+    //     { text: "Cancel", style: "cancel" },
+    //   ]);
+    // } else if (kind === "future") {
+    //   Alert.alert("Manage Run", "What would you like to do with this run?", [
+    //     {
+    //       text: "Save",
+    //       onPress: () => {
+    //         // Add only if not already saveda
+    //         if (!savedRuns.some((r) => r.created_at === run.created_at)) {
+    //           setSavedRuns((prev) => [...prev, run]);
+    //         }
+    //       },
+    //     },
+    //     {
+    //       text: "Edit Future",
+    //       onPress: () => {
+    //         // Edit logic here
+    //         console.log("Edit Future selected");
+    //       },
+    //     },
+    //     { text: "Cancel", style: "cancel" },
+    //   ]);
+    // }
   };
 
   const handleSignOut = () => {
@@ -181,14 +186,6 @@ const Home = () => {
     setHadasInp(inp);
     router.push("/(root)/(tabs)/chat");
   };
-
-  const [hasPermission, setHasPermission] = useState<boolean>(false);
-
-  // const {
-  //   data: recentRuns,
-  //   loading,
-  //   error,
-  // } = useFetch<Run[]>(`/(api)/ride/${user?.id}`);
 
   useEffect(() => {
     (async () => {
@@ -251,14 +248,35 @@ const Home = () => {
     }
   }, [startAddress, endAddress]);
 
-  const generator = async () => {
-    // console.log("sdf1");
-    // const clerkId = user?.id; // This is the logged-in user's clerk id
-    // console.log("sdf2");
-    // console.log("clerkId:", clerkId);
+  useEffect(() => {
+    fetchRoutes("recent_routes");
+    fetchRoutes("saved_routes");
+    fetchRoutes("future_routes");
+  }, []);
 
-    // return;
-    //--------------------------------------------------------------------------------
+  const fetchRoutes = async (apiType: string) => {
+    try {
+      const recent = await fetch(`/(api)/${apiType}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ clerkId: user?.id }),
+      }).then((res) => res.json());
+
+      if (apiType === "recent_routes") {
+        setRecentRunRoutes(recent);
+      } else if (apiType === "saved_routes") {
+        setSavedRunsRoutes(recent);
+      } else if (apiType === "future_routes") {
+        setFutureRunsRoutes(recent);
+      }
+    } catch (error) {
+      console.error("Error fetching routes:", error);
+    }
+  };
+
+  const generator = async () => {
     // log the form inputs:
     console.log("Length:", length);
     console.log("Start Point:", startPoint);
@@ -305,16 +323,27 @@ const Home = () => {
 
   const viewRadio = (kind: string) => {
     if (kind == "recent") {
-      return recentRuns?.slice(0, 3);
+      return recentRunRoutes;
     } else if (kind == "saved") {
-      return savedRuns;
+      return savedRunsRoutes;
     } else if (kind == "future") {
-      return futureRuns;
+      return futureRunsRoutes;
     }
+  };
+
+  const debug = async () => {
+    console.log("debug");
+    fetchRoutes("recent_routes");
+    fetchRoutes("saved_routes");
+    fetchRoutes("future_routes");
+    console.log("saved routes: ", savedRunsRoutes);
+    console.log("\n\n\n\nrecent routes: ", recentRunRoutes);
+    console.log("\n\n\n\nfuture routes: ", futureRunsRoutes);
   };
 
   return (
     <SafeAreaView className="bg-general-500">
+      <Button title="Hi" onPress={debug} />
       <FlatList
         data={viewRadio(kind)}
         renderItem={({ item }) => (

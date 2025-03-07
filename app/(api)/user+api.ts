@@ -14,7 +14,7 @@ const routes = [
       [7, 8],
     ],
     is_saved: true,
-    is_scheduled: false,
+    is_scheduled: new Date(),
     is_deleted: false,
   },
 ];
@@ -29,14 +29,16 @@ export async function POST(request: Request) {
         route_id SERIAL PRIMARY KEY,
         clerk_id VARCHAR(255) REFERENCES users(clerk_id) ON DELETE CASCADE,
         route_title TEXT NOT NULL,
+        address TEXT DEFAULT NULL,
         difficulty TEXT NOT NULL,
         directions JSONB NOT NULL,
         elevation_gain FLOAT NOT NULL,
         length FLOAT NOT NULL,
         waypoints JSONB NOT NULL,
         is_saved BOOLEAN DEFAULT FALSE,
-        is_scheduled BOOLEAN DEFAULT FALSE,
-        is_deleted BOOLEAN DEFAULT FALSE
+        is_scheduled TIMESTAMP DEFAULT NULL,
+        is_deleted BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jerusalem')
       );
     `;
 
@@ -61,7 +63,7 @@ export async function POST(request: Request) {
     // Insert running routes if provided
     if (routes && Array.isArray(routes) && routes.length > 0) {
       for (const route of routes) {
-        const { route_title, difficulty, directions, elevationGain, length, waypoints, is_saved = false, is_scheduled = false, is_deleted = false } = route;
+        const { route_title, difficulty, directions, elevationGain, length, waypoints, is_saved = false, is_scheduled = null, is_deleted = false } = route;
 
         await sql`
           INSERT INTO running_routes (

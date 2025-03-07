@@ -202,27 +202,51 @@ const ShowRun = () => {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}:${millis.toString().padStart(2, "0")}`;
   };
 
+  const getAddressFromPoint = async (point: { latitude: number; longitude: number }) => {
+    try {
+      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${point.latitude}&lon=${point.longitude}`;
+      console.log("url:", url);
+      const response = await fetch(url, {
+        headers: {
+          "User-Agent": "MyRunningApp/1.0 (contact@example.com)", // Change this to your app name & email
+          "Accept-Language": "en", // Optional: Get responses in English
+        },
+      });
+
+      if (!response.ok) {
+        console.log("response:", response);
+        throw new Error(`Network response was not ok: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return `${data.address.road || "Unknown Road"}, ${data.address.city || "Unknown City"}`;
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return "Planet Earth";
+    }
+  };
+
   const addRunToDatabase = async () => {
-    // Add the run to the database
     console.log("Add run to database");
-    const clerkId = user?.id; // This is the logged-in user's clerk id
+    const clerkId = user?.id;
     console.log("clerkId:", clerkId);
 
-    // collect the route data and prepare it to be added to the database
+    const startAddress = await getAddressFromPoint(routePinsE[0]);
+
     const route = {
       clerkId,
       route_title: "Fun Route",
+      address: startAddress,
       difficulty: easyMap ? "easy" : mediumMap ? "medium" : "hard",
       directions: easyMap ? routeDirectionsE : mediumMap ? routeDirectionsM : routeDirectionsH,
       elevationGain: easyMap ? routeElevation.easy : mediumMap ? routeElevation.medium : routeElevation.hard,
       length: easyMap ? actualRouteLength.easy : mediumMap ? actualRouteLength.medium : actualRouteLength.hard,
-      waypoints: routePinsE.map((pin) => [pin.longitude, pin.latitude]),
+      waypoints: (easyMap ? routePinsE : mediumMap ? routePinsM : routePinsH).map((pin) => [pin.longitude, pin.latitude]),
       is_saved: true,
-      is_scheduled: false,
+      is_scheduled: null,
       is_deleted: false,
     };
 
-    // here i habe to add the route to the database
     try {
       const response = await fetch("/(api)/add_route", {
         method: "POST",
@@ -249,7 +273,6 @@ const ShowRun = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* add a header with 3 tabs for the 3 difficulties (easy, medium, hard), and mark the chosen one bu the user. do this using radio*/}
       {!hideHeader && (
         <View style={styles.radioContainer}>
           <View style={styles.radioGroup}>

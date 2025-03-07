@@ -46,16 +46,19 @@ declare interface MapProps {
 }
 
 declare interface Run {
-  origin_address: string;
-  destination_address: string;
-  origin_latitude: number;
-  origin_longitude: number;
-  destination_latitude: number;
-  destination_longitude: number;
-  run_time: number;
-  route_lenght: number;
-  difficulty_level: string;
+  clerk_id: string;
   created_at: string;
+  difficulty: string;
+  directions: any;
+  elevation_gain: number;
+  is_deleted: boolean;
+  is_saved: boolean;
+  is_scheduled: string;
+  length: number;
+  route_id: number;
+  route_title: string;
+  address: string;
+  waypoints: any;
 }
 
 declare interface ButtonProps extends TouchableOpacityProps {
