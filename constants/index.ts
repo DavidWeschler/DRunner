@@ -14,8 +14,6 @@ import lock from "@/assets/icons/lock.png";
 import map from "@/assets/icons/map.png";
 import out from "@/assets/icons/out.png";
 import person from "@/assets/icons/person.png";
-import pin from "@/assets/icons/pin.png";
-import point from "@/assets/icons/point.png";
 import profile from "@/assets/icons/profile.png";
 import search from "@/assets/icons/search.png";
 import star from "@/assets/icons/star.png";
@@ -58,8 +56,6 @@ export const icons = {
   map,
   out,
   person,
-  pin,
-  point,
   profile,
   search,
   star,
