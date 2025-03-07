@@ -5,6 +5,8 @@ import Line_Algorithm from "./line_algorithm";
 import Map from "../../components/Map";
 import { useLocationStore } from "../../store/index";
 
+import { useUser } from "@clerk/clerk-react";
+
 const ShowRun = () => {
   const mapTheme = useLocationStore((state) => state.mapTheme);
   // Retrieve map theme from store
@@ -37,6 +39,8 @@ const ShowRun = () => {
 
   const [actualRouteLength, setActualRouteLength] = useState({ easy: 0, medium: 0, hard: 0 });
   const [routeElevation, setRouteElevation] = useState({ easy: 0, medium: 0, hard: 0 });
+
+  const { user } = useUser();
 
   // Stopwatch state
   const [isRunning, setIsRunning] = useState(false);
@@ -198,13 +202,77 @@ const ShowRun = () => {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}:${millis.toString().padStart(2, "0")}`;
   };
 
+  const getAddressFromPoint = async (point: { latitude: number; longitude: number }) => {
+    try {
+      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${point.latitude}&lon=${point.longitude}`;
+      console.log("url:", url);
+      const response = await fetch(url, {
+        headers: {
+          "User-Agent": "MyRunningApp/1.0 (contact@example.com)", // Change this to your app name & email
+          "Accept-Language": "en", // Optional: Get responses in English
+        },
+      });
+
+      if (!response.ok) {
+        console.log("response:", response);
+        throw new Error(`Network response was not ok: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return `${data.address.road || "Unknown Road"}, ${data.address.city || "Unknown City"}`;
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return "Planet Earth";
+    }
+  };
+
+  const addRunToDatabase = async () => {
+    console.log("Add run to database");
+    const clerkId = user?.id;
+    console.log("clerkId:", clerkId);
+
+    const startAddress = await getAddressFromPoint(routePinsE[0]);
+
+    const route = {
+      clerkId,
+      route_title: "Fun Route",
+      address: startAddress,
+      difficulty: easyMap ? "easy" : mediumMap ? "medium" : "hard",
+      directions: easyMap ? routeDirectionsE : mediumMap ? routeDirectionsM : routeDirectionsH,
+      elevationGain: easyMap ? routeElevation.easy : mediumMap ? routeElevation.medium : routeElevation.hard,
+      length: easyMap ? actualRouteLength.easy : mediumMap ? actualRouteLength.medium : actualRouteLength.hard,
+      waypoints: (easyMap ? routePinsE : mediumMap ? routePinsM : routePinsH).map((pin) => [pin.longitude, pin.latitude]),
+      is_saved: true,
+      is_scheduled: null,
+      is_deleted: false,
+    };
+
+    try {
+      const response = await fetch("/(api)/add_route", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(route),
+      });
+
+      if (response.ok) {
+        console.log("Route added successfully");
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to add route", errorData);
+      }
+    } catch (error) {
+      console.error("Error adding route", error);
+    }
+  };
+
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
   return (
     <View style={{ flex: 1 }}>
-      {/* add a header with 3 tabs for the 3 difficulties (easy, medium, hard), and mark the chosen one bu the user. do this using radio*/}
       {!hideHeader && (
         <View style={styles.radioContainer}>
           <View style={styles.radioGroup}>
@@ -276,6 +344,7 @@ const ShowRun = () => {
             onPress={() => {
               setHideHeader(true);
               setHideButton(true);
+              addRunToDatabase();
               console.log("Start Run");
             }}
           />

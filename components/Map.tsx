@@ -135,7 +135,7 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
     <>
       <MapView provider={PROVIDER_DEFAULT} className="w-full h-full rounded-2xl" tintColor="black" showsUserLocation={true} userInterfaceStyle="light" customMapStyle={mapTheme} onLongPress={handleLongPress}>
         {pins.map((pin, index) => (
-          <Marker key={index} coordinate={{ latitude: pin.latitude, longitude: pin.longitude }} title={`Pin ${index + 1}`} />
+          <Marker key={index} coordinate={{ latitude: pin.latitude, longitude: pin.longitude }} title={index === 3 || index === 0 ? "Start" : `Pin ${index + 1}`} />
         ))}
 
         {directions && directions.map((points: string, index: number) => <Polyline key={index} coordinates={decodePolyline(points)} strokeColor="#CC6600" strokeWidth={4} />)}

@@ -1,14 +1,14 @@
 import { Run } from "@/types/type";
 
-export const sortRuns = (runs: Run[]): Run[] => {
-  const result = runs.sort((a, b) => {
-    const dateA = new Date(`${a.created_at}T${a.run_time}`);
-    const dateB = new Date(`${b.created_at}T${b.run_time}`);
-    return dateB.getTime() - dateA.getTime();
-  });
+// export const sortRuns = (runs: Run[]): Run[] => {
+//   const result = runs.sort((a, b) => {
+//     const dateA = new Date(`${a.created_at}T${a.run_time}`);
+//     const dateB = new Date(`${b.created_at}T${b.run_time}`);
+//     return dateB.getTime() - dateA.getTime();
+//   });
 
-  return result.reverse();
-};
+//   return result.reverse();
+// };
 
 export function formatTime(minutes: number): string {
   const formattedMinutes = +minutes?.toFixed(0) || 0;
@@ -22,12 +22,14 @@ export function formatTime(minutes: number): string {
   }
 }
 
-export function formatDate(dateString: string): string {
+export function formatDate(dateString: string, future = false): string {
   const date = new Date(dateString);
   const day = date.getDate();
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const month = monthNames[date.getMonth()];
   const year = date.getFullYear();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
 
-  return `${day < 10 ? "0" + day : day} ${month} ${year}`;
+  return `${month} ${day} ${year < 2025 || future ? year : ""}, ${hours < 10 ? "0" + hours : hours}:${minutes < 10 ? "0" + minutes : minutes}`;
 }
