@@ -5,6 +5,8 @@ import Line_Algorithm from "./line_algorithm";
 import Map from "../../components/Map";
 import { useLocationStore } from "../../store/index";
 
+import { useUser } from "@clerk/clerk-react";
+
 const ShowRun = () => {
   const mapTheme = useLocationStore((state) => state.mapTheme);
   // Retrieve map theme from store
@@ -37,6 +39,8 @@ const ShowRun = () => {
 
   const [actualRouteLength, setActualRouteLength] = useState({ easy: 0, medium: 0, hard: 0 });
   const [routeElevation, setRouteElevation] = useState({ easy: 0, medium: 0, hard: 0 });
+
+  const { user } = useUser();
 
   // Stopwatch state
   const [isRunning, setIsRunning] = useState(false);
@@ -198,6 +202,47 @@ const ShowRun = () => {
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}:${millis.toString().padStart(2, "0")}`;
   };
 
+  const addRunToDatabase = async () => {
+    // Add the run to the database
+    console.log("Add run to database");
+    const clerkId = user?.id; // This is the logged-in user's clerk id
+    console.log("clerkId:", clerkId);
+
+    // collect the route data and prepare it to be added to the database
+    const route = {
+      clerkId,
+      route_title: "Fun Route",
+      difficulty: easyMap ? "easy" : mediumMap ? "medium" : "hard",
+      directions: easyMap ? routeDirectionsE : mediumMap ? routeDirectionsM : routeDirectionsH,
+      elevationGain: easyMap ? routeElevation.easy : mediumMap ? routeElevation.medium : routeElevation.hard,
+      length: easyMap ? actualRouteLength.easy : mediumMap ? actualRouteLength.medium : actualRouteLength.hard,
+      waypoints: routePinsE.map((pin) => [pin.longitude, pin.latitude]),
+      is_saved: true,
+      is_scheduled: false,
+      is_deleted: false,
+    };
+
+    // here i habe to add the route to the database
+    try {
+      const response = await fetch("/(api)/add_route", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(route),
+      });
+
+      if (response.ok) {
+        console.log("Route added successfully");
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to add route", errorData);
+      }
+    } catch (error) {
+      console.error("Error adding route", error);
+    }
+  };
+
   if (loading) {
     return <ActivityIndicator size="large" color="#0000ff" />;
   }
@@ -276,6 +321,7 @@ const ShowRun = () => {
             onPress={() => {
               setHideHeader(true);
               setHideButton(true);
+              addRunToDatabase();
               console.log("Start Run");
             }}
           />

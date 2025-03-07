@@ -5,7 +5,6 @@ import { router } from "expo-router";
 import { useState, useEffect } from "react";
 import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import GoogleTextInput from "@/components/GoogleTextInput";
 import HadasTextInput from "@/components/HadasInp";
 import Map from "@/components/Map";
@@ -16,7 +15,6 @@ import { useLocationStore } from "@/store";
 import { Run } from "@/types/type";
 import React from "react";
 import CustomButton from "@/components/CustomButton";
-
 import PointInput from "@/components/GoogleText";
 
 const recentRuns = [
@@ -80,10 +78,14 @@ const recentRuns = [
 
 const getLatLngFromAddress = async (address: string) => {
   console.log("Getting lat and long from address:", address);
-  const [result] = await Location.geocodeAsync(address);
-  console.log("Latitude:", result.latitude);
-  console.log("Longitude:", result.longitude);
-  return { latitude: result.latitude, longitude: result.longitude };
+  try {
+    const [result] = await Location.geocodeAsync(address);
+    console.log("Latitude:", result.latitude);
+    console.log("Longitude:", result.longitude);
+    return { latitude: result.latitude, longitude: result.longitude };
+  } catch (error) {
+    throw new Error(`${error}`);
+  }
 };
 
 const Home = () => {
@@ -250,6 +252,13 @@ const Home = () => {
   }, [startAddress, endAddress]);
 
   const generator = async () => {
+    // console.log("sdf1");
+    // const clerkId = user?.id; // This is the logged-in user's clerk id
+    // console.log("sdf2");
+    // console.log("clerkId:", clerkId);
+
+    // return;
+    //--------------------------------------------------------------------------------
     // log the form inputs:
     console.log("Length:", length);
     console.log("Start Point:", startPoint);
@@ -272,8 +281,13 @@ const Home = () => {
     setLengthInput(parseFloat(length) || 3);
     setStartPointInput(startLatLong);
     if (endPoint) {
-      const endLatLong = await getLatLngFromAddress(endPoint);
-      setEndPointInput(endLatLong);
+      try {
+        const endLatLong = await getLatLngFromAddress(endPoint);
+        setEndPointInput(endLatLong);
+      } catch (error) {
+        console.log("(not a real error) couldnt get lat long from end point, setting it to null");
+        setEndPointInput(null);
+      }
     } else {
       setEndPointInput(null);
     }
