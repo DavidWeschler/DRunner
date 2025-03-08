@@ -37,15 +37,41 @@ const getLatLngFromAddress = async (address: string) => {
 // ---------------------------------------------------------------------
 
 const Chat = () => {
-  const { inp, userLongitude, userLatitude, setHadasInp, setLengthInput, setStartAddress, setEndAddress, setDifficultyInput, setStartPointInput, setEndPointInput } = useLocationStore();
+  const { inp, setUserLocation, setHadasInp, setLengthInput, setStartAddress, setEndAddress, setDifficultyInput, setStartPointInput, setEndPointInput } = useLocationStore();
   const [messages, setMessages] = useState<{ text: string; sender: "user" | "bot"; timestamp: string }[]>([{ text: generateStartingMessage(), sender: "bot", timestamp: new Date().toLocaleTimeString() }]);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const [deepAnswered, setDeepAnswered] = useState(true);
+  const [generatePressed, setGeneratePressed] = useState(false);
+  const [userLocationStr, setUserLocationStr] = useState("");
   const flatListRef = useRef<FlatList>(null);
   const scrollToBottom = () => {
     flatListRef.current?.scrollToEnd({ animated: true });
   };
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+
+      const address = await Location.reverseGeocodeAsync({
+        latitude: location.coords?.latitude!,
+        longitude: location.coords?.longitude!,
+      });
+
+      setUserLocation({
+        latitude: location.coords?.latitude,
+        longitude: location.coords?.longitude,
+        address: `${address[0].name}, ${address[0].region}`,
+      });
+
+      setUserLocationStr(`${address[0].formattedAddress}`);
+    })();
+  }, []);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow", () => setKeyboardVisible(true));
@@ -83,7 +109,7 @@ const Chat = () => {
             content: message,
           },
         ],
-        temperature: 0.3, // Reduce creativity for better compliance
+        temperature: 0.4, // Reduce creativity for better compliance
         max_tokens: 500,
       }),
     });
@@ -100,7 +126,7 @@ const Chat = () => {
   interface AIreply {
     startLocation?: string;
     endLocation?: string;
-    routeLenght?: string;
+    routeLength?: string;
     difficultyLvl?: string;
     AIresponse?: string;
   }
@@ -111,6 +137,7 @@ const Chat = () => {
   }
 
   const generateRes = async (userInput: string) => {
+    scrollToBottom();
     let finalAnswer = "I didn't catch that. Try rephrasing your message :)";
     try {
       let currentInputs = {
@@ -123,16 +150,18 @@ const Chat = () => {
       const systemPrompt: ApiMessage = {
         role: "system",
         content: `You are a JSON generator for running routes. Follow these rules STRICTLY:
-      1. Respond ONLY with valid JSON using these keys: startLocation, endLocation, routeLenght, difficultyLvl, AIresponse. Do not include any other keys!
+      1. Respond ONLY with valid JSON using these keys: startLocation, endLocation, routeLength, difficultyLvl, AIresponse. Do not include any other keys!
       2. Use "unknown" for missing values
       3. NEVER include explanations, thoughts, or markdown
       4. Difficulty must be one of: easy, medium, hard. you may choose the closest one
-      5. routeLenght must be numbers only.
+      5. routeLength must be numbers only.
       6. AIresponse is your text response to the user's message. Answer as shortly as possible. Make sure to include what you understood.
-      7. In AIresponse ask the user on a specific next step from any single missing value here: ${JSON.stringify(currentInputs)}. If everything is correct, ask if the user wants to generate the route by clicking the button "Generate",
+      7. In AIresponse ask the user on a specific next step from any single MISSING value here: ${JSON.stringify(currentInputs)} make sure its missing! If everything is correct, ask if the user wants to generate the route by clicking the button "Generate".
       8. If the user want advices on how to plan a route, help him (no more than 20 words) in the AIresponse
-      9. Do not include any additional text or formatting. Only respond with JSON.`,
+      9. Do not include any additional text or formatting. Only respond with JSON.
+      10. my location is: ${userLocationStr}`,
       };
+      console.log("@@@@@@@@@@@@@@", userLocationStr);
 
       const userMessage: ApiMessage = {
         role: "user",
@@ -159,11 +188,11 @@ const Chat = () => {
         throw new Error("No JSON found in response");
       }
 
-      const reply = JSON.parse(cleanedJson) as AIreply;
-
+      const reply = JSON.parse(cleanedJson);
+      console.log("reply JSON:", reply);
       if (reply?.startLocation && reply.startLocation !== "unknown") setStartAddress(reply.startLocation);
       if (reply?.endLocation && reply.endLocation !== "unknown") setEndAddress(reply.endLocation);
-      if (reply?.routeLenght && reply.routeLenght !== "unknown") setLengthInput(Number(reply.routeLenght));
+      if (reply?.routeLength && reply.routeLength !== "unknown") setLengthInput(Number(reply.routeLength));
       if (reply?.difficultyLvl && ["easy", "medium", "hard"].includes(reply.difficultyLvl)) setDifficultyInput(reply.difficultyLvl as "easy" | "medium" | "hard");
 
       //erase
@@ -233,6 +262,9 @@ const Chat = () => {
   };
 
   const generateRoute = async () => {
+    setGeneratePressed(true);
+    setDeepAnswered(false);
+    setBtnTitle("Working on it...");
     const s = useLocationStore.getState().startAddress; // || users current location
     const e = useLocationStore.getState().endAddress; // || users current location
     const l = useLocationStore.getState().length || 5;
@@ -240,23 +272,33 @@ const Chat = () => {
     let startCoords = null;
     let endCoords = null;
 
-    if (s) {
-      startCoords = await getLatLngFromAddress(s);
-      setStartPointInput(startCoords);
-    } else {
-      console.log("Cannot generate route without a start point");
-      return;
+    try {
+      if (s) {
+        startCoords = await getLatLngFromAddress(s);
+        setStartPointInput(startCoords);
+      } else {
+        console.log("Cannot generate route without a start point");
+        return;
+      }
+      if (e) {
+        endCoords = await getLatLngFromAddress(e);
+        if (endCoords !== startCoords) setEndPointInput(endCoords); // this is supposed to help with creating a circular route
+      }
+      setLengthInput(l);
+      setDifficultyInput(d as "easy" | "medium" | "hard");
+      router.push("/(root)/showRoute");
+    } catch {
+      setGeneratePressed(false);
+      setDeepAnswered(true);
+      setBtnTitle("Generate");
+      const timestamp = new Date().toLocaleTimeString();
+      setMessages((prev) => [...prev, { text: "Sorry, something went wrong with generating your route", sender: "bot", timestamp }]);
+      scrollToBottom();
     }
-    if (e) {
-      endCoords = await getLatLngFromAddress(e);
-      if (endCoords !== startCoords) setEndPointInput(endCoords); // this is supposed to help with creating a circular route
-    }
-    setLengthInput(l);
-    setDifficultyInput(d as "easy" | "medium" | "hard");
-    router.push("/(root)/showRoute");
   };
 
   const [isModalVisible, setModalVisible] = useState(false);
+  const [btnTitle, setBtnTitle] = useState("Generate");
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
@@ -264,7 +306,6 @@ const Chat = () => {
   return (
     <SafeAreaView className="flex-1 p-4">
       <View className="flex-row justify-between items-center w-full px-4">
-        {/* Back Button */}
         <TouchableOpacity
           onPress={() => {
             router.push("/home");
@@ -274,20 +315,18 @@ const Chat = () => {
           <Image source={icons.backArrow} className="w-6 h-6" />
         </TouchableOpacity>
 
-        {/* Centered Title */}
         <View className="flex-1 justify-center items-center">
           <Text className="text-2xl font-JakartaBold mt-2">Hadas AI 🤖</Text>
         </View>
 
-        {/* Help Button */}
         <View className="items-center justify-center">
-          <CustomButton onPress={toggleModal} title="?" bgVariant="secondary" textVariant="default" className="ml-6 w-12 h-12 rounded-full flex items-center justify-center mt-1" textClassName="relative -mt-1" />
+          <CustomButton onPress={toggleModal} title="?" bgVariant="secondary" textVariant="default" className="ml-6 w-11 h-11 rounded-full flex items-center justify-center mt-1" textClassName="relative -mt-1" />
           <HadasHelp visible={isModalVisible} onClose={toggleModal} />
         </View>
       </View>
 
       <View className="border-t border-gray-300 w-full my-4 mt-5" />
-      {messages.length > 3 && <Button title="Generate Route" onPress={generateRoute} />}
+      {(messages.length > 3 || useLocationStore.getState().length || useLocationStore.getState().startAddress) && !generatePressed && <CustomButton onPress={generateRoute} title={btnTitle} bgVariant="primary" textVariant="default" className="mt-[-10]" />}
       <FlatList
         ref={flatListRef}
         data={messages}

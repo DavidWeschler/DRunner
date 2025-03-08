@@ -1,8 +1,12 @@
 import RunCard from "@/components/RunCard";
-import { images } from "@/constants";
+import { icons, images } from "@/constants";
+import { Run } from "@/types/type";
 import { useUser } from "@clerk/clerk-expo";
-import { FlatList, Text, View, Image, ActivityIndicator } from "react-native";
+import { FlatList, Text, View, Image, ActivityIndicator, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuth } from "@clerk/clerk-expo";
+import { router } from "expo-router";
+import { useState } from "react";
 
 const recentRuns = [
   {
@@ -65,12 +69,33 @@ const recentRuns = [
 
 const Runs = () => {
   const { user } = useUser();
+  const { signOut } = useAuth();
   const loading = false;
+
+  const [kind, setKind] = useState("recent");
+  const [recentRunRoutes, setRecentRunRoutes] = useState<Run[]>([]);
+  const [savedRunsRoutes, setSavedRunsRoutes] = useState<Run[]>([]);
+  const [futureRunsRoutes, setFutureRunsRoutes] = useState<Run[]>([]);
+
+  const viewRadio = (kind: string) => {
+    if (kind == "recent") {
+      return recentRunRoutes;
+    } else if (kind == "saved") {
+      return savedRunsRoutes;
+    } else if (kind == "future") {
+      return futureRunsRoutes;
+    }
+  };
+
+  const handleSignOut = () => {
+    signOut();
+    router.replace("/(auth)/sign-in");
+  };
 
   return (
     <SafeAreaView>
       <FlatList
-        data={recentRuns}
+        data={viewRadio(kind)}
         renderItem={({ item }) => <RunCard run={item} />}
         keyExtractor={(item, index) => index.toString()}
         className="px-5"
@@ -82,8 +107,8 @@ const Runs = () => {
           <View className="flex flex-col items-center justify-center">
             {!loading ? (
               <>
-                <Image source={images.noResult} className="w-40 h-40" alt="No recent runs found" resizeMode="contain" />
-                <Text className="text-sm">No recent runs found</Text>
+                <Image source={images.noResult} className="mt-12 w-40 h-40" alt={`No ${kind} runs found`} resizeMode="contain" />
+                <Text className="text-sm">{`No ${kind} runs found`}</Text>
               </>
             ) : (
               <ActivityIndicator size="small" color="#000" />
@@ -92,9 +117,25 @@ const Runs = () => {
         )}
         ListHeaderComponent={
           <>
-            <View className="flex-1 justify-center items-center">
-              <Text className="text-2xl font-JakartaBold mt-5">Running Routes History</Text>
-              <View className="border-t border-gray-300 w-full my-4" />
+            <View className="flex flex-row items-center justify-between my-5">
+              <Text className="text-2xl font-JakartaExtraBold">Manage Your Routes 📝</Text>
+              <TouchableOpacity onPress={handleSignOut} className="justify-center items-center w-10 h-10 rounded-full absolute right-0">
+                <Image source={icons.out} className="w-4 h-4" />
+              </TouchableOpacity>
+            </View>
+
+            <View className="flex flex-row justify-between items-center bg-gray-100 p-2 rounded-full w-full">
+              <TouchableOpacity className={`flex-1 p-3 rounded-full ${kind === "recent" ? "bg-blue-500" : "bg-transparent"}`} onPress={() => setKind("recent")}>
+                <Text className={`text-center font-bold ${kind === "recent" ? "text-white" : "text-gray-600"}`}>Recent</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity className={`flex-1 p-3 rounded-full ${kind === "saved" ? "bg-blue-500" : "bg-transparent"}`} onPress={() => setKind("saved")}>
+                <Text className={`text-center font-bold ${kind === "saved" ? "text-white" : "text-gray-600"}`}>Saved</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity className={`flex-1 p-3 rounded-full ${kind === "future" ? "bg-blue-500" : "bg-transparent"}`} onPress={() => setKind("future")}>
+                <Text className={`text-center font-bold ${kind === "future" ? "text-white" : "text-gray-600"}`}>Future</Text>
+              </TouchableOpacity>
             </View>
           </>
         }
