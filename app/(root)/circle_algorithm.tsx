@@ -248,8 +248,7 @@ async function CircularAlgorithm({ routeLengthKm, startPoint }: AlgorithmParams)
       routes.push(route);
     } catch (error) {
       console.error("Error generating route:", error);
-      console.log("start poiny in circular algorithm: ", startPoint);
-      i--; // Try again if a route fails to generate.
+      // i--; // Try again if a route fails to generate. This is dangerous, could cause infinite loop and cost money.
     }
   }
 

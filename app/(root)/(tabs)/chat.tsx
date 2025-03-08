@@ -37,7 +37,7 @@ const getLatLngFromAddress = async (address: string) => {
 // ---------------------------------------------------------------------
 
 const Chat = () => {
-  const { inp, setHadasInp, setLengthInput, setStartAddress, setEndAddress, setDifficultyInput, setStartPointInput, setEndPointInput } = useLocationStore();
+  const { inp, userLongitude, userLatitude, setHadasInp, setLengthInput, setStartAddress, setEndAddress, setDifficultyInput, setStartPointInput, setEndPointInput } = useLocationStore();
   const [messages, setMessages] = useState<{ text: string; sender: "user" | "bot"; timestamp: string }[]>([{ text: generateStartingMessage(), sender: "bot", timestamp: new Date().toLocaleTimeString() }]);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -243,6 +243,9 @@ const Chat = () => {
     if (s) {
       startCoords = await getLatLngFromAddress(s);
       setStartPointInput(startCoords);
+    } else {
+      console.log("Cannot generate route without a start point");
+      return;
     }
     if (e) {
       endCoords = await getLatLngFromAddress(e);
