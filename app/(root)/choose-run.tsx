@@ -8,6 +8,7 @@ import { useRouter } from "expo-router";
 import CircularAlgorithm from "./circle_algorithm";
 import Line_Algorithm from "./line_algorithm";
 import { useUser } from "@clerk/clerk-react";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const ChooseRun = () => {
   const router = useRouter();
@@ -38,6 +39,10 @@ const ChooseRun = () => {
   // hard route:
   const [routePinsH, setRoutePinsH] = useState<{ latitude: number; longitude: number }[]>([]);
   const [routeDirectionsH, setRouteDirectionsH] = useState<string[] | null>(null);
+
+  // date and time:
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [currLevel, setCurrLevel] = useState("easy");
 
   // This useEffect has 3 functions that calculate all 3 routes and store them locally, for further display on the map
   useEffect(() => {
@@ -145,6 +150,8 @@ const ChooseRun = () => {
   };
 
   const addRunToDatabase = async (difficulty: string) => {
+    console.log("saving route with difficulty:", difficulty);
+
     console.log("Add run to database");
     const clerkId = user?.id;
     console.log("clerkId:", clerkId);
@@ -185,6 +192,21 @@ const ChooseRun = () => {
     }
   };
 
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date: Date, level: string) => {
+    console.warn("A date has been picked: ", date);
+    hideDatePicker();
+
+    addRunToDatabase(level);
+  };
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="flex-1 bg-white">
       <View className="flex flex-row items-center justify-between my-2">
@@ -210,6 +232,18 @@ const ChooseRun = () => {
           <View key={index} className="items-center justify-center flex-1">
             <Text className={`text-xl font-bold ${level === "easy" ? "text-blue-500" : level === "medium" ? "text-yellow-500" : "text-red-500"}`}>{level.charAt(0).toUpperCase() + level.slice(1)} Route</Text>
 
+            <View className="flex-row space-x-4">
+              <TouchableOpacity className="bg-green-300 rounded-lg px-4 py-2" onPress={async () => await addRunToDatabase(level)}>
+                <Text className="text-black font-semibold">Save Route</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity className="bg-yellow-300 rounded-lg px-4 py-2" onPress={showDatePicker}>
+                <Text className="text-black font-semibold">Schedule Route</Text>
+              </TouchableOpacity>
+            </View>
+
+            <DateTimePickerModal isVisible={isDatePickerVisible} mode="datetime" onConfirm={(date) => handleConfirm(date, level)} onCancel={hideDatePicker} />
+
             {/* Map Component */}
             <View className="flex flex-row items-center bg-transparent h-[400px] w-[90%] mx-auto mt-4">
               {level === "easy" && <Map theme={mapTheme || "standard"} pins={routePinsE} directions={routeDirectionsE} />}
@@ -225,11 +259,6 @@ const ChooseRun = () => {
           </View>
         ))}
       </Swiper>
-
-      {/* Save Run Buttons */}
-      <Button title="Add Easy to Database (debug)" onPress={async () => await addRunToDatabase("easy")} />
-      <Button title="Add Medium to Database (debug)" onPress={async () => await addRunToDatabase("medium")} />
-      <Button title="Add Hard to Database (debug)" onPress={async () => await addRunToDatabase("hard")} />
 
       {/* Start Run Button */}
       <TouchableOpacity

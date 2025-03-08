@@ -3,6 +3,7 @@ import { useAuth } from "@clerk/clerk-expo";
 import * as Location from "expo-location";
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
+import * as Notifications from "expo-notifications";
 import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet, Alert, Platform, Button } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GoogleTextInput from "@/components/GoogleTextInput";
@@ -17,6 +18,8 @@ import React from "react";
 import CustomButton from "@/components/CustomButton";
 import PointInput from "@/components/FormGoogleText";
 
+import { SchedulableTriggerInputTypes } from "expo-notifications";
+
 const getLatLngFromAddress = async (address: string) => {
   console.log("Getting lat and long from address:", address);
   try {
@@ -28,6 +31,16 @@ const getLatLngFromAddress = async (address: string) => {
     throw new Error(`${error}`);
   }
 };
+
+// First, set the handler that will cause the notification
+// to show the alert
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 const Home = () => {
   console.log("Home screen rendered");
@@ -195,6 +208,16 @@ const Home = () => {
     fetchRoutes("future_routes");
   }, []);
 
+  useEffect(() => {
+    // Request permissions on mount.
+    (async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        alert("Notification permissions not granted!");
+      }
+    })();
+  }, []);
+
   const fetchRoutes = async (apiType: string) => {
     try {
       const recent = await fetch(`/(api)/${apiType}`, {
@@ -259,8 +282,6 @@ const Home = () => {
     setEndPoint("");
     setDifficulty("");
 
-    // router.push("/(root)/ronsShowRoute");
-    // router.push("/(root)/showRoute");
     router.push("/(root)/choose-run");
   };
 
@@ -274,14 +295,58 @@ const Home = () => {
     }
   };
 
+  // // this is for debugging notifications
+  useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener((notification) => {
+      console.log("Notification received:", notification);
+      checkPendingNotifications();
+      // Notifications.cancelAllScheduledNotificationsAsync(); // cancel all notifications, this is not good but theres a bug in the expo-notifications library
+    });
+    return () => subscription.remove();
+  }, []);
+
+  // to check pending notifications
+  const checkPendingNotifications = async () => {
+    const pending = await Notifications.getAllScheduledNotificationsAsync();
+    console.log("Pending notifications:", pending);
+  };
+
+  // useEffect(() => {
+  //   checkPendingNotifications();
+  // }, []);
+
+  // // to cancel all pending notifications
+  // useEffect(() => {
+  //   Notifications.cancelAllScheduledNotificationsAsync();
+  // }, []);
+
   const debug = async () => {
-    console.log("debug");
+    // return;
     fetchRoutes("recent_routes");
     fetchRoutes("saved_routes");
     fetchRoutes("future_routes");
-    console.log("saved routes: ", savedRunsRoutes);
-    console.log("\n\n\n\nrecent routes: ", recentRunRoutes);
-    console.log("\n\n\n\nfuture routes: ", futureRunsRoutes);
+    // console.log("saved routes: ", savedRunsRoutes);
+    // console.log("\n\n\n\nrecent routes: ", recentRunRoutes);
+    // console.log("\n\n\n\nfuture routes: ", futureRunsRoutes);
+
+    console.log("Scheduling notification");
+    const notification = {
+      title: "It's time to run! 🏃‍♂️",
+      body: "Don't forget to run the route you scheduled for today.",
+      data: { data: "goes here" },
+    };
+
+    const trigger: Notifications.DateTriggerInput = {
+      type: SchedulableTriggerInputTypes.DATE,
+      date: new Date(2025, 2, 8, 10, 45), // Note: Month is 0-indexed, so 2 represents March (this is march 8, 2025 at 10:41 am)
+    };
+
+    try {
+      const id = await Notifications.scheduleNotificationAsync({ content: notification, trigger });
+      console.log("Notification scheduled with id:", id);
+    } catch (error) {
+      console.error("Error scheduling notification:", error);
+    }
   };
 
   return (
