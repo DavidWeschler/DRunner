@@ -37,7 +37,7 @@ const getLatLngFromAddress = async (address: string) => {
 // ---------------------------------------------------------------------
 
 const Chat = () => {
-  const { inp, setHadasInp, setLengthInput, setStartAddress, setEndAddress, setDifficultyInput, setStartPointInput, setEndPointInput } = useLocationStore();
+  const { inp, userLongitude, userLatitude, setHadasInp, setLengthInput, setStartAddress, setEndAddress, setDifficultyInput, setStartPointInput, setEndPointInput } = useLocationStore();
   const [messages, setMessages] = useState<{ text: string; sender: "user" | "bot"; timestamp: string }[]>([{ text: generateStartingMessage(), sender: "bot", timestamp: new Date().toLocaleTimeString() }]);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
@@ -272,6 +272,9 @@ const Chat = () => {
     if (s) {
       startCoords = await getLatLngFromAddress(s);
       setStartPointInput(startCoords);
+    } else {
+      console.log("Cannot generate route without a start point");
+      return;
     }
     if (e) {
       endCoords = await getLatLngFromAddress(e);
@@ -279,13 +282,14 @@ const Chat = () => {
     }
     setLengthInput(l);
     setDifficultyInput(d as "easy" | "medium" | "hard");
-    router.push("/(root)/showRoute");
+    // router.push("/(root)/showRoute");
+    router.push("/(root)/choose-run");
   };
 
   return (
     <SafeAreaView className="flex-1 p-4">
       <View className="justify-center items-center">
-        {useLocationStore.getState().length && <Button title="Generate Route" onPress={generateRoute} />}
+        {useLocationStore.getState().startAddress && <Button title="Generate Route" onPress={generateRoute} />}
 
         <Text className="text-2xl font-JakartaBold mt-5">Chatting With Hadas AI (NEW)</Text>
         <View className="border-t border-gray-300 w-full my-4" />
