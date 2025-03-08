@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import { View, Text, FlatList, Keyboard, Platform, Button } from "react-native";
+import { useState, useEffect, useRef } from "react";
+import { View, Text, FlatList, Keyboard, Platform, Button, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HadasTextInput from "@/components/HadasInp";
 import { icons } from "@/constants";
 import { useLocationStore } from "@/store";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
-import axios from "axios";
 import * as Location from "expo-location";
 import { router } from "expo-router";
+import CustomButton from "@/components/CustomButton";
+import HadasHelp from "@/components/HadasHelp";
 
 const OPENROUTER_API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY;
 
@@ -42,6 +42,10 @@ const Chat = () => {
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const [deepAnswered, setDeepAnswered] = useState(true);
+  const flatListRef = useRef<FlatList>(null);
+  const scrollToBottom = () => {
+    flatListRef.current?.scrollToEnd({ animated: true });
+  };
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow", () => setKeyboardVisible(true));
@@ -50,6 +54,7 @@ const Chat = () => {
     if (inp) {
       // Clear the conversation and add new message
       setMessages(() => [{ text: generateStartingMessage(), sender: "bot", timestamp: new Date().toLocaleTimeString() }]);
+      scrollToBottom();
       handleSend({ inp });
       setHadasInp(""); // Clear input after sending
     }
@@ -59,39 +64,6 @@ const Chat = () => {
     };
   }, [inp]);
 
-  const askAio = async (instructions: string, message: string) => {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "qwen/qwq-32b:free",
-        messages: [
-          {
-            role: "system",
-            content: instructions,
-          },
-          {
-            role: "user",
-            content: message,
-          },
-        ],
-        temperature: 0.3, // Reduce creativity for better compliance
-        max_tokens: 120,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    console.log("Full response:", JSON.stringify(data, null, 2)); // Log the full response
-    const messageContent = JSON.parse(data.choices[0].message.content);
-    return messageContent;
-  };
   const askAi = async (instructions: string, message: string) => {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -139,6 +111,7 @@ const Chat = () => {
   }
 
   const generateRes = async (userInput: string) => {
+    let finalAnswer = "I didn't catch that. Try rephrasing your message :)";
     try {
       let currentInputs = {
         "running route length ": useLocationStore.getState().length,
@@ -155,7 +128,7 @@ const Chat = () => {
       3. NEVER include explanations, thoughts, or markdown
       4. Difficulty must be one of: easy, medium, hard. you may choose the closest one
       5. routeLenght must be numbers only.
-      6. AIresponse is your text response to the user's message. Answer as shortly as possible while including what route features you got.
+      6. AIresponse is your text response to the user's message. Answer as shortly as possible. Make sure to include what you understood.
       7. In AIresponse ask the user on a specific next step from any single missing value here: ${JSON.stringify(currentInputs)}. If everything is correct, ask if the user wants to generate the route by clicking the button "Generate",
       8. If the user want advices on how to plan a route, help him (no more than 20 words) in the AIresponse
       9. Do not include any additional text or formatting. Only respond with JSON.`,
@@ -203,7 +176,6 @@ const Chat = () => {
       console.log("Entered inputs:", currentInputs);
       //end erase
 
-      let finalAnswer = "I didn't catch that. Try rephrasing your message :)";
       finalAnswer =
         reply?.AIresponse && reply.AIresponse !== "unknown"
           ? (reply.AIresponse ?? "")
@@ -214,13 +186,11 @@ const Chat = () => {
               .filter((s: string) => s.trim() !== "")
               .pop() ?? finalAnswer // Ensures finalAnswer remains a string
           : finalAnswer;
-
+    } catch (error) {
+    } finally {
       const timestamp = new Date().toLocaleTimeString();
       setMessages((prev) => [...prev, { text: finalAnswer, sender: "bot", timestamp }]);
-    } catch (error) {
-      console.error("Error resolving intent:", error);
-      const timestamp = new Date().toLocaleTimeString();
-      setMessages((prev) => [...prev, { text: "I didn't catch that. Try reprashing your message :)", sender: "bot", timestamp }]);
+      scrollToBottom();
     }
   };
 
@@ -258,6 +228,7 @@ const Chat = () => {
       setMessages((prev) => [...prev, { text: "Sorry, something went wrong. Please try again.", sender: "bot", timestamp }]);
     } finally {
       setDeepAnswered(true);
+      scrollToBottom();
     }
   };
 
@@ -282,15 +253,40 @@ const Chat = () => {
     router.push("/(root)/showRoute");
   };
 
+  const [isModalVisible, setModalVisible] = useState(false);
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
   return (
     <SafeAreaView className="flex-1 p-4">
-      <View className="justify-center items-center">
-        {useLocationStore.getState().length && <Button title="Generate Route" onPress={generateRoute} />}
+      <View className="flex-row justify-between items-center w-full px-4">
+        {/* Back Button */}
+        <TouchableOpacity
+          onPress={() => {
+            router.push("/home");
+          }}
+          className="justify-center items-center w-10 h-10 rounded-full"
+        >
+          <Image source={icons.backArrow} className="w-6 h-6" />
+        </TouchableOpacity>
 
-        <Text className="text-2xl font-JakartaBold mt-5">Chatting With Hadas AI (NEW)</Text>
-        <View className="border-t border-gray-300 w-full my-4" />
+        {/* Centered Title */}
+        <View className="flex-1 justify-center items-center">
+          <Text className="text-2xl font-JakartaBold mt-2">Hadas AI 🤖</Text>
+        </View>
+
+        {/* Help Button */}
+        <View className="items-center justify-center">
+          <CustomButton onPress={toggleModal} title="?" bgVariant="secondary" textVariant="default" className="ml-6 w-12 h-12 rounded-full flex items-center justify-center mt-1" textClassName="relative -mt-1" />
+          <HadasHelp visible={isModalVisible} onClose={toggleModal} />
+        </View>
       </View>
+
+      <View className="border-t border-gray-300 w-full my-4 mt-5" />
+      {messages.length > 3 && <Button title="Generate Route" onPress={generateRoute} />}
       <FlatList
+        ref={flatListRef}
         data={messages}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
@@ -303,13 +299,7 @@ const Chat = () => {
       />
 
       <View className={`${keyboardVisible ? "" : " p-2 mb-20"}`}>
-        <HadasTextInput
-          icon={icons.to}
-          containerStyle="bg-white shadow-md shadow-neutral-300"
-          placeholder="Message"
-          handleString={handleSend}
-          editable={deepAnswered} // Disable input if deepAnswered is false
-        />
+        <HadasTextInput icon={icons.to} containerStyle="bg-white shadow-md shadow-neutral-300" placeholder="Message" handleString={handleSend} editable={deepAnswered} />
       </View>
     </SafeAreaView>
   );
