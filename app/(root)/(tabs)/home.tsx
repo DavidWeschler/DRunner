@@ -18,8 +18,6 @@ import React from "react";
 import CustomButton from "@/components/CustomButton";
 import PointInput from "@/components/FormGoogleText";
 
-import { SchedulableTriggerInputTypes } from "expo-notifications";
-
 const getLatLngFromAddress = async (address: string) => {
   console.log("Getting lat and long from address:", address);
   try {
@@ -186,13 +184,6 @@ const Home = () => {
     fetchWeather();
   }, [userLatLong]);
 
-  const handleDestinationPress = (location: { latitude: number; longitude: number; address: string }) => {
-    setDestinationLocation(location);
-
-    router.push("/(root)/find-run");
-  };
-
-  // useEffect to setStartPoint
   useEffect(() => {
     if (startAddress) {
       setStartPoint(startAddress);
@@ -295,63 +286,8 @@ const Home = () => {
     }
   };
 
-  // // this is for debugging notifications
-  useEffect(() => {
-    const subscription = Notifications.addNotificationReceivedListener((notification) => {
-      console.log("Notification received:", notification);
-      checkPendingNotifications();
-      // Notifications.cancelAllScheduledNotificationsAsync(); // cancel all notifications, this is not good but theres a bug in the expo-notifications library
-    });
-    return () => subscription.remove();
-  }, []);
-
-  // to check pending notifications
-  const checkPendingNotifications = async () => {
-    const pending = await Notifications.getAllScheduledNotificationsAsync();
-    console.log("Pending notifications:", pending);
-  };
-
-  // useEffect(() => {
-  //   checkPendingNotifications();
-  // }, []);
-
-  // // to cancel all pending notifications
-  // useEffect(() => {
-  //   Notifications.cancelAllScheduledNotificationsAsync();
-  // }, []);
-
-  const debug = async () => {
-    // return;
-    fetchRoutes("recent_routes");
-    fetchRoutes("saved_routes");
-    fetchRoutes("future_routes");
-    // console.log("saved routes: ", savedRunsRoutes);
-    // console.log("\n\n\n\nrecent routes: ", recentRunRoutes);
-    // console.log("\n\n\n\nfuture routes: ", futureRunsRoutes);
-
-    console.log("Scheduling notification");
-    const notification = {
-      title: "It's time to run! 🏃‍♂️",
-      body: "Don't forget to run the route you scheduled for today.",
-      data: { data: "goes here" },
-    };
-
-    const trigger: Notifications.DateTriggerInput = {
-      type: SchedulableTriggerInputTypes.DATE,
-      date: new Date(2025, 2, 8, 10, 45), // Note: Month is 0-indexed, so 2 represents March (this is march 8, 2025 at 10:41 am)
-    };
-
-    try {
-      const id = await Notifications.scheduleNotificationAsync({ content: notification, trigger });
-      console.log("Notification scheduled with id:", id);
-    } catch (error) {
-      console.error("Error scheduling notification:", error);
-    }
-  };
-
   return (
     <SafeAreaView className="bg-general-500">
-      <Button title="Hi" onPress={debug} />
       <FlatList
         data={viewRadio(kind)}
         renderItem={({ item }) => (

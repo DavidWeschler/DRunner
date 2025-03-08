@@ -10,6 +10,9 @@ import Line_Algorithm from "./line_algorithm";
 import { useUser } from "@clerk/clerk-react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
+import * as Notifications from "expo-notifications";
+import { SchedulableTriggerInputTypes } from "expo-notifications";
+
 const ChooseRun = () => {
   const router = useRouter();
   const { mapTheme } = useLocationStore();
@@ -42,7 +45,7 @@ const ChooseRun = () => {
 
   // date and time:
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [currLevel, setCurrLevel] = useState("easy");
+  const [chosenDate, setChosenDate] = useState(new Date());
 
   // This useEffect has 3 functions that calculate all 3 routes and store them locally, for further display on the map
   useEffect(() => {
@@ -149,7 +152,7 @@ const ChooseRun = () => {
     }
   };
 
-  const addRunToDatabase = async (difficulty: string) => {
+  const addRunToDatabase = async (difficulty: string, future = false, save = false) => {
     console.log("saving route with difficulty:", difficulty);
 
     console.log("Add run to database");
@@ -167,8 +170,8 @@ const ChooseRun = () => {
       elevationGain: difficulty === "easy" ? routeElevation.easy : difficulty === "medium" ? routeElevation.medium : routeElevation.hard,
       length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
       waypoints: (difficulty === "easy" ? routePinsE : difficulty === "medium" ? routePinsM : routePinsH).map((pin) => [pin.longitude, pin.latitude]),
-      is_saved: true,
-      is_scheduled: null,
+      is_saved: save,
+      is_scheduled: future ? chosenDate : null,
       is_deleted: false,
     };
 
@@ -183,12 +186,15 @@ const ChooseRun = () => {
 
       if (response.ok) {
         console.log("Route added successfully");
+        return true;
       } else {
         const errorData = await response.json();
         console.error("Failed to add route", errorData);
+        return false;
       }
     } catch (error) {
       console.error("Error adding route", error);
+      return false;
     }
   };
 
@@ -200,18 +206,60 @@ const ChooseRun = () => {
     setDatePickerVisibility(false);
   };
 
-  const handleConfirm = (date: Date, level: string) => {
+  // // this is for debugging notifications
+  // useEffect(() => {
+  //   const subscription = Notifications.addNotificationReceivedListener((notification) => {
+  //     console.log("Notification received:", notification);
+  //     checkPendingNotifications();
+  //     // Notifications.cancelAllScheduledNotificationsAsync(); // cancel all notifications, this is not good but theres a bug in the expo-notifications library
+  //   });
+  //   return () => subscription.remove();
+  // }, []);
+
+  // // to check pending notifications
+  // const checkPendingNotifications = async () => {
+  //   const pending = await Notifications.getAllScheduledNotificationsAsync();
+  //   console.log("Pending notifications:", pending);
+  // };
+
+  const setNotification = async (date: Date) => {
+    const notification = {
+      title: "It's time to run! 🏃‍♂️",
+      body: "Don't forget to run the route you scheduled for today.",
+      data: { data: "goes here" },
+    };
+
+    const trigger: Notifications.DateTriggerInput = {
+      type: SchedulableTriggerInputTypes.DATE,
+      date: date,
+    };
+
+    try {
+      const id = await Notifications.scheduleNotificationAsync({ content: notification, trigger });
+      console.log("Notification scheduled with id:", id);
+    } catch (error) {
+      console.error("Error scheduling notification:", error);
+    }
+  };
+
+  const handleConfirm = async (date: Date, level: string) => {
     console.warn("A date has been picked: ", date);
     hideDatePicker();
-
-    addRunToDatabase(level);
+    setChosenDate(date);
+    const status = await addRunToDatabase(level, true, false);
+    if (status) await setNotification(date);
   };
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="flex-1 bg-white">
       <View className="flex flex-row items-center justify-between my-2">
         <Text className="text-2xl font-JakartaExtraBold ml-12">Select a route 🏃‍♂️‍➡️</Text>
-        <TouchableOpacity onPress={() => router.back()} className="justify-center items-center w-10 h-10 rounded-full absolute left-0">
+        <TouchableOpacity
+          onPress={() => {
+            router.push("/home");
+          }}
+          className="justify-center items-center w-10 h-10 rounded-full absolute left-0"
+        >
           <Image source={icons.backArrow} className="w-6 h-6" />
         </TouchableOpacity>
       </View>
@@ -233,7 +281,7 @@ const ChooseRun = () => {
             <Text className={`text-xl font-bold ${level === "easy" ? "text-blue-500" : level === "medium" ? "text-yellow-500" : "text-red-500"}`}>{level.charAt(0).toUpperCase() + level.slice(1)} Route</Text>
 
             <View className="flex-row space-x-4">
-              <TouchableOpacity className="bg-green-300 rounded-lg px-4 py-2" onPress={async () => await addRunToDatabase(level)}>
+              <TouchableOpacity className="bg-green-300 rounded-lg px-4 py-2" onPress={async () => await addRunToDatabase(level, false, true)}>
                 <Text className="text-black font-semibold">Save Route</Text>
               </TouchableOpacity>
 
@@ -242,7 +290,7 @@ const ChooseRun = () => {
               </TouchableOpacity>
             </View>
 
-            <DateTimePickerModal isVisible={isDatePickerVisible} mode="datetime" onConfirm={(date) => handleConfirm(date, level)} onCancel={hideDatePicker} />
+            <DateTimePickerModal isVisible={isDatePickerVisible} mode="datetime" onConfirm={async (date) => await handleConfirm(date, level)} onCancel={hideDatePicker} />
 
             {/* Map Component */}
             <View className="flex flex-row items-center bg-transparent h-[400px] w-[90%] mx-auto mt-4">
