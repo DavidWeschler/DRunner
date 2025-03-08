@@ -57,9 +57,9 @@ const Chat = () => {
       keyboardDidHideListener.remove();
       keyboardDidShowListener.remove();
     };
-  }, [inp]);
+  }, [inp]); // Dependency on `inp` to trigger the effect when `inp` changes
 
-  const askAio = async (instructions: string, message: string) => {
+  const askAi = async (instructions: string, message: string) => {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -89,10 +89,10 @@ const Chat = () => {
 
     const data = await response.json();
     console.log("Full response:", JSON.stringify(data, null, 2)); // Log the full response
-    const messageContent = JSON.parse(data.choices[0].message.content);
+    const messageContent = data.choices[0].message.content;
     return messageContent;
   };
-  const askAi = async (instructions: string, message: string) => {
+  const askAiOLD = async (instructions: string, message: string) => {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -112,9 +112,10 @@ const Chat = () => {
           },
         ],
         temperature: 0.3, // Reduce creativity for better compliance
-        max_tokens: 500,
+        max_tokens: 120,
       }),
     });
+
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
@@ -125,12 +126,11 @@ const Chat = () => {
     return messageContent;
   };
 
-  interface AIreply {
-    startLocation?: string;
-    endLocation?: string;
-    routeLenght?: string;
-    difficultyLvl?: string;
-    AIresponse?: string;
+  interface RouteDetails {
+    start?: string;
+    end?: string;
+    len?: string;
+    difficulty?: string;
   }
 
   interface ApiMessage {
@@ -138,82 +138,86 @@ const Chat = () => {
     content: string;
   }
 
+  const resolveIntent = async (userInput: string): Promise<Boolean | null> => {
+    const apiUrl = "https://openrouter.ai/api/v1/chat/completions";
+    const headers = {
+      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+    };
+
+    const systemPrompt: ApiMessage = {
+      role: "system",
+      content: `Answer only with $ or %: answer $ if the sentence include features of the wanted running route (e.g lenght, starting point, ending point, difficulty level), answer with % otherwhise. Answer only with $ or % with nothing else. The sentence is: `,
+    };
+
+    const userMessage: ApiMessage = {
+      role: "user",
+      content: `${userInput}\n`,
+    };
+    let rawContent = "";
+
+    try {
+      let i = 2;
+      rawContent = await askAi(systemPrompt.content, userMessage.content);
+      while (!rawContent || !((rawContent.includes("$") && !rawContent.includes("%")) || (rawContent.includes("%") && !rawContent.includes("$")))) {
+        rawContent = await askAi(systemPrompt.content, userMessage.content);
+        if (i === 0) {
+          return rawContent === "$";
+        }
+        i--;
+      }
+      return rawContent.includes("$");
+    } catch (error) {
+      return null;
+    }
+  };
+
   const generateRes = async (userInput: string) => {
     try {
-      let currentInputs = {
-        "running route length ": useLocationStore.getState().length,
-        "running route start location ": useLocationStore.getState().startAddress,
-        "running route end location ": useLocationStore.getState().endAddress,
-        "running route difficulty level ": useLocationStore.getState().difficulty,
-      };
-
-      const systemPrompt: ApiMessage = {
-        role: "system",
-        content: `You are a JSON generator for running routes. Follow these rules STRICTLY:
-      1. Respond ONLY with valid JSON using these keys: startLocation, endLocation, routeLenght, difficultyLvl, AIresponse. Do not include any other keys!
-      2. Use "unknown" for missing values
-      3. NEVER include explanations, thoughts, or markdown
-      4. Difficulty must be one of: easy, medium, hard. you may choose the closest one
-      5. routeLenght must be numbers only.
-      6. AIresponse is your text response to the user's message. Answer as shortly as possible while including what route features you got.
-      7. In AIresponse ask the user on a specific next step from any single missing value here: ${JSON.stringify(currentInputs)}. If everything is correct, ask if the user wants to generate the route by clicking the button "Generate",
-      8. If the user want advices on how to plan a route, help him (no more than 20 words) in the AIresponse
-      9. Do not include any additional text or formatting. Only respond with JSON.`,
-      };
-
-      const userMessage: ApiMessage = {
-        role: "user",
-        content: `${userInput}\n\nONLY RESPOND WITH JSON. NO ADDITIONAL TEXT.`,
-      };
-
-      let rawContent = "";
-
-      rawContent = await askAi(systemPrompt.content, userMessage.content);
-      const jsonString = rawContent?.match(/\{[\s\S]*\}/)?.[0] || "";
-
-      console.log("jsonString:", jsonString);
-      // Clean common formatting issues
-      const cleanedJson = jsonString
-        .replace(/```json/g, "") // Remove markdown code blocks
-        .replace(/```/g, "") // Remove any remaining backticks
-        .replace(/\\n/g, "") // Remove newline characters
-        .replace(/\n/g, "") // Remove literal newlines
-        .replace(/\\/g, ""); // Remove any remaining \
-
-      console.log("Cleaned JSON:", cleanedJson);
-
-      if (!cleanedJson) {
-        throw new Error("No JSON found in response");
+      const response = await resolveIntent(userInput);
+      let res = "";
+      if (response === null) {
+        throw new Error("No response from AI");
+      } else if (response) {
+        console.log("$$$$$$$$$$");
+        await extractRouteDetails(userInput);
+      } else {
+        console.log("%%%%%%%%%%");
+        res = (await adviceUsr(`Answer VERY shortly. mention you can help with planning a running route. The sentence is: `, `${userInput} .Reply with no more then 15 words!`)) + " ";
       }
 
-      const reply = JSON.parse(cleanedJson) as AIreply;
-
-      if (reply?.startLocation && reply.startLocation !== "unknown") setStartAddress(reply.startLocation);
-      if (reply?.endLocation && reply.endLocation !== "unknown") setEndAddress(reply.endLocation);
-      if (reply?.routeLenght && reply.routeLenght !== "unknown") setLengthInput(Number(reply.routeLenght));
-      if (reply?.difficultyLvl && ["easy", "medium", "hard"].includes(reply.difficultyLvl)) setDifficultyInput(reply.difficultyLvl as "easy" | "medium" | "hard");
-
-      //erase
-      currentInputs = {
+      const currentInputs = {
         "running route length ": useLocationStore.getState().length,
         "running route start location ": useLocationStore.getState().startAddress,
         "running route end location ": useLocationStore.getState().endAddress,
         "running route difficulty level ": useLocationStore.getState().difficulty,
       };
-      console.log("Entered inputs:", currentInputs);
-      //end erase
 
-      let finalAnswer = "I didn't catch that. Try rephrasing your message :)";
-      finalAnswer =
-        reply?.AIresponse && reply.AIresponse !== "unknown"
-          ? (reply.AIresponse ?? "")
-              .replace(/\*\*/g, "\n**")
-              .replace(/\*\*/g, "")
-              .split(/<\/think>/)
-              .map((s: string) => s.replace(/\n/g, ""))
-              .filter((s: string) => s.trim() !== "")
-              .pop() ?? finalAnswer // Ensures finalAnswer remains a string
-          : finalAnswer;
+      const nullKeys = Object.entries(currentInputs).filter(([key, value]) => value === null);
+
+      let conclude = "";
+      let finalAnswer = "";
+      while (!conclude || conclude.includes("user") || conclude.includes("I need to")) {
+        if (nullKeys.length !== 0) {
+          if (res === "I didn't catch that. Try reprashing your message :)") {
+            finalAnswer = res;
+          } else {
+            console.log("nullKeys");
+            conclude = await adviceUsr(`Ask VERY shortly how you can help with deciding on the ${nullKeys[0]}. Reply with no more then 10 words!`, `My current running route features: ${JSON.stringify(currentInputs)}`);
+            finalAnswer = res + conclude;
+          }
+        } else {
+          console.log("conclude");
+          conclude = await adviceUsr(
+            `VERY shortly recap the running route features and ask if the he want to change something or click "Generate" to see the suggested routes. 
+            The route features:
+            ${JSON.stringify(currentInputs)}`,
+            ""
+          );
+          finalAnswer = conclude;
+        }
+      }
+      finalAnswer = finalAnswer.replace(/\*\*/g, "\n**").replace(/\*\*/g, "");
 
       const timestamp = new Date().toLocaleTimeString();
       setMessages((prev) => [...prev, { text: finalAnswer, sender: "bot", timestamp }]);
@@ -222,6 +226,130 @@ const Chat = () => {
       const timestamp = new Date().toLocaleTimeString();
       setMessages((prev) => [...prev, { text: "I didn't catch that. Try reprashing your message :)", sender: "bot", timestamp }]);
     }
+  };
+
+  const adviceUsr = async (content: string, userInput: string) => {
+    const apiUrl = "https://openrouter.ai/api/v1/chat/completions";
+    const headers = {
+      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+    };
+
+    const systemPrompt: ApiMessage = {
+      role: "system",
+      content: content,
+    };
+
+    const userMessage: ApiMessage = {
+      role: "user",
+      content: `${userInput}\n`,
+    };
+
+    try {
+      let cleanedText = "";
+      while (!cleanedText || cleanedText.includes("user") || cleanedText.includes("I need to")) {
+        const reply = await askAi(systemPrompt.content, userMessage.content);
+        cleanedText = reply
+          .split(/<\/think>/) // Split by </think>
+          .map((s: string) => s.replace(/\n/g, "")) // Remove all newline characters
+          .filter((s: string) => s.trim() !== "") // Remove empty elements
+          .pop();
+      }
+      return cleanedText;
+    } catch (error) {
+      return "I didn't catch that. Try rephrasing your message :)";
+    }
+  };
+
+  const extractRouteDetails = async (userInput: string) => {
+    const apiUrl = "https://openrouter.ai/api/v1/chat/completions";
+    const headers = {
+      Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+    };
+
+    const currentInputs = {
+      "running route length ": useLocationStore.getState().length,
+      "running route start location ": useLocationStore.getState().startAddress,
+      "running route end location ": useLocationStore.getState().endAddress,
+      "running route difficulty level ": useLocationStore.getState().difficulty,
+    };
+
+    let systemPrompt: ApiMessage = {
+      role: "system",
+      content: `You are a JSON generator for running routes. Follow these rules STRICTLY:
+    1. Respond ONLY with valid JSON using these keys: start, end, len, difficulty
+    2. Use "unknown" for missing values
+    3. Never include explanations, thoughts, or markdown
+    4. Difficulty must be one of: easy, medium, hard. you may choose the closest one
+    5. The The current route features:
+    ${JSON.stringify(currentInputs)}
+    
+    Current request: `,
+    };
+
+    const userMessage: ApiMessage = {
+      role: "user",
+      content: `${userInput}\n\nONLY RESPOND WITH JSON. NO ADDITIONAL TEXT.`,
+    };
+
+    let rawContent = "";
+
+    try {
+      rawContent = await askAi(systemPrompt.content, userMessage.content);
+
+      // Extract JSON from response text using regex
+      const jsonString = rawContent?.match(/\{[\s\S]*\}/)?.[0] || "";
+
+      // Clean common formatting issues
+      const cleanedJson = jsonString
+        .replace(/```json/g, "") // Remove markdown code blocks
+        .replace(/```/g, "") // Remove any remaining backticks
+        .replace(/\\n/g, "") // Remove newline characters
+        .replace(/\n/g, ""); // Remove literal newlines
+
+      if (!cleanedJson) {
+        throw new Error("No JSON found in response");
+      }
+
+      // Parse with error handling
+      const reply = JSON.parse(cleanedJson) as RouteDetails;
+
+      // Validate structure
+      if (!("start" in reply && "end" in reply && "len" in reply && "difficulty" in reply)) {
+        throw new Error("Invalid JSON structure");
+      }
+
+      if (reply?.start && reply.start !== "unknown") setStartAddress(reply.start);
+      if (reply?.end && reply.end !== "unknown") setEndAddress(reply.end);
+      if (reply?.len && reply.len !== "unknown") setLengthInput(Number(reply.len));
+      if (reply?.difficulty && ["easy", "medium", "hard"].includes(reply.difficulty)) setDifficultyInput(reply.difficulty as "easy" | "medium" | "hard");
+
+      // const currentInputs = {
+      //   "running route length: ": useLocationStore.getState().length,
+      //   "running route start location: ": useLocationStore.getState().startAddress,
+      //   "running route end location: ": useLocationStore.getState().endAddress,
+      //   "running route difficulty level: ": useLocationStore.getState().difficulty,
+      // };
+
+      // systemPrompt = {
+      //   role: "system",
+      //   content: `State the current values as a comprehensive sentence of the running route input that we understood so far unless they are "unknown". DO NOT add anything else to your answer. DO NOT ask any questions.
+      //   Current values:
+      //   ${JSON.stringify(currentInputs)}`,
+      // };
+
+      // let cleanedText = "";
+      // while (!cleanedText) {
+      //   const reply = await askAi(systemPrompt.content, "");
+      //   cleanedText = reply
+      //     .split(/<\/think>/) // Split by </think>
+      //     .map((s: string) => s.replace(/\n/g, "")) // Remove all newline characters
+      //     .filter((s: string) => s.trim() !== "") // Remove empty elements
+      //     .pop();
+      // }
+      // return cleanedText;
+    } catch (error) {}
   };
 
   const handleSend = async ({ inp }: { inp: string }) => {
@@ -287,7 +415,7 @@ const Chat = () => {
       <View className="justify-center items-center">
         {useLocationStore.getState().length && <Button title="Generate Route" onPress={generateRoute} />}
 
-        <Text className="text-2xl font-JakartaBold mt-5">Chatting With Hadas AI (NEW)</Text>
+        <Text className="text-2xl font-JakartaBold mt-5">Chatting With Hadas AI</Text>
         <View className="border-t border-gray-300 w-full my-4" />
       </View>
       <FlatList
