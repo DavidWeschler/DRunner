@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Image, Text, TouchableOpacity, ScrollView, Button } from "react-native";
+import { View, Image, Text, TouchableOpacity, ScrollView, Button, Alert, StyleSheet } from "react-native";
 import Swiper from "react-native-swiper";
 import Map from "@/components/Map";
 import { useLocationStore } from "@/store";
@@ -9,9 +9,12 @@ import CircularAlgorithm from "./circle_algorithm";
 import Line_Algorithm from "./line_algorithm";
 import { useUser } from "@clerk/clerk-react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
 import * as Notifications from "expo-notifications";
 import { SchedulableTriggerInputTypes } from "expo-notifications";
+import { A } from "@clerk/clerk-react/dist/useAuth-BQT424bY";
+
+import MyDateTimePicker from "../../components/MyDatePicker";
+import Entypo from "@expo/vector-icons/Entypo";
 
 const ChooseRun = () => {
   const router = useRouter();
@@ -44,10 +47,11 @@ const ChooseRun = () => {
   const [routeDirectionsH, setRouteDirectionsH] = useState<string[] | null>(null);
 
   // date and time:
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [chosenDate, setChosenDate] = useState(new Date());
+  const [selectedDateTime, setSelectedDateTime] = useState<string | null>(null);
 
-  // This useEffect has 3 functions that calculate all 3 routes and store them locally, for further display on the map
+  const [easySaved, setEasySaved] = useState(false);
+  const [mediumSaved, setMediumSaved] = useState(false);
+  const [hardSaved, setHardSaved] = useState(false);
 
   const straightRoute = async () => {
     console.log("Calculating straight route");
@@ -171,7 +175,7 @@ const ChooseRun = () => {
     }
   };
 
-  const addRunToDatabase = async (difficulty: string, future = false, save = false) => {
+  const addRunToDatabase = async (difficulty: string, future: Date | null, save = false) => {
     console.log("saving route with difficulty:", difficulty);
 
     console.log("Add run to database");
@@ -179,6 +183,9 @@ const ChooseRun = () => {
     console.log("clerkId:", clerkId);
 
     const startAddress = await getAddressFromPoint(routePinsE[0]);
+
+    // make the furture date a local time
+    const localTime = future ? new Date(future.getTime() - future.getTimezoneOffset() * 60000) : null;
 
     const route = {
       clerkId,
@@ -190,7 +197,7 @@ const ChooseRun = () => {
       length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
       waypoints: (difficulty === "easy" ? routePinsE : difficulty === "medium" ? routePinsM : routePinsH).map((pin) => [pin.longitude, pin.latitude]),
       is_saved: save,
-      is_scheduled: future ? chosenDate : null,
+      is_scheduled: localTime,
       is_deleted: false,
     };
 
@@ -208,21 +215,15 @@ const ChooseRun = () => {
         return true;
       } else {
         const errorData = await response.json();
-        console.error("Failed to add route", errorData);
+        console.log("Failed to add route", errorData);
+        Alert.alert("Error adding route", "Please try again later.");
         return false;
       }
     } catch (error) {
-      console.error("Error adding route", error);
+      console.log("Error adding route:", error);
+      Alert.alert("Error adding route", "Please try again later.");
       return false;
     }
-  };
-
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
   };
 
   // // this is for debugging notifications
@@ -257,16 +258,38 @@ const ChooseRun = () => {
       const id = await Notifications.scheduleNotificationAsync({ content: notification, trigger });
       console.log("Notification scheduled with id:", id);
     } catch (error) {
-      console.error("Error scheduling notification:", error);
+      Alert.alert("Error scheduling notification", "Please try again later.");
     }
   };
 
-  const handleConfirm = async (date: Date, level: string) => {
-    console.warn("A date has been picked: ", date);
-    hideDatePicker();
-    setChosenDate(date);
-    const status = await addRunToDatabase(level, true, false);
-    if (status) await setNotification(date);
+  const handleSaveRoute = async (level: string) => {
+    if (level === "easy" && easySaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
+    if (level === "medium" && mediumSaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
+    if (level === "hard" && hardSaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
+
+    console.log("saving route with difficulty:", level);
+    const status = await addRunToDatabase(level, null, true);
+    if (status) {
+      if (level === "easy") setEasySaved(true);
+      if (level === "medium") setMediumSaved(true);
+      if (level === "hard") setHardSaved(true);
+    }
+  };
+
+  // Function to receive date from MyDateTimePicker
+  const handleDateTimeSelection = async (date: Date, level: string) => {
+    if (level === "easy" && easySaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
+    if (level === "medium" && mediumSaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
+    if (level === "hard" && hardSaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
+    setSelectedDateTime(date.toLocaleString()); // Store formatted date
+
+    const status = await addRunToDatabase(level, date, false);
+    if (status) {
+      await setNotification(date);
+      if (level === "easy") setEasySaved(true);
+      if (level === "medium") setMediumSaved(true);
+      if (level === "hard") setHardSaved(true);
+    }
   };
 
   return (
@@ -284,8 +307,8 @@ const ChooseRun = () => {
       </View>
       <View className="border-t border-gray-300 w-[95%] mx-auto my-0" />
       <Swiper
-        style={{ height: 620 }}
-        containerStyle={{ flex: 1 }}
+        style={{ height: 650 }}
+        containerStyle={{ flex: 1, marginTop: -20 }}
         loop={false}
         showsPagination={true}
         dotColor="gray"
@@ -297,19 +320,7 @@ const ChooseRun = () => {
       >
         {difficulties.map((level, index) => (
           <View key={index} className="items-center justify-center flex-1">
-            <Text className={`text-xl font-bold ${level === "easy" ? "text-blue-500" : level === "medium" ? "text-yellow-500" : "text-red-500"}`}>{level.charAt(0).toUpperCase() + level.slice(1)} Route</Text>
-
-            <View className="flex-row space-x-4">
-              <TouchableOpacity className="bg-green-300 rounded-lg px-4 py-2" onPress={async () => await addRunToDatabase(level, false, true)}>
-                <Text className="text-black font-semibold">Save Route</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity className="bg-yellow-300 rounded-lg px-4 py-2" onPress={showDatePicker}>
-                <Text className="text-black font-semibold">Schedule Route</Text>
-              </TouchableOpacity>
-            </View>
-
-            <DateTimePickerModal isVisible={isDatePickerVisible} mode="datetime" onConfirm={async (date) => await handleConfirm(date, level)} onCancel={hideDatePicker} />
+            <Text className={`text-xl font-bold mt-10 ${level === "easy" ? "text-blue-500" : level === "medium" ? "text-yellow-500" : "text-red-500"}`}>{level.charAt(0).toUpperCase() + level.slice(1)} Route</Text>
 
             {/* Map Component */}
             <View className="flex flex-row items-center bg-transparent h-[400px] w-[90%] mx-auto mt-4">
@@ -318,20 +329,39 @@ const ChooseRun = () => {
               {level === "hard" && <Map theme={mapTheme || "standard"} pins={routePinsH} directions={routeDirectionsH} />}
             </View>
 
+            <View className="flex-row justify-end items-center space-x-4 w-[90%] mx-auto">
+              <TouchableOpacity style={styles.button} onPress={async () => await handleSaveRoute(level)}>
+                <Entypo name="save" size={24} color="black" />
+              </TouchableOpacity>
+              <MyDateTimePicker alreadyChoseDate={level === "easy" ? easySaved : level === "medium" ? mediumSaved : hardSaved} onDateTimeSelected={async (date) => await handleDateTimeSelection(date, level)} />
+            </View>
+
             {/* Route Details */}
-            <View className="bg-gray-100 rounded-2xl p-4 w-[90%] mx-auto mt-4 mb-10">
+            <View className="bg-gray-100 rounded-2xl p-4 w-[90%] mx-auto mb-10">
               <Text className="text-lg font-semibold text-gray-700">Route Length: {actualRouteLength[difficulty]} km</Text>
               <Text className="text-lg font-semibold text-gray-700">Elevation Gain: {routeElevation[difficulty]} m</Text>
             </View>
+            <View className="mb-5"></View>
           </View>
         ))}
       </Swiper>
 
       {/* Start Run Button */}
+
       <TouchableOpacity
         className="w-[95%] p-4 bg-blue-500 rounded-full items-center mx-auto mb-4"
         onPress={() => {
-          console.log("Start Run");
+          console.log("Start Run: current difficulty:", difficulty, "Ron: here you pass the parameters to the next screen");
+
+          const route = {
+            difficulty,
+            pins: difficulty === "easy" ? routePinsE : difficulty === "medium" ? routePinsM : routePinsH,
+            directions: difficulty === "easy" ? routeDirectionsE : difficulty === "medium" ? routeDirectionsM : routeDirectionsH,
+            elevationGain: difficulty === "easy" ? routeElevation.easy : difficulty === "medium" ? routeElevation.medium : routeElevation.hard,
+            length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
+          };
+
+          // pass the route to the next screen
         }}
       >
         <Text className="text-white text-lg font-bold">Start Run</Text>
@@ -339,5 +369,13 @@ const ChooseRun = () => {
     </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  button: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 0,
+  },
+});
 
 export default ChooseRun;
