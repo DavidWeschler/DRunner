@@ -158,9 +158,9 @@ const Chat = () => {
       5. routeLength must be numbers only.
       6. AIresponse is your text response to the user's message. Answer as shortly as possible. Make sure to include what you understood.
       7. In AIresponse ask the user on a specific next step from any single MISSING value here: ${JSON.stringify(currentInputs)} make sure its missing! If everything is correct, ask if the user wants to generate the route by clicking the button "Generate".
-      8. If the user want advices on how to plan a route, help him (no more than 20 words) in the AIresponse
+      8. If the user ask for advices on planning a route, Give him a usfull advices HOW or SUGGEST some options (no more than 40 words) in the AIresponse.
       9. Do not include any additional text or formatting. Only respond with JSON.
-      10. my location is: ${userLocationStr}`,
+      10. if the user is refreing his location, this is his address to use: ${userLocationStr ? userLocationStr : "Haneviim 37 Jerusalem"}`,
       };
       console.log("@@@@@@@@@@@@@@", userLocationStr);
 
@@ -327,7 +327,7 @@ const Chat = () => {
       </View>
 
       <View className="border-t border-gray-300 w-full my-4 mt-5" />
-      {(messages.length > 3 || useLocationStore.getState().length || useLocationStore.getState().startAddress) && !generatePressed && <CustomButton onPress={generateRoute} title={btnTitle} bgVariant="primary" textVariant="default" className="mt-[-10]" />}
+      {(messages.length > 3 || useLocationStore.getState().length || useLocationStore.getState().startAddress) && !generatePressed && deepAnswered && <CustomButton onPress={generateRoute} title={btnTitle} bgVariant="primary" textVariant="default" className="mt-[-10]" />}
       <FlatList
         ref={flatListRef}
         data={messages}
