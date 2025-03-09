@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless";
 export async function POST(request: Request) {
   try {
     const sql = neon(`${process.env.DATABASE_URL}`);
-    const { clerkId } = await request.json();
+    const { clerkId, maxNumOfRoutes } = await request.json();
 
     if (!clerkId) {
       console.error("Missing clerkId in request body");
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
         AND is_deleted = FALSE
         AND is_scheduled IS NOT NULL
         ORDER BY created_at DESC
-        LIMIT 50;
+        LIMIT ${maxNumOfRoutes};
     `;
 
     return Response.json(recentRuns, { status: 200 });

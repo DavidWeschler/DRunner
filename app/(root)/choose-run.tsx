@@ -273,6 +273,8 @@ const ChooseRun = () => {
       if (level === "easy") setEasySaved(true);
       if (level === "medium") setMediumSaved(true);
       if (level === "hard") setHardSaved(true);
+
+      Alert.alert("Route saved successfully", "You can see your saved routes in the manage section.");
     }
   };
 
@@ -289,6 +291,8 @@ const ChooseRun = () => {
       if (level === "easy") setEasySaved(true);
       if (level === "medium") setMediumSaved(true);
       if (level === "hard") setHardSaved(true);
+
+      Alert.alert("Route scheduled successfully", "You will receive a notification on the scheduled date.");
     }
   };
 
@@ -347,7 +351,6 @@ const ChooseRun = () => {
       </Swiper>
 
       {/* Start Run Button */}
-
       <TouchableOpacity
         className="w-[95%] p-4 bg-blue-500 rounded-full items-center mx-auto mb-4"
         onPress={() => {

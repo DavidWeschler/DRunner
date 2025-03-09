@@ -3,20 +3,18 @@ import { neon } from "@neondatabase/serverless";
 export async function POST(request: Request) {
   try {
     const sql = neon(`${process.env.DATABASE_URL}`);
-    const { clerkId, maxNumOfRoutes } = await request.json();
+    const { clerkId, routeId } = await request.json();
 
-    if (!clerkId) {
-      console.error("Missing clerkId in request body");
-      return Response.json({ error: "Missing clerkId" }, { status: 400 });
+    if (!routeId) {
+      console.log("Missing routeId in request body");
+      return Response.json({ error: "Missing routeId" }, { status: 400 });
     }
 
     const recentRuns = await sql`
-        SELECT * FROM running_routes
+        UPDATE running_routes
+        SET is_deleted = TRUE
         WHERE clerk_id = ${clerkId}
-        AND is_deleted = FALSE
-        AND is_saved = TRUE
-        ORDER BY created_at DESC
-        LIMIT ${maxNumOfRoutes};
+        AND route_id = ${routeId};
     `;
 
     return Response.json(recentRuns, { status: 200 });

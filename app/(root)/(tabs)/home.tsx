@@ -216,7 +216,7 @@ const Home = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ clerkId: user?.id }),
+        body: JSON.stringify({ clerkId: user?.id, maxNumOfRoutes: 3 }),
       }).then((res) => res.json());
 
       if (apiType === "recent_routes") {
