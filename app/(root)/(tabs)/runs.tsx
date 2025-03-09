@@ -275,7 +275,7 @@ const Runs = () => {
               <Text>🗑️{"   "} Delete this item</Text>
             </Pressable>
 
-            <View className="p-3 border-b flex-row items-center justify-between">
+            <View className="p-1 border-b flex-row items-center justify-between">
               <Text>🔖 Save this route</Text>
               <Switch value={selectedRunSavedStatus} onValueChange={toggleSaveRoute} trackColor={{ false: "#767577", true: "#34D399" }} thumbColor={selectedRunSavedStatus ? "#10B981" : "#f4f3f4"} />
             </View>
