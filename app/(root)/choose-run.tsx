@@ -69,7 +69,6 @@ const ChooseRun = () => {
     console.log("inputsLine:", inputsLine);
 
     const results = await Line_Algorithm(inputsLine);
-    console.log("results line route:\n", results);
     // If the user chose a route that is too short, the algorithm will return the same route for all difficulties
     // in this case, we will set the same route for all difficulties
     const [easyRoute, mediumRoute, hardRoute] = results.length === 1 ? [results[0], results[0], results[0]] : results;
@@ -94,7 +93,6 @@ const ChooseRun = () => {
 
   const circularRoute = async () => {
     console.log("Calculating circular route");
-    console.log("xxx");
     if (inpStartPoint === null || inpLength === null) {
       console.log("Invalid input values sdf");
       return;
@@ -109,7 +107,6 @@ const ChooseRun = () => {
       startPoint: [inpStartPoint.longitude, inpStartPoint.latitude] as [number, number],
     };
     const results = await CircularAlgorithm(inputs);
-    console.log("results circular route:\n", results);
     const easyRoute = results[0];
     const mediumRoute = results[1];
     const hardRoute = results[2];
@@ -129,8 +126,6 @@ const ChooseRun = () => {
     setRouteDirectionsM(mediumRoute.directions.split("\n"));
     setRoutePinsH(hardRoute.waypoints.map((wp: number[]) => ({ latitude: wp[1], longitude: wp[0] })));
     setRouteDirectionsH(hardRoute.directions.split("\n"));
-
-    console.log("sdf123r");
   };
 
   const fetchRoute = async () => {
