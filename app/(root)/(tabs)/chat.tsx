@@ -286,7 +286,7 @@ const Chat = () => {
       }
       setLengthInput(l);
       setDifficultyInput(d as "easy" | "medium" | "hard");
-      router.push("/(root)/showRoute");
+      router.push("/(root)/choose-run");
     } catch {
       setGeneratePressed(false);
       setDeepAnswered(true);
