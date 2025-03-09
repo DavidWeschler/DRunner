@@ -8,7 +8,8 @@ import * as Location from "expo-location";
 import { router } from "expo-router";
 import CustomButton from "@/components/CustomButton";
 import HadasHelp from "@/components/HadasHelp";
-
+import TypingDots from "@/components/AiThinking";
+import React from "react";
 const OPENROUTER_API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY;
 
 // --------------------- Helper functions -------------------------------
@@ -38,7 +39,7 @@ const getLatLngFromAddress = async (address: string) => {
 
 const Chat = () => {
   const { inp, setUserLocation, setHadasInp, setLengthInput, setStartAddress, setEndAddress, setDifficultyInput, setStartPointInput, setEndPointInput } = useLocationStore();
-  const [messages, setMessages] = useState<{ text: string; sender: "user" | "bot"; timestamp: string }[]>([{ text: generateStartingMessage(), sender: "bot", timestamp: new Date().toLocaleTimeString() }]);
+  const [messages, setMessages] = useState<{ text: string | JSX.Element; sender: "user" | "bot"; timestamp: string }[]>([{ text: generateStartingMessage(), sender: "bot", timestamp: new Date().toLocaleTimeString() }]);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const [deepAnswered, setDeepAnswered] = useState(true);
@@ -246,12 +247,12 @@ const Chat = () => {
       setMessages((prev) => [...prev, { text: inp, sender: "user", timestamp }]);
       setDeepAnswered(false);
       // Show thinking indicator
-      setMessages((prev) => [...prev, { text: "Thinking...", sender: "bot", timestamp }]);
+      setMessages((prev) => [...prev, { text: <TypingDots />, sender: "bot", timestamp }]);
 
       await generateRes(inp);
 
       // Remove thinking indicator
-      setMessages((prev) => prev.filter((msg) => msg.text !== "Thinking..."));
+      setMessages((prev) => prev.filter((msg) => !React.isValidElement(msg.text)));
     } catch (error) {
       console.error("Error handling message:", error);
       setMessages((prev) => [...prev, { text: "Sorry, something went wrong. Please try again.", sender: "bot", timestamp }]);
