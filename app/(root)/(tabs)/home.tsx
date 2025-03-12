@@ -26,7 +26,9 @@ const getLatLngFromAddress = async (address: string) => {
     console.log("Longitude:", result.longitude);
     return { latitude: result.latitude, longitude: result.longitude };
   } catch (error) {
-    throw new Error(`${error}`);
+    console.log("Error getting lat and long from address:", error);
+    Alert.alert("Couldn't find the address, setting a default value.");
+    return null;
   }
 };
 
@@ -64,68 +66,9 @@ const Home = () => {
   const [savedRunsRoutes, setSavedRunsRoutes] = useState<Run[]>([]);
   const [futureRunsRoutes, setFutureRunsRoutes] = useState<Run[]>([]);
 
-  const handleLongPress = (run: Run) => {
-    return;
-    // if (kind === "recent") {
-    //   Alert.alert("Manage Run", "What would you like to do with this run?", [
-    //     {
-    //       text: "Save",
-    //       onPress: () => {
-    //         // Add only if not already saved
-    //         if (!savedRuns.some((r) => r.created_at === run.created_at)) {
-    //           setSavedRuns((prev) => [...prev, run]);
-    //         }
-    //       },
-    //     },
-    //     {
-    //       text: "Future",
-    //       onPress: () => {
-    //         // Add only if not already in future runs
-    //         if (!futureRuns.some((r) => r.created_at === run.created_at)) {
-    //           setFutureRuns((prev) => [...prev, run]);
-    //         }
-    //       },
-    //     },
-    //     { text: "Cancel", style: "cancel" },
-    //   ]);
-    // } else if (kind === "saved") {
-    //   Alert.alert("Manage Run", "What would you like to do with this run?", [
-    //     {
-    //       text: "Unsave",
-    //       onPress: () => setSavedRuns((prev) => prev.filter((r) => r.created_at !== run.created_at)),
-    //     },
-    //     {
-    //       text: "Future",
-    //       onPress: () => {
-    //         // Add only if not already in future runs
-    //         if (!futureRuns.some((r) => r.created_at === run.created_at)) {
-    //           setFutureRuns((prev) => [...prev, run]);
-    //         }
-    //       },
-    //     },
-    //     { text: "Cancel", style: "cancel" },
-    //   ]);
-    // } else if (kind === "future") {
-    //   Alert.alert("Manage Run", "What would you like to do with this run?", [
-    //     {
-    //       text: "Save",
-    //       onPress: () => {
-    //         // Add only if not already saveda
-    //         if (!savedRuns.some((r) => r.created_at === run.created_at)) {
-    //           setSavedRuns((prev) => [...prev, run]);
-    //         }
-    //       },
-    //     },
-    //     {
-    //       text: "Edit Future",
-    //       onPress: () => {
-    //         // Edit logic here
-    //         console.log("Edit Future selected");
-    //       },
-    //     },
-    //     { text: "Cancel", style: "cancel" },
-    //   ]);
-    // }
+  const handleRunPress = ({ run }: { run: Run }) => {
+    console.log("Run pressed:", run);
+    // router.push("/(root)/run-a-aroute", { run: item });
   };
 
   const handleSignOut = () => {
@@ -232,21 +175,18 @@ const Home = () => {
   };
 
   const generator = async () => {
-    // log the form inputs:
     console.log("Length:", length);
     console.log("Start Point:", startPoint);
     console.log("End Point:", endPoint);
     console.log("Difficulty:", difficulty);
 
-    // bug: we need this value but we get stuck on this line. idk why.
-
     let startLatLong = null;
     if (!startPoint) {
-      // later on we will put here a default value.
-      Alert.alert("Missing Start Point!\n", "Calculating with your current \nlocation.");
+      Alert.alert("Missing Start Point!", "Calculating with your current location.", [{ text: "continue", style: "default" }]);
       startLatLong = userLatLong;
     } else {
       startLatLong = await getLatLngFromAddress(startPoint); // this turns the address into lat and long (for free)
+      if (!startLatLong) startLatLong = userLatLong;
     }
 
     // update the inputs in the singleton store
@@ -256,7 +196,7 @@ const Home = () => {
     if (endPoint) {
       try {
         const endLatLong = await getLatLngFromAddress(endPoint);
-        setEndPointInput(endLatLong);
+        endPoint ? setEndPointInput(endLatLong) : setEndPointInput(null);
       } catch (error) {
         console.log("(not a real error) couldnt get lat long from end point, setting it to null");
         setEndPointInput(null);
@@ -291,7 +231,7 @@ const Home = () => {
       <FlatList
         data={viewRadio(kind)}
         renderItem={({ item }) => (
-          <TouchableOpacity className="p-4 bg-white rounded-lg shadow-md mb-2" onLongPress={() => handleLongPress(item)}>
+          <TouchableOpacity className="p-4 bg-white rounded-lg shadow-md mb-2" onPress={() => handleRunPress({ run: item })}>
             <RunCard run={item} />
           </TouchableOpacity>
         )}
