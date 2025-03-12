@@ -10,7 +10,8 @@ import { useEffect, useState } from "react";
 import * as Notifications from "expo-notifications";
 import { SchedulableTriggerInputTypes } from "expo-notifications";
 
-import MyDateTimePicker from "../../../components/MyDatePicker";
+// import MyDateTimePicker from "../../../components/MyDatePicker";
+import MyDateTimePicker from "@/components/MyDatePicker";
 
 const Runs = () => {
   const { user } = useUser();
@@ -217,7 +218,7 @@ const Runs = () => {
       <FlatList
         data={viewRadio(kind)}
         renderItem={({ item }) => (
-          <TouchableOpacity className="p-4 bg-white rounded-lg shadow-md mb-2" onLongPress={() => handleLongPress(item)}>
+          <TouchableOpacity className="p-4 bg-white rounded-lg shadow-md mb-2" onLongPress={() => handleLongPress(item)} testID="runCard">
             <RunCard run={item} />
           </TouchableOpacity>
         )}
@@ -243,7 +244,7 @@ const Runs = () => {
           <>
             <View className="flex flex-row items-center justify-between my-5">
               <Text className="text-2xl font-JakartaExtraBold">Manage Your Routes 📝</Text>
-              <TouchableOpacity onPress={handleSignOut} className="justify-center items-center w-10 h-10 rounded-full absolute right-0">
+              <TouchableOpacity onPress={handleSignOut} className="justify-center items-center w-10 h-10 rounded-full absolute right-0" testID="signOutButton">
                 <Image source={icons.out} className="w-4 h-4" />
               </TouchableOpacity>
             </View>
