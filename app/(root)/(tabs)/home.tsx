@@ -120,7 +120,8 @@ const Home = () => {
 
         setWeather(`${data.main.temp}°C with ${data.weather[0].description} ${weatherEmoji}`);
       } catch (error) {
-        console.error("Error fetching weather:", error);
+        console.log("Error fetching weather:", error);
+        setWeather("Weather data currently not available 😔");
       }
     };
 
@@ -170,7 +171,7 @@ const Home = () => {
         setFutureRunsRoutes(recent);
       }
     } catch (error) {
-      console.error("Error fetching routes:", error);
+      console.log("Error fetching routes:", error);
     }
   };
 
@@ -182,7 +183,6 @@ const Home = () => {
 
     let startLatLong = null;
     if (!startPoint) {
-      Alert.alert("Missing Start Point!", "Calculating with your current location.", [{ text: "continue", style: "default" }]);
       startLatLong = userLatLong;
     } else {
       startLatLong = await getLatLngFromAddress(startPoint); // this turns the address into lat and long (for free)

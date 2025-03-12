@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
     return Response.json({ message: "Route added successfully" }, { status: 201 });
   } catch (error) {
-    console.error("Error adding route:", error);
+    console.log("Error adding route:", error);
     return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

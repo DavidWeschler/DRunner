@@ -35,10 +35,10 @@ const ChooseRun = () => {
           console.log("Route fetched successfully");
         } else {
           const errorData = await response.json();
-          console.error("Failed to fetch route", errorData);
+          console.log("Failed to fetch route", errorData);
         }
       } catch (error) {
-        console.error("Error fetching route", error);
+        console.log("Error fetching route", error);
       }
     };
 

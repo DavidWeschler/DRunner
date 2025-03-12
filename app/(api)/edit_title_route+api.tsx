@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     return Response.json(recentRuns, { status: 200 });
   } catch (error) {
-    console.error("Error updating route:", error);
+    console.log("Error updating route:", error);
     return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

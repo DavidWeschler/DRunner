@@ -78,7 +78,7 @@ export async function POST(request: Request) {
 
     return new Response(JSON.stringify({ message: "User and routes created successfully", clerkId: userClerkId }), { status: 201 });
   } catch (error) {
-    console.error("Error creating user and routes:", error);
+    console.log("Error creating user and routes:", error);
     return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

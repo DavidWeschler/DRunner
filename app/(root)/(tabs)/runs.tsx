@@ -46,7 +46,8 @@ const Runs = () => {
         setFutureRunsRoutes(recent);
       }
     } catch (error) {
-      console.error("Error fetching routes:", error);
+      console.log("Error fetching routes:", error);
+      Alert.alert("We couldn't load your routes, please try again later.");
     }
   };
 
@@ -206,7 +207,7 @@ const Runs = () => {
       const result = await response.json();
       console.log("Route saved/unsaved:", result);
     } catch (error) {
-      console.error("Error saved/unsaved route:", error);
+      console.log("Error saved/unsaved route:", error);
       Alert.alert("Error", "Could not update route status. Please try again.");
     } finally {
       await refreshRoutes();

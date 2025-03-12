@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     return Response.json(recentRuns, { status: 200 });
   } catch (error) {
-    console.error("Error fetching recent routes:", error);
+    console.log("Error fetching recent routes:", error);
     return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

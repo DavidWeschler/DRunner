@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     const { clerkId, maxNumOfRoutes } = await request.json();
 
     if (!clerkId) {
-      console.error("Missing clerkId in request body");
+      console.log("Missing clerkId in request body");
       return Response.json({ error: "Missing clerkId" }, { status: 400 });
     }
 
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     return Response.json(recentRuns, { status: 200 });
   } catch (error) {
-    console.error("Error fetching recent routes:", error);
+    console.log("Error fetching recent routes:", error);
     return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

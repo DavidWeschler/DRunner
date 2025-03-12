@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     // Return only waypoints and directions
     return Response.json({ waypoints: route[0].waypoints, directions: route[0].directions }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching route:", error);
+    console.log("Error fetching route:", error);
     return Response.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

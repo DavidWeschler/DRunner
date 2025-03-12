@@ -254,7 +254,7 @@ const Chat = () => {
       // Remove thinking indicator
       setMessages((prev) => prev.filter((msg) => !React.isValidElement(msg.text)));
     } catch (error) {
-      console.error("Error handling message:", error);
+      console.log("Error handling message:", error);
       setMessages((prev) => [...prev, { text: "Sorry, something went wrong. Please try again.", sender: "bot", timestamp }]);
     } finally {
       setDeepAnswered(true);
