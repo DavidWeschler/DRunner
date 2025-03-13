@@ -60,7 +60,7 @@ const getDirectionsBetweenPins = async (pins: Pin[]): Promise<string[]> => {
         directions.push(data.routes[0].overview_polyline.points);
       }
     } catch (error) {
-      console.error(`Error fetching directions between pin ${i} and pin ${(i + 1) % pins.length}:`, error);
+      console.log(`Error fetching directions between pin ${i} and pin ${(i + 1) % pins.length}:`, error);
     }
   }
   return directions;
@@ -80,7 +80,7 @@ const adjustPinToRoad = async (coord: Coordinate): Promise<Coordinate> => {
       return { latitude: location.latitude, longitude: location.longitude };
     }
   } catch (error) {
-    console.error("Unexpected error:", error);
+    console.log("Unexpected error:", error);
   }
   console.log("failed to adjust a coordinate. bad url: ", url);
   return coord; // Return original coordinate if snapping fails
@@ -188,6 +188,7 @@ async function generateCircularRoute(startPoint: Coord, routeLengthKm: number): 
 
   // Query Google Directions.
   const response = await axios.get<DirectionsResponse>(googleUrl);
+  console.log("length error here?");
   if (!response.data.routes || response.data.routes.length === 0) {
     throw new Error("No routes found from Google Directions API");
   }
@@ -242,14 +243,24 @@ async function getElevationGain(polylineStr: string): Promise<number> {
  */
 async function CircularAlgorithm({ routeLengthKm, startPoint }: AlgorithmParams): Promise<RouteWithDifficulty[]> {
   const routes: RouteResult[] = [];
+  let errorCount = 0;
   for (let i = 0; i < 3; i++) {
     try {
       const route = await generateCircularRoute(startPoint, routeLengthKm * 0.6);
       routes.push(route);
     } catch (error) {
-      console.error("Error generating route:", error);
+      console.log("Error generating route:", error);
+      errorCount++;
+      if (errorCount >= 5) {
+        console.log("Too many errors. Exiting loop.");
+        break;
+      }
       // i--; // Try again if a route fails to generate. This is dangerous, could cause infinite loop and cost money.
     }
+  }
+
+  if (routes.length < 3) {
+    throw new Error("Failed to generate 3 routes.");
   }
 
   // Sort routes by elevation gain (ascending: lowest gain first).

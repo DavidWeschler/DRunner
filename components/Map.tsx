@@ -71,11 +71,11 @@ const getGoogleGeocode = async (latitude: number, longitude: number) => {
     if (data.status === "OK" && data.results.length > 0) {
       return data.results[0].formatted_address;
     } else {
-      console.error("Google Geocode API error:", data.status);
+      console.log("Google Geocode API error:", data.status);
       return null;
     }
   } catch (error) {
-    console.error("Error fetching geocode:", error);
+    console.log("Error fetching geocode:", error);
     return null;
   }
 };
@@ -119,7 +119,7 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
       setLocationData({ latitude, longitude, address: addressData });
       setAlertVisible(true); // Show the custom alert modal
     } catch (error) {
-      console.error("Error fetching address:", error);
+      console.log("Error fetching address:", error);
     }
   };
 

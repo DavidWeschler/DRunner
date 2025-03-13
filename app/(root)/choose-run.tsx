@@ -99,8 +99,7 @@ const ChooseRun = () => {
     console.log("Calculating circular route");
     if (inpStartPoint === null || inpLength === null) {
       console.log("Invalid input values sdf");
-      return;
-      // throw new Error("Invalid input values sdf");
+      throw new Error("Invalid input values sdf");
     }
     console.log("okoko");
     console.log("inpStartPoint:", inpStartPoint);
@@ -110,7 +109,11 @@ const ChooseRun = () => {
       routeLengthKm: inpLength <= 0 || inpLength > 100 ? 5 : inpLength,
       startPoint: [inpStartPoint.longitude, inpStartPoint.latitude] as [number, number],
     };
+
     const results = await CircularAlgorithm(inputs);
+    console.log("ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp");
+
+    console.log("results:", results);
     const easyRoute = results[0];
     const mediumRoute = results[1];
     const hardRoute = results[2];
@@ -130,14 +133,19 @@ const ChooseRun = () => {
     setRouteDirectionsM(mediumRoute.directions.split("\n"));
     setRoutePinsH(hardRoute.waypoints.map((wp: number[]) => ({ latitude: wp[1], longitude: wp[0] })));
     setRouteDirectionsH(hardRoute.directions.split("\n"));
+
+    console.log("oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
   };
 
   const fetchRoute = async () => {
     try {
       inpEndPoint ? await straightRoute() : await circularRoute();
     } catch (error) {
-      console.error("Error calculating route:", error);
+      console.log("Error calculating route:", error);
+      Alert.alert("We couldn't generate your route", "Please try again later. 😶‍🌫️");
+      router.push("/home");
     } finally {
+      console.log("Resetting input values in FINALLY");
       setLengthInput(0);
       setStartPointInput(null);
       setEndPointInput(null);
@@ -170,7 +178,7 @@ const ChooseRun = () => {
       const data = await response.json();
       return `${data.address.road || "Unknown Road"}, ${data.address.city || "Unknown City"}`;
     } catch (error) {
-      console.error("Error fetching address:", error);
+      console.log("Error fetching address:", error);
       return "Planet Earth";
     }
   };
@@ -273,6 +281,8 @@ const ChooseRun = () => {
       if (level === "easy") setEasySaved(true);
       if (level === "medium") setMediumSaved(true);
       if (level === "hard") setHardSaved(true);
+
+      Alert.alert("Route saved successfully", "You can see your saved routes in the manage section.");
     }
   };
 
@@ -289,6 +299,8 @@ const ChooseRun = () => {
       if (level === "easy") setEasySaved(true);
       if (level === "medium") setMediumSaved(true);
       if (level === "hard") setHardSaved(true);
+
+      Alert.alert("Route scheduled successfully", "You will receive a notification on the scheduled date.");
     }
   };
 
@@ -347,7 +359,6 @@ const ChooseRun = () => {
       </Swiper>
 
       {/* Start Run Button */}
-
       <TouchableOpacity
         className="w-[95%] p-4 bg-blue-500 rounded-full items-center mx-auto mb-4"
         onPress={() => {
