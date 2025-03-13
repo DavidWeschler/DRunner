@@ -1,8 +1,6 @@
-import { LocationStore } from "@/types/type";
+import { LocationStore, MapThemeType, MarkerData } from "@/types/type";
 import { create } from "zustand";
 import mapThemes from "../components/MapThemes/mapThemes";
-
-type MapThemeType = "standard" | "dark" | "aubergine" | "night" | "retro" | "silver";
 
 export const useLocationStore = create<LocationStore>((set) => ({
   userLatitude: null,
@@ -11,7 +9,7 @@ export const useLocationStore = create<LocationStore>((set) => ({
   destinationLatitude: null,
   destinationLongitude: null,
   destinationAddress: null,
-  mapTheme: null,
+  mapTheme: "standard",
   length: null,
   startPoint: null,
   startAddress: null,
@@ -19,6 +17,8 @@ export const useLocationStore = create<LocationStore>((set) => ({
   endAddress: null,
   difficulty: null,
   inp: null,
+  routeWayPoints: [],
+  routeDirections: [],
 
   setUserLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => {
     set(() => ({
@@ -81,6 +81,18 @@ export const useLocationStore = create<LocationStore>((set) => ({
   setHadasInp: (inp: string) => {
     set(() => ({
       inp,
+    }));
+  },
+
+  setRouteWayPoints: (waypoints: MarkerData[]) => {
+    set(() => ({
+      routeWayPoints: waypoints,
+    }));
+  },
+
+  setRouteDirections: (directions: string[]) => {
+    set(() => ({
+      routeDirections: directions,
     }));
   },
 }));
