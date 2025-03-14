@@ -369,7 +369,7 @@ const ChooseRun = () => {
       {/* Start Run Button */}
       <TouchableOpacity
         className="w-[95%] p-4 bg-blue-500 rounded-full items-center mx-auto mb-4"
-        onPress={() => {
+        onPress={async () => {
           console.log("Start Run: current difficulty:", difficulty, "Ron: here you pass the parameters to the next screen");
 
           const route = {
@@ -381,6 +381,18 @@ const ChooseRun = () => {
           };
           setRouteWayPoints(route.pins);
           setRouteDirections(route.directions || []);
+
+          const routeAlreadySaved = difficulty === "easy" ? easySaved : difficulty === "medium" ? mediumSaved : hardSaved;
+          if (!routeAlreadySaved) {
+            setLoading(true);
+            const status = await addRunToDatabase(difficulty, null, false);
+            if (status) {
+              if (difficulty === "easy") setEasySaved(true);
+              if (difficulty === "medium") setMediumSaved(true);
+              if (difficulty === "hard") setHardSaved(true);
+            }
+            setLoading(true);
+          }
 
           router.push("/run-a-route");
         }}
