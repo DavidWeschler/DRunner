@@ -3,7 +3,7 @@ import { View, Text, FlatList, Keyboard, Platform, Button, TouchableOpacity, Ima
 import { SafeAreaView } from "react-native-safe-area-context";
 import HadasTextInput from "@/components/HadasInp";
 import { icons } from "@/constants";
-import { useLocationStore } from "@/store";
+import { useLocationStore, useaiModelStore } from "@/store";
 import * as Location from "expo-location";
 import { router } from "expo-router";
 import CustomButton from "@/components/CustomButton";
@@ -39,6 +39,7 @@ const getLatLngFromAddress = async (address: string) => {
 
 const Chat = () => {
   const { inp, setUserLocation, setHadasInp, setLengthInput, setStartAddress, setEndAddress, setDifficultyInput, setStartPointInput, setEndPointInput } = useLocationStore();
+  const { model } = useaiModelStore();
   const [messages, setMessages] = useState<{ text: string | JSX.Element; sender: "user" | "bot"; timestamp: string }[]>([
     {
       text: generateStartingMessage(),
@@ -119,7 +120,7 @@ const Chat = () => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-r1-distill-llama-70b:free",
+        model: model.host,
         messages: [
           {
             role: "system",
@@ -167,7 +168,7 @@ const Chat = () => {
       2. Use "unknown" for missing values
       3. NEVER include explanations, thoughts, or markdown
       4. Difficulty must be one of: easy, medium, hard. you may choose the closest one
-      5. routeLength must be numbers only.
+      5. routeLength must be numbers only in kilometers.
       6. AIresponse is your text response to the user's message. Answer as shortly as possible. Make sure to include what you understood.
       7. In AIresponse ask the user on a specific next step from any single MISSING value here: ${JSON.stringify(currentInputs)} make sure its missing! If everything is correct, ask if the user wants to generate the route by clicking the button "Generate".
       8. If the user ask for advices on planning a route, Give him a usfull advices HOW or SUGGEST some options (no more than 40 words) in the AIresponse.

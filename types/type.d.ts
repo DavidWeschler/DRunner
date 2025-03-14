@@ -168,6 +168,16 @@ declare interface LocationStore {
   setRouteDirections: (directions: string[]) => void;
 }
 
+declare interface aiModel {
+  name: string;
+  host: string;
+}
+
+declare interface aiModelStore {
+  model: aiModel;
+  setAiModel: (m: aiModel) => void;
+}
+
 // declare interface DriverStore {
 //   drivers: MarkerData[];
 //   selectedDriver: number | null;

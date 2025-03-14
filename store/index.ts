@@ -1,4 +1,4 @@
-import { LocationStore, MapThemeType, MarkerData } from "@/types/type";
+import { LocationStore, aiModelStore, MapThemeType, MarkerData, aiModel } from "@/types/type";
 import { create } from "zustand";
 import mapThemes from "../components/MapThemes/mapThemes";
 
@@ -93,6 +93,15 @@ export const useLocationStore = create<LocationStore>((set) => ({
   setRouteDirections: (directions: string[]) => {
     set(() => ({
       routeDirections: directions,
+    }));
+  },
+}));
+
+export const useaiModelStore = create<aiModelStore>((set) => ({
+  model: { name: "Google Gemma 3", host: "google/gemma-3-4b-it:free" },
+  setAiModel: (m: aiModel) => {
+    set(() => ({
+      model: m,
     }));
   },
 }));
