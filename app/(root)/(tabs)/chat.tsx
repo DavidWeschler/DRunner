@@ -334,7 +334,7 @@ const Chat = () => {
         </View>
 
         <View className="items-center justify-center">
-          <CustomButton onPress={toggleModal} title="?" bgVariant="secondary" textVariant="default" className="ml-6 w-11 h-1 rounded-full flex items-center justify-center mt-1" textClassName="relative -mt-1" />
+          <CustomButton onPress={toggleModal} title="?" bgVariant="secondary" textVariant="default" className="ml-6 w-11 h-11 rounded-full flex items-center justify-center mt-1" textClassName="relative -mt-1" />
           <HadasHelp visible={isModalVisible} onClose={toggleModal} />
         </View>
       </View>
