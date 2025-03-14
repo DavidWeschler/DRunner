@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import { AboutModalProps } from "@/types/type";
-import { useLocationStore } from "@/store";
-import AnimatedGlowBox from "@/components/AnimatedGlowBox";
+import { useLocationStore, useaiModelStore } from "@/store";
 
 const HadasHelp = ({ visible, onClose }: AboutModalProps) => {
   const { length, startAddress, endAddress, difficulty } = useLocationStore();
+  const { model } = useaiModelStore();
   const [currentInputs, setCurrentInputs] = useState({
     "Running route length": length,
     "Start location": startAddress,
@@ -44,13 +44,16 @@ const HadasHelp = ({ visible, onClose }: AboutModalProps) => {
               When the Generate button appears, you can see matching routes! 🏃‍♂️‍➡️
             </Text>
 
+            <Text style={[styles.title]} className="text-md font-JakartaBold">
+              Current model: <Text className="text-md font-JakartaBold text-blue-700">{model.name}</Text>
+            </Text>
+
             <Text style={styles.title} className="text-md font-JakartaBold">
               Current features:
             </Text>
-            <AnimatedGlowBox />
             <View style={styles.currentInputsContainer}>
               {Object.entries(currentInputs).map(([key, value]) => (
-                <View key={key} style={{ flexDirection: "row", marginBottom: 4 }}>
+                <View key={key} style={{ flexDirection: "row", marginBottom: 1 }}>
                   <Text style={styles.bodyText} className="text-md font-JakartaMedium text-gray-500">
                     {key}:
                   </Text>
@@ -109,12 +112,11 @@ const styles = StyleSheet.create({
   currentInputsContainer: {
     padding: 15,
     borderRadius: 8,
-    marginBottom: 20,
+    marginBottom: 2,
     width: "100%",
-    marginTop: 10,
   },
   closeButton: {
-    marginTop: 20,
+    marginTop: 10,
     backgroundColor: "#0286FF",
     paddingVertical: 12,
     paddingHorizontal: 25,
