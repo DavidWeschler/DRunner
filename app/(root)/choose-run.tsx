@@ -13,7 +13,9 @@ import * as Notifications from "expo-notifications";
 import { SchedulableTriggerInputTypes } from "expo-notifications";
 import { A } from "@clerk/clerk-react/dist/useAuth-BQT424bY";
 
-import MyDateTimePicker from "../../components/MyDatePicker";
+// import MyDateTimePicker from "../../components/MyDatePicker";
+import MyDateTimePicker from "@/components/MyDatePicker";
+import Spinner from "@/components/Spinner";
 import Entypo from "@expo/vector-icons/Entypo";
 
 const ChooseRun = () => {
@@ -52,6 +54,9 @@ const ChooseRun = () => {
   const [easySaved, setEasySaved] = useState(false);
   const [mediumSaved, setMediumSaved] = useState(false);
   const [hardSaved, setHardSaved] = useState(false);
+
+  // spinner
+  const [loading, setLoading] = useState(false);
 
   const straightRoute = async () => {
     console.log("Calculating straight route");
@@ -111,7 +116,6 @@ const ChooseRun = () => {
     };
 
     const results = await CircularAlgorithm(inputs);
-    console.log("ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp");
 
     console.log("results:", results);
     const easyRoute = results[0];
@@ -133,18 +137,20 @@ const ChooseRun = () => {
     setRouteDirectionsM(mediumRoute.directions.split("\n"));
     setRoutePinsH(hardRoute.waypoints.map((wp: number[]) => ({ latitude: wp[1], longitude: wp[0] })));
     setRouteDirectionsH(hardRoute.directions.split("\n"));
-
-    console.log("oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
   };
 
   const fetchRoute = async () => {
     try {
+      setLoading(true);
+
       inpEndPoint ? await straightRoute() : await circularRoute();
     } catch (error) {
       console.log("Error calculating route:", error);
       Alert.alert("We couldn't generate your route", "Please try again later. 😶‍🌫️");
       router.push("/home");
     } finally {
+      setLoading(false);
+
       console.log("Resetting input values in FINALLY");
       setLengthInput(0);
       setStartPointInput(null);
@@ -193,7 +199,7 @@ const ChooseRun = () => {
     const startAddress = await getAddressFromPoint(routePinsE[0]);
 
     // make the furture date a local time
-    const localTime = future ? new Date(future.getTime() - future.getTimezoneOffset() * 60000) : null;
+    // const localTime = future ? new Date(future.getTime() - future.getTimezoneOffset() * 60000) : null;
 
     const route = {
       clerkId,
@@ -205,7 +211,7 @@ const ChooseRun = () => {
       length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
       waypoints: (difficulty === "easy" ? routePinsE : difficulty === "medium" ? routePinsM : routePinsH).map((pin) => [pin.longitude, pin.latitude]),
       is_saved: save,
-      is_scheduled: localTime,
+      is_scheduled: future || null,
       is_deleted: false,
     };
 
@@ -306,6 +312,8 @@ const ChooseRun = () => {
 
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="flex-1 bg-white">
+      <Spinner visible={loading} />
+
       <View className="flex flex-row items-center justify-between my-2">
         <Text className="text-2xl font-JakartaExtraBold ml-12">Select a route 🏃‍♂️‍➡️</Text>
         <TouchableOpacity

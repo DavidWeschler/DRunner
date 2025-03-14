@@ -6,6 +6,8 @@ import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import { router } from "expo-router";
 
+// documentation: https://docs.expo.dev/develop/unit-testing/
+
 // Mock dependencies
 jest.mock("@clerk/clerk-expo");
 jest.mock("expo-location");
@@ -51,7 +53,7 @@ describe("Home Component", () => {
   });
 
   // Test if the kind state changes when tabs are pressed
-  it("changes kind state when tabs are pressed", () => {
+  it("changes kind state when tabs are pressed without saved", () => {
     const { getByText } = render(<Home />);
     fireEvent.press(getByText("Saved"));
     expect(getByText("No saved runs found")).toBeTruthy();

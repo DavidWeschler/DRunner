@@ -175,7 +175,7 @@ const Runs = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ clerkId: user?.id, routeId: selectedRun?.route_id, scheduleDate: new Date(date.getTime() - date.getTimezoneOffset() * 60000) }),
+        body: JSON.stringify({ clerkId: user?.id, routeId: selectedRun?.route_id, scheduleDate: date }),
       }).then((res) => res.json());
 
       console.log("Route scheduling edited:", res);
