@@ -14,6 +14,7 @@ import { SchedulableTriggerInputTypes } from "expo-notifications";
 import MyDateTimePicker from "@/components/MyDatePicker";
 import Spinner from "@/components/Spinner";
 import { all } from "axios";
+import { useLocationStore } from "@/store";
 
 import { getIsraelTimezoneOffset } from "@/lib/utils";
 
@@ -21,6 +22,7 @@ const Runs = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
+  const { setRouteDirections, setRouteWayPoints } = useLocationStore();
 
   const [kind, setKind] = useState("recent");
   const [recentRunRoutes, setRecentRunRoutes] = useState<Run[]>([]);
@@ -208,6 +210,10 @@ const Runs = () => {
     console.log("Running this route:", selectedRun);
     setModalVisible(false);
     await refreshRoutes();
+    const pins = selectedRun ? selectedRun.waypoints.map((waypoint: any) => ({ longitude: waypoint[0], latitude: waypoint[1] })) : [];
+    setRouteWayPoints(pins);
+    setRouteDirections(selectedRun?.directions || []);
+    router.push("/(root)/run-a-route");
   };
 
   const toggleSaveRoute = async () => {

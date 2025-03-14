@@ -379,6 +379,9 @@ const ChooseRun = () => {
             elevationGain: difficulty === "easy" ? routeElevation.easy : difficulty === "medium" ? routeElevation.medium : routeElevation.hard,
             length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
           };
+
+          console.log("pins: ", route.pins);
+          console.log("directions: ", route.directions);
           setRouteWayPoints(route.pins);
           setRouteDirections(route.directions || []);
 

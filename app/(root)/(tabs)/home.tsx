@@ -47,7 +47,7 @@ const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
-  const { setUserLocation, setDestinationLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, setEndAddress, mapTheme } = useLocationStore();
+  const { setUserLocation, setDestinationLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, setEndAddress, mapTheme, setRouteDirections, setRouteWayPoints } = useLocationStore();
 
   const [length, setLength] = useState("");
   const [startPoint, setStartPoint] = useState("");
@@ -68,7 +68,11 @@ const Home = () => {
 
   const handleRunPress = ({ run }: { run: Run }) => {
     console.log("Run pressed:", run);
-    // router.push("/(root)/run-a-aroute", { run: item });
+    const pins = run.waypoints.map((waypoint: any) => ({ longitude: waypoint[0], latitude: waypoint[1] }));
+
+    setRouteWayPoints(pins);
+    setRouteDirections(run.directions || []);
+    router.push("/(root)/run-a-route");
   };
 
   const handleSignOut = () => {

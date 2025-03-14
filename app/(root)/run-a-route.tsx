@@ -1,123 +1,136 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Image, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import { View, Image, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useLocationStore } from "@/store";
-import { icons, images } from "@/constants";
+import { icons } from "@/constants";
 import { useRouter } from "expo-router";
 import CustomButton from "@/components/CustomButton";
-import BottomSheet, { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Map from "@/components/Map";
+
+import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Set to true to see warnings for potential issues
+});
 
 const RunRoute = () => {
   const router = useRouter();
   const { mapTheme, routeWayPoints, routeDirections } = useLocationStore();
   const bottomSheetRef = useRef<BottomSheet>(null);
 
+  // Refs for timer interval and start time
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
 
-  const [isRunning, setIsRunning] = useState(false); // Stopwatch state (running/paused)
-  const [elapsedTime, setElapsedTime] = useState(0); // Time elapsed
+  // Stopwatch state
+  const [isRunning, setIsRunning] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0); // in milliseconds
   const [laps, setLaps] = useState<{ time: number; lapTime: number; overallTime: number }[]>([]);
-  const [startTime, setStartTime] = useState(0);
-  const [isPaused, setIsPaused] = useState(false); // Check if it's paused
+  const [isPaused, setIsPaused] = useState(false);
   const [isFirst, setIsFirst] = useState(true);
   const scrollViewRef = useRef<ScrollView>(null);
 
-  useEffect(() => {
-    setStartTime(performance.now()); // Set the start time when the component mounts
-  }, []);
-
-  const handleAddLap = () => {
-    const currentTime = performance.now();
-    const lapTime = laps.length > 0 ? currentTime - laps[laps.length - 1].time : currentTime - startTime; // Calculate lap time
-    const overallTime = currentTime - startTime; // Overall time since start
-
-    // Add new lap to the laps array
-    setLaps((prevLaps) => [...prevLaps, { time: currentTime, lapTime, overallTime }]);
+  // Format time function: converts ms to HH:MM:SS
+  const formatTime = (time: number) => {
+    const totalSeconds = Math.floor(time / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   };
 
+  // Handle start, pause, and resume functionality
   const handleStartPause = () => {
-    if (isFirst) {
-      setIsFirst(false);
-    }
-    //setIsRunning(!isRunning);
-    // setIsPaused(!isPaused);
     if (!isRunning) {
+      // Start the stopwatch
       setIsRunning(true);
-      setIsPaused(false); // Start the timer, not paused
-    } else {
-      setIsRunning(false);
-      setIsPaused(true); // Pause the timer
+      setIsPaused(false);
+      setIsFirst(false);
+      startTimeRef.current = Date.now();
+      intervalRef.current = setInterval(() => {
+        if (startTimeRef.current !== null) {
+          setElapsedTime(Date.now() - startTimeRef.current);
+        }
+      }, 1000);
+    } else if (!isPaused) {
+      // Pause the stopwatch
+      setIsPaused(true);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    } else if (isPaused) {
+      // Resume the stopwatch
+      setIsPaused(false);
+      startTimeRef.current = Date.now() - elapsedTime;
+      intervalRef.current = setInterval(() => {
+        if (startTimeRef.current !== null) {
+          setElapsedTime(Date.now() - startTimeRef.current);
+        }
+      }, 1000);
     }
   };
 
+  // Handle lap and reset functionality
   const handleResetLap = () => {
     if (isRunning && !isPaused) {
-      // Record Lap
-      handleAddLap();
-      if (scrollViewRef.current) {
-        scrollViewRef.current.scrollToEnd({ animated: true });
-      }
-    } else {
-      // Reset Stopwatch
-      setIsFirst(true);
+      // Record a lap: compute lap time relative to the last lap
+      const lastOverallTime = laps.length > 0 ? laps[laps.length - 1].overallTime : 0;
+      const lapTime = elapsedTime - lastOverallTime;
+      const newLap = { time: Date.now(), lapTime, overallTime: elapsedTime };
+      setLaps((prev) => [...prev, newLap]);
+    } else if (isPaused) {
+      // Reset the stopwatch and laps when paused
       setIsRunning(false);
       setIsPaused(false);
       setElapsedTime(0);
       setLaps([]);
+      setIsFirst(true);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     }
   };
 
-  const formatTime = (milliseconds: number) => {
-    const mins = Math.floor(milliseconds / 60000);
-    const secs = Math.floor((milliseconds % 60000) / 1000);
-    const millis = Math.floor((milliseconds % 1000) / 10); // Keep only two digits
-
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}:${millis.toString().padStart(2, "0")}`;
-  };
-
+  // Cleanup interval on component unmount
   useEffect(() => {
-    if (isRunning) {
-      startTimeRef.current = performance.now() - elapsedTime; // Adjust start time for resuming
-      intervalRef.current = setInterval(() => {
-        setElapsedTime(performance.now() - startTimeRef.current!);
-      }, 10);
-    } else if (!isRunning && intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning]);
+  }, []);
+
+  // Auto-scroll lap log to the bottom when a new lap is added
+  useEffect(() => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [laps]);
 
   return (
     <GestureHandlerRootView className="flex-1">
       <View className="flex-1 bg-white">
         <View className="flex flex-col h-screen bg-blue-500">
-          <View className="flex flex-row absolute z-10 top-16 items-center justify-start px-5">
+          <View className="flex flex-row absolute z-10 top-25 mt-3 items-center justify-start px-5">
             <TouchableOpacity onPress={() => router.back()}>
               <View className="w-10 h-10 bg-white rounded-full items-center justify-center">
                 <Image source={icons.backArrow} resizeMode="contain" className="w-6 h-6" />
               </View>
             </TouchableOpacity>
-            <Text className="text-xl font-JakartaSemiBold ml-5">{"Go Back"}</Text>
+            <Text className="text-xl font-JakartaSemiBold ml-5">Go Back</Text>
           </View>
 
           <Map theme={mapTheme || "standard"} pins={routeWayPoints} directions={routeDirections} />
         </View>
 
-        <BottomSheet ref={bottomSheetRef} snapPoints={["22%", "65%"]}>
-          <BottomSheetView
-            style={{
-              flex: 1,
-              padding: 20,
-            }}
-          >
+        <BottomSheet ref={bottomSheetRef} snapPoints={["25%", "65%"]}>
+          <BottomSheetView style={{ flex: 1, padding: 20 }}>
             <Text className="text-5xl font-JakartaBold text-center mb-3">{formatTime(elapsedTime)}</Text>
             <View className="border-t border-gray-300 w-[95%] mx-auto mb-4" />
             <View className="flex-row space-x-4">
@@ -125,11 +138,7 @@ const RunRoute = () => {
                 <Text className="text-lg font-bold text-white">{isRunning ? (isPaused ? "Resume" : "Pause") : "Start"}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={handleResetLap}
-                className={`flex-1 rounded-full p-3 flex justify-center items-center shadow-md shadow-neutral-400/70 ${(!isRunning && isPaused) || (isRunning && !isPaused && !isFirst) ? "bg-gray-500" : "bg-gray-400"}`}
-                disabled={!isRunning && !isPaused} // Disable when not running
-              >
+              <TouchableOpacity onPress={handleResetLap} className={`flex-1 rounded-full p-3 flex justify-center items-center shadow-md shadow-neutral-400/70 ${(!isRunning && isPaused) || (isRunning && !isPaused && !isFirst) ? "bg-gray-500" : "bg-gray-400"}`} disabled={!isRunning && !isPaused}>
                 <Text className="text-lg font-bold text-white">{(isRunning && !isPaused) || isFirst ? "Lap" : "Reset"}</Text>
               </TouchableOpacity>
             </View>
@@ -152,7 +161,7 @@ const RunRoute = () => {
               )}
             </ScrollView>
 
-            <CustomButton title="End Run" onPress={() => router.push(`/home`)} className="mt-5 mb-3" />
+            <CustomButton title="End Run" onPressIn={() => router.push(`/home`)} className="mt-5 mb-3" />
           </BottomSheetView>
         </BottomSheet>
       </View>
