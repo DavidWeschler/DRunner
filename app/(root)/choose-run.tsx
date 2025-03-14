@@ -189,7 +189,7 @@ const ChooseRun = () => {
     }
   };
 
-  const addRunToDatabase = async (difficulty: string, future: Date | null, save = false) => {
+  const addRunToDatabase = async (difficulty: string, future: Date | null, save = false, recent = false) => {
     console.log("saving route with difficulty:", difficulty);
 
     console.log("Add run to database");
@@ -210,6 +210,7 @@ const ChooseRun = () => {
       elevationGain: difficulty === "easy" ? routeElevation.easy : difficulty === "medium" ? routeElevation.medium : routeElevation.hard,
       length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
       waypoints: (difficulty === "easy" ? routePinsE : difficulty === "medium" ? routePinsM : routePinsH).map((pin) => [pin.longitude, pin.latitude]),
+      is_recent: recent,
       is_saved: save,
       is_scheduled: future || null,
       is_deleted: false,
@@ -310,6 +311,32 @@ const ChooseRun = () => {
     }
   };
 
+  const updateRecentRoute = async () => {
+    try {
+      const response = await fetch("/(api)/update_recent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ clerkId: user?.id, difficulty, is_recent: true }),
+      });
+
+      if (response.ok) {
+        console.log("Route updated successfully");
+        return true;
+      } else {
+        const errorData = await response.json();
+        console.log("Failed to update route", errorData);
+        Alert.alert("Error updating route", "Please try again later.");
+        return false;
+      }
+    } catch (error) {
+      console.log("Error updating route:", error);
+      Alert.alert("Error updating route", "Please try again later.");
+      return false;
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="flex-1 bg-white">
       <Spinner visible={loading} />
@@ -388,13 +415,15 @@ const ChooseRun = () => {
           const routeAlreadySaved = difficulty === "easy" ? easySaved : difficulty === "medium" ? mediumSaved : hardSaved;
           if (!routeAlreadySaved) {
             setLoading(true);
-            const status = await addRunToDatabase(difficulty, null, false);
+            const status = await addRunToDatabase(difficulty, null, false, true);
             if (status) {
               if (difficulty === "easy") setEasySaved(true);
               if (difficulty === "medium") setMediumSaved(true);
               if (difficulty === "hard") setHardSaved(true);
             }
             setLoading(true);
+          } else {
+            await updateRecentRoute();
           }
 
           router.push("/run-a-route");

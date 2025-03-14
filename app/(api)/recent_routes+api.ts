@@ -13,8 +13,8 @@ export async function POST(request: Request) {
     const recentRuns = await sql`
         SELECT * FROM running_routes
         WHERE clerk_id = ${clerkId}
+        AND is_recent = TRUE
         AND is_deleted = FALSE
-        AND is_scheduled IS NULL
         ORDER BY created_at DESC
         LIMIT ${maxNumOfRoutes};
     `;

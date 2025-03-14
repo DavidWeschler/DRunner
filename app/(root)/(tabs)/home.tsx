@@ -66,12 +66,21 @@ const Home = () => {
   const [savedRunsRoutes, setSavedRunsRoutes] = useState<Run[]>([]);
   const [futureRunsRoutes, setFutureRunsRoutes] = useState<Run[]>([]);
 
-  const handleRunPress = ({ run }: { run: Run }) => {
+  const handleRunPress = async ({ run }: { run: Run }) => {
     console.log("Run pressed:", run);
     const pins = run.waypoints.map((waypoint: any) => ({ longitude: waypoint[0], latitude: waypoint[1] }));
 
     setRouteWayPoints(pins);
     setRouteDirections(run.directions || []);
+
+    await fetch(`/(api)/update_recent`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ clerkId: user?.id, difficulty: run.difficulty, is_recent: true, route_id: run.route_id }),
+    });
+
     router.push("/(root)/run-a-route");
   };
 

@@ -35,6 +35,7 @@ export async function POST(request: Request) {
         elevation_gain FLOAT NOT NULL,
         length FLOAT NOT NULL,
         waypoints JSONB NOT NULL,
+        is_recent BOOLEAN DEFAULT FALSE,
         is_saved BOOLEAN DEFAULT FALSE,
         is_scheduled TIMESTAMP DEFAULT NULL,
         is_deleted BOOLEAN DEFAULT FALSE,

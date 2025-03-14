@@ -3,7 +3,7 @@ import { neon } from "@neondatabase/serverless";
 export async function POST(request: Request) {
   try {
     const sql = neon(`${process.env.DATABASE_URL}`);
-    const { clerkId, route_title, address, difficulty, directions, elevationGain, length, waypoints, is_saved = false, is_scheduled = null, is_deleted = false } = await request.json();
+    const { clerkId, route_title, address, difficulty, directions, elevationGain, length, waypoints, is_recent = false, is_saved = false, is_scheduled = null, is_deleted = false } = await request.json();
 
     // Validate required fields
     if (!clerkId || !route_title || !difficulty || !directions || elevationGain === undefined || length === undefined || !waypoints) {
@@ -13,10 +13,10 @@ export async function POST(request: Request) {
     // Insert the route into the running_routes table
     await sql`
       INSERT INTO running_routes (
-        clerk_id, route_title, address, difficulty, directions, elevation_gain, length, waypoints, is_saved, is_scheduled, is_deleted
+        clerk_id, route_title, address, difficulty, directions, elevation_gain, length, waypoints, is_recent, is_saved, is_scheduled, is_deleted
       ) VALUES (
         ${clerkId}, ${route_title}, ${address}, ${difficulty}, ${JSON.stringify(directions)},
-        ${elevationGain}, ${length}, ${JSON.stringify(waypoints)}, ${is_saved}, ${is_scheduled}, ${is_deleted}
+        ${elevationGain}, ${length}, ${JSON.stringify(waypoints)}, ${is_recent}, ${is_saved}, ${is_scheduled}, ${is_deleted}
       );
     `;
 

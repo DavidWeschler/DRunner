@@ -9,8 +9,6 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import * as Notifications from "expo-notifications";
 import { SchedulableTriggerInputTypes } from "expo-notifications";
-
-// import MyDateTimePicker from "../../../components/MyDatePicker";
 import MyDateTimePicker from "@/components/MyDatePicker";
 import Spinner from "@/components/Spinner";
 import { all } from "axios";
@@ -213,6 +211,15 @@ const Runs = () => {
     const pins = selectedRun ? selectedRun.waypoints.map((waypoint: any) => ({ longitude: waypoint[0], latitude: waypoint[1] })) : [];
     setRouteWayPoints(pins);
     setRouteDirections(selectedRun?.directions || []);
+
+    await fetch(`/(api)/update_recent`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ clerkId: user?.id, difficulty: selectedRun?.difficulty, is_recent: true, route_id: selectedRun?.route_id }),
+    });
+
     router.push("/(root)/run-a-route");
   };
 
