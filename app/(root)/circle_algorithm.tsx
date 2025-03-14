@@ -127,6 +127,7 @@ interface RouteWithDifficulty extends RouteResult {
 interface AlgorithmParams {
   routeLengthKm: number;
   startPoint: Coord; // [lng, lat]
+  mode: string;
 }
 
 /**
@@ -135,7 +136,7 @@ interface AlgorithmParams {
  * Then it queries the Google Directions API to get the route's encoded polyline,
  * computes the total positive elevation gain, and calculates the actual route length.
  */
-async function generateCircularRoute(startPoint: Coord, routeLengthKm: number): Promise<RouteResult> {
+async function generateCircularRoute(startPoint: Coord, routeLengthKm: number, mode: string): Promise<RouteResult> {
   // Divide the route into three segments.
   const segmentLength = routeLengthKm / 3;
 
@@ -184,11 +185,10 @@ async function generateCircularRoute(startPoint: Coord, routeLengthKm: number): 
   const originStr = formatCoord(startPoint as number[]);
   const destinationStr = originStr; // Loop route: ends where it starts.
   const waypointStr = [firstStop, secondStop].map(formatCoord).join("|");
-  const googleUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${originStr}&destination=${destinationStr}&waypoints=${waypointStr}&mode=walking&key=${API_KEY}`;
+  const googleUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=${originStr}&destination=${destinationStr}&waypoints=${waypointStr}&mode=${mode}&key=${API_KEY}`;
 
   // Query Google Directions.
   const response = await axios.get<DirectionsResponse>(googleUrl);
-  console.log("length error here?");
   if (!response.data.routes || response.data.routes.length === 0) {
     throw new Error("No routes found from Google Directions API");
   }
@@ -241,12 +241,12 @@ async function getElevationGain(polylineStr: string): Promise<number> {
  * sorts them (lowest gain = easiest, highest gain = hardest), and assigns difficulty labels accordingly.
  * Each route object also contains the actual route length (in kilometers).
  */
-async function CircularAlgorithm({ routeLengthKm, startPoint }: AlgorithmParams): Promise<RouteWithDifficulty[]> {
+async function CircularAlgorithm({ routeLengthKm, startPoint, mode = "walking" }: AlgorithmParams): Promise<RouteWithDifficulty[]> {
   const routes: RouteResult[] = [];
   let errorCount = 0;
   for (let i = 0; i < 3; i++) {
     try {
-      const route = await generateCircularRoute(startPoint, routeLengthKm * 0.6);
+      const route = await generateCircularRoute(startPoint, routeLengthKm * 0.6, mode);
       routes.push(route);
     } catch (error) {
       console.log("Error generating route:", error);

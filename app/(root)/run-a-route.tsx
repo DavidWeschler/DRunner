@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Map from "@/components/Map";
 
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+import { rgbaColor } from "react-native-reanimated/lib/typescript/Colors";
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -130,7 +131,7 @@ const RunRoute = () => {
         </View>
 
         <BottomSheet ref={bottomSheetRef} snapPoints={["25%", "65%"]}>
-          <BottomSheetView style={{ flex: 1, padding: 20 }}>
+          <BottomSheetView style={{ flex: 1, padding: 20, backgroundColor: "rgb(226, 226, 226)" }}>
             <Text className="text-5xl font-JakartaBold text-center mb-3">{formatTime(elapsedTime)}</Text>
             <View className="border-t border-gray-300 w-[95%] mx-auto mb-4" />
             <View className="flex-row space-x-4">
@@ -145,7 +146,7 @@ const RunRoute = () => {
 
             {/* Lap Log ScrollView */}
             <ScrollView className="mt-4 flex-1" ref={scrollViewRef}>
-              <View className="border-t border-white" />
+              <View className="border-t border-black" />
               {laps.length > 0 ? (
                 laps.map((lap, index) => (
                   <View key={index} className="flex-row justify-between py-2 border-b border-gray-300 mt-2">

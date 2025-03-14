@@ -19,6 +19,13 @@ export const useLocationStore = create<LocationStore>((set) => ({
   inp: null,
   routeWayPoints: [],
   routeDirections: [],
+  mode: "walking",
+
+  setMode: (mode: string) => {
+    set(() => ({
+      mode,
+    }));
+  },
 
   setUserLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => {
     set(() => ({

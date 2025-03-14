@@ -4,7 +4,7 @@ import * as Location from "expo-location";
 import { router } from "expo-router";
 import { useState, useEffect } from "react";
 import * as Notifications from "expo-notifications";
-import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet, Alert, Platform, Button } from "react-native";
+import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet, Alert, Platform, Button, Switch } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GoogleTextInput from "@/components/GoogleTextInput";
 import HadasTextInput from "@/components/HadasInp";
@@ -47,7 +47,7 @@ const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
-  const { setUserLocation, setDestinationLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, setEndAddress, mapTheme, setRouteDirections, setRouteWayPoints } = useLocationStore();
+  const { setUserLocation, setDestinationLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, setEndAddress, mapTheme, setRouteDirections, setRouteWayPoints, setMode, mode } = useLocationStore();
 
   const [length, setLength] = useState("");
   const [startPoint, setStartPoint] = useState("");
@@ -63,6 +63,7 @@ const Home = () => {
   const [hasPermission, setHasPermission] = useState<boolean>(false);
 
   const [recentRunRoutes, setRecentRunRoutes] = useState<Run[]>([]);
+
   const [savedRunsRoutes, setSavedRunsRoutes] = useState<Run[]>([]);
   const [futureRunsRoutes, setFutureRunsRoutes] = useState<Run[]>([]);
 
@@ -315,6 +316,19 @@ const Home = () => {
 
                   <View className="justify-center items-center">
                     <PointInput label="End Point" placeholder={"Optional"} setAddress={setEndAddress} setPointInput={setEndPointInput} setPoint={setEndPoint} />
+                  </View>
+
+                  {/* Switch for Walking / Cycling */}
+                  <View className="mt-3 flex flex-row items-center">
+                    <Text className="text-black text-lg font-JakartaSemiBold mr-3">Mode:</Text>
+                    <View className="flex flex-row space-x-3">
+                      <TouchableOpacity onPress={() => setMode("walking")} className={`px-3 py-1 rounded-full border ${mode === "walking" ? "border-blue-500" : "border-gray-400"} bg-[#F4F4F4]`}>
+                        <Text className={`font-medium ${mode === "walking" ? "text-blue-500" : "text-gray-600"}`}>Running 🏃‍♂️‍➡️</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => setMode("bicycling")} className={`px-3 py-1 rounded-full border ${mode === "bicycling" ? "border-blue-500" : "border-gray-400"} bg-[#F4F4F4]`}>
+                        <Text className={`font-medium ${mode === "bicycling" ? "text-blue-500" : "text-gray-600"}`}>Cycling 🚴‍♂️</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
 
                   <View className="justify-left items-left my-3">

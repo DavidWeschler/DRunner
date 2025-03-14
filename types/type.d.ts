@@ -150,6 +150,8 @@ declare interface LocationStore {
   routeWayPoints: MarkerData[];
   routeDirections: string[];
 
+  mode: string;
+
   //algorithm inputs setters:
   setLengthInput: (length: number) => void;
   setStartPointInput: ({ latitude, longitude }: { latitude: number; longitude: number } | null) => void;
@@ -166,6 +168,8 @@ declare interface LocationStore {
 
   setRouteWayPoints: (waypoints: MarkerData[]) => void;
   setRouteDirections: (directions: string[]) => void;
+
+  setMode: (mode: string) => void;
 }
 
 declare interface aiModel {

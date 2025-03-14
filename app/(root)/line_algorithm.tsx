@@ -10,6 +10,7 @@ interface AlgorithmParams {
   routeLengthKm: number;
   startPoint: Coord; // [lng, lat]
   endPoint: Coord; // [lng, lat]
+  mode: string;
 }
 
 interface DirectionLeg {
@@ -41,10 +42,10 @@ export interface RouteObject {
 const formatCoord = (coord: number[]): string => `${coord[1]},${coord[0]}`;
 
 // Fetch directions from Google using origin, destination, and an optional waypoint.
-async function fetchDirectionsWithWaypoint(origin: number[], destination: number[], waypoint?: number[]): Promise<DirectionsResponse> {
+async function fetchDirectionsWithWaypoint(mode: string, origin: number[], destination: number[], waypoint?: number[]): Promise<DirectionsResponse> {
   const originStr = formatCoord(origin);
   const destinationStr = formatCoord(destination);
-  let url = `https://maps.googleapis.com/maps/api/directions/json?origin=${originStr}&destination=${destinationStr}&mode=walking&key=${API_KEY}`;
+  let url = `https://maps.googleapis.com/maps/api/directions/json?origin=${originStr}&destination=${destinationStr}&mode=${mode}&key=${API_KEY}`;
   if (waypoint) {
     const waypointStr = formatCoord(waypoint);
     url += `&waypoints=${waypointStr}`;
@@ -98,7 +99,7 @@ async function getElevationGain(polyline: string): Promise<number> {
  * Each route uses a randomly generated detour waypoint to (try to) achieve the desired routeLengthKm.
  * The returned routes are sorted by elevation gain (lowest gain → "easy", then "medium", then "hard").
  */
-async function Line_Algorithm({ routeLengthKm, startPoint, endPoint }: AlgorithmParams): Promise<RouteObject[]> {
+async function Line_Algorithm({ routeLengthKm, startPoint, endPoint, mode = "walking" }: AlgorithmParams): Promise<RouteObject[]> {
   const routes: RouteObject[] = [];
 
   // Compute the direct (straight-line) distance for reference.
@@ -107,7 +108,7 @@ async function Line_Algorithm({ routeLengthKm, startPoint, endPoint }: Algorithm
   // If the desired route length is less than or equal to the direct distance, return a direct route.
   if (routeLengthKm <= directDistance) {
     // make a route that goes directly from start to end without any waypoints, calculate the elevation and actuall length, and return it as the only route
-    const directionsData: DirectionsResponse = await fetchDirectionsWithWaypoint(startPoint, endPoint);
+    const directionsData: DirectionsResponse = await fetchDirectionsWithWaypoint(mode, startPoint, endPoint);
     if (directionsData.routes.length === 0) {
       throw new Error("No routes found by Google Directions API for direct route");
     }
@@ -152,7 +153,7 @@ async function Line_Algorithm({ routeLengthKm, startPoint, endPoint }: Algorithm
     const detourPoint: Coord = destination(midPoint, dRandom, detourBearing, { units: "kilometers" }).geometry.coordinates as Coord; // [lng, lat]
 
     // --- FETCH DIRECTIONS FOR THE DETOUR ROUTE ---
-    const directionsData: DirectionsResponse = await fetchDirectionsWithWaypoint(startPoint, endPoint, detourPoint);
+    const directionsData: DirectionsResponse = await fetchDirectionsWithWaypoint(mode, startPoint, endPoint, detourPoint);
     if (directionsData.routes.length === 0) {
       throw new Error("No routes found by Google Directions API for detour route");
     }

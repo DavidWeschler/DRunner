@@ -20,7 +20,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 
 const ChooseRun = () => {
   const router = useRouter();
-  const { mapTheme, setRouteDirections, setRouteWayPoints } = useLocationStore();
+  const { mapTheme, setRouteDirections, setRouteWayPoints, mode } = useLocationStore();
   const inpLength = useLocationStore((state) => state.length);
   const inpStartPoint = useLocationStore((state) => state.startPoint);
   const inpEndPoint = useLocationStore((state) => state.endPoint);
@@ -73,6 +73,7 @@ const ChooseRun = () => {
       routeLengthKm: inpLength || 0,
       startPoint: [inpStartPoint.longitude, inpStartPoint.latitude] as [number, number],
       endPoint: [inpEndPoint.longitude, inpEndPoint.latitude] as [number, number],
+      mode: mode,
     };
 
     console.log("inputsLine:", inputsLine);
@@ -113,6 +114,7 @@ const ChooseRun = () => {
     const inputs = {
       routeLengthKm: inpLength <= 0 || inpLength > 100 ? 5 : inpLength,
       startPoint: [inpStartPoint.longitude, inpStartPoint.latitude] as [number, number],
+      mode: mode,
     };
 
     const results = await CircularAlgorithm(inputs);
