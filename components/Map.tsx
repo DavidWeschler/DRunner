@@ -1,6 +1,6 @@
 import { icons } from "@/constants";
 import { useLocationStore } from "@/store";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Text, View, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
@@ -53,14 +53,6 @@ const decodePolyline = (encoded: string): Coordinate[] => {
 
   return polyline;
 };
-
-const dummy = [
-  { latitude: 32.144065, longitude: 34.876698 },
-  { latitude: 32.14821885296124, longitude: 34.8605208136513 },
-  { latitude: 32.13216372224022, longitude: 34.8673076747823 },
-  { latitude: 32.13300035031964, longitude: 34.88742070172813 },
-  { latitude: 32.14954143801683, longitude: 34.89231651624365 },
-];
 
 interface MapProps {
   theme: MapThemeType;
@@ -131,9 +123,45 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
     }
   };
 
+  const mapRef = useRef<MapView>(null);
+
+  useEffect(() => {
+    if (pins.length > 0 && mapRef.current) {
+      const timeoutId = setTimeout(() => {
+        mapRef.current?.fitToCoordinates(
+          pins.map((pin) => ({ latitude: pin.latitude, longitude: pin.longitude })),
+          {
+            edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+            animated: true,
+          }
+        );
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [pins]);
+
   return (
     <>
-      <MapView provider={PROVIDER_DEFAULT} className="w-full h-full rounded-2xl" tintColor="black" showsUserLocation={true} userInterfaceStyle="light" customMapStyle={mapTheme} onLongPress={handleLongPress}>
+      <MapView
+        ref={mapRef}
+        provider={PROVIDER_DEFAULT}
+        className="w-full h-full rounded-2xl"
+        tintColor="black"
+        showsUserLocation={true}
+        userInterfaceStyle="light"
+        customMapStyle={mapTheme}
+        onLongPress={handleLongPress}
+        initialRegion={
+          pins.length > 0
+            ? {
+                latitude: pins[0].latitude,
+                longitude: pins[0].longitude,
+                latitudeDelta: 0.00002, // Zoom level
+                longitudeDelta: 0.00002, // Zoom level
+              }
+            : undefined
+        }
+      >
         {pins.map((pin, index) => (
           <Marker key={index} coordinate={{ latitude: pin.latitude, longitude: pin.longitude }} title={index === 3 || index === 0 ? "Start" : `Pin ${index + 1}`} />
         ))}

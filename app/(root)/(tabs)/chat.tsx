@@ -39,7 +39,17 @@ const getLatLngFromAddress = async (address: string) => {
 
 const Chat = () => {
   const { inp, setUserLocation, setHadasInp, setLengthInput, setStartAddress, setEndAddress, setDifficultyInput, setStartPointInput, setEndPointInput } = useLocationStore();
-  const [messages, setMessages] = useState<{ text: string | JSX.Element; sender: "user" | "bot"; timestamp: string }[]>([{ text: generateStartingMessage(), sender: "bot", timestamp: new Date().toLocaleTimeString() }]);
+  const [messages, setMessages] = useState<{ text: string | JSX.Element; sender: "user" | "bot"; timestamp: string }[]>([
+    {
+      text: generateStartingMessage(),
+      sender: "bot",
+      timestamp: new Date().toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false, // 24-hour format
+      }),
+    },
+  ]);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
 
   const [deepAnswered, setDeepAnswered] = useState(true);
@@ -80,7 +90,17 @@ const Chat = () => {
 
     if (inp) {
       // Clear the conversation and add new message
-      setMessages(() => [{ text: generateStartingMessage(), sender: "bot", timestamp: new Date().toLocaleTimeString() }]);
+      setMessages(() => [
+        {
+          text: generateStartingMessage(),
+          sender: "bot",
+          timestamp: new Date().toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false, // 24-hour format
+          }),
+        },
+      ]);
       scrollToBottom();
       handleSend({ inp });
       setHadasInp(""); // Clear input after sending
@@ -123,14 +143,6 @@ const Chat = () => {
     const messageContent = data.choices[0].message.content;
     return messageContent;
   };
-
-  interface AIreply {
-    startLocation?: string;
-    endLocation?: string;
-    routeLength?: string;
-    difficultyLvl?: string;
-    AIresponse?: string;
-  }
 
   interface ApiMessage {
     role: string;
@@ -218,7 +230,11 @@ const Chat = () => {
           : finalAnswer;
     } catch (error) {
     } finally {
-      const timestamp = new Date().toLocaleTimeString();
+      const timestamp = new Date().toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false, // 24-hour format
+      });
       setMessages((prev) => [...prev, { text: finalAnswer, sender: "bot", timestamp }]);
       scrollToBottom();
     }
@@ -228,19 +244,11 @@ const Chat = () => {
     if (!inp.trim() || !deepAnswered) {
       return;
     }
-    const timestamp = new Date().toLocaleTimeString();
-
-    //DEBUG
-    const currentInputs = {
-      "running route length ": useLocationStore.getState().length,
-      "running route start location ": useLocationStore.getState().startAddress,
-      "running route end location ": useLocationStore.getState().endAddress,
-      "running route difficulty level ": useLocationStore.getState().difficulty,
-    };
-    console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-    console.log("Current inputs:", currentInputs);
-    console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-    //END DEBUG
+    const timestamp = new Date().toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false, // 24-hour format
+    });
 
     try {
       // Add user message
@@ -292,7 +300,11 @@ const Chat = () => {
       setGeneratePressed(false);
       setDeepAnswered(true);
       setBtnTitle("Generate");
-      const timestamp = new Date().toLocaleTimeString();
+      const timestamp = new Date().toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false, // 24-hour format
+      });
       setMessages((prev) => [...prev, { text: "Sorry, something went wrong with generating your route", sender: "bot", timestamp }]);
       scrollToBottom();
     }

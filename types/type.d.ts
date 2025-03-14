@@ -25,6 +25,8 @@ import { TextInputProps, TouchableOpacityProps } from "react-native";
 //   price?: string;
 // }
 
+type MapThemeType = "standard" | "dark" | "aubergine" | "night" | "retro" | "silver";
+
 declare interface AboutModalProps {
   visible: boolean;
   onClose: () => void;
@@ -69,6 +71,7 @@ declare interface ButtonProps extends TouchableOpacityProps {
   IconRight?: React.ComponentType<any>;
   className?: string;
   textClassName?: string;
+  width?: string;
 }
 
 declare interface GoogleInputProps {
@@ -143,6 +146,10 @@ declare interface LocationStore {
   //hadas
   inp: string | null;
 
+  //for the running phase /fix
+  routeWayPoints: MarkerData[];
+  routeDirections: string[];
+
   //algorithm inputs setters:
   setLengthInput: (length: number) => void;
   setStartPointInput: ({ latitude, longitude }: { latitude: number; longitude: number } | null) => void;
@@ -156,6 +163,9 @@ declare interface LocationStore {
   setMapTheme: (theme: MapThemeType) => void;
   setUserLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => void;
   setDestinationLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => void;
+
+  setRouteWayPoints: (waypoints: MarkerData[]) => void;
+  setRouteDirections: (directions: string[]) => void;
 }
 
 // declare interface DriverStore {

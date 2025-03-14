@@ -14,7 +14,7 @@ const AnimatedGlowBox = () => {
       }}
       style={{
         position: "absolute",
-        top: 505, // 20px from the top of the parent
+        top: 450, // 20px from the top of the parent
         left: 6, // 20px from the left of the parent
         right: 20, // 20px from the right of the parent
         bottom: 10, // 20px from the bottom of the parent

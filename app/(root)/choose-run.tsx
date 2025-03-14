@@ -20,7 +20,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 
 const ChooseRun = () => {
   const router = useRouter();
-  const { mapTheme } = useLocationStore();
+  const { mapTheme, setRouteDirections, setRouteWayPoints } = useLocationStore();
   const inpLength = useLocationStore((state) => state.length);
   const inpStartPoint = useLocationStore((state) => state.startPoint);
   const inpEndPoint = useLocationStore((state) => state.endPoint);
@@ -379,8 +379,10 @@ const ChooseRun = () => {
             elevationGain: difficulty === "easy" ? routeElevation.easy : difficulty === "medium" ? routeElevation.medium : routeElevation.hard,
             length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
           };
+          setRouteWayPoints(route.pins);
+          setRouteDirections(route.directions || []);
 
-          // pass the route to the next screen
+          router.push("/run-a-route");
         }}
       >
         <Text className="text-white text-lg font-bold">Start Run</Text>
