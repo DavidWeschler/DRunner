@@ -82,7 +82,7 @@ const Profile = () => {
           </View>
         </View>
 
-        <View className="items-center justify-center items-left mt-2">
+        <View className="items-center justify-center items-left mt-5">
           <Text className="text-black text-lg font-JakartaSemiBold">AI Model</Text>
           <View className="border-t border-gray-300 w-full my-4" />
         </View>
@@ -167,13 +167,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4F4F4",
     paddingVertical: 5,
     paddingHorizontal: 10,
-    borderRadius: 20,
+    borderRadius: 10,
     width: "30%",
     alignItems: "center",
     justifyContent: "center",
-    // marginHorizontal: 5,
-    // marginBottom: 10,
-    // borderWidth: 1,
+    marginHorizontal: 5,
+    marginBottom: 10,
     borderColor: "#D1D5DB",
     overflow: "hidden",
   },
@@ -208,7 +207,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   radioImage: {
-    width: "100%",
+    width: "120%",
     height: 50,
     resizeMode: "cover",
     borderRadius: 10,

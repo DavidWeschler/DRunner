@@ -40,7 +40,8 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
   },
   alertContainer: {
-    width: "80%",
+    width: "85%",
+    height: "85%",
     backgroundColor: "white",
     borderRadius: 10,
     padding: 20,

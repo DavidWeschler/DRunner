@@ -83,6 +83,7 @@ const styles = StyleSheet.create({
   },
   alertContainer: {
     width: "85%",
+    height: "85%",
     backgroundColor: "white",
     borderRadius: 12,
     padding: 20,
