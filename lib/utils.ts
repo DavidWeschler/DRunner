@@ -1,14 +1,12 @@
-import { Run } from "@/types/type";
+export function getIsraelTimezoneOffset(): number {
+  const ISRAEL_TIMEZONE_OFFSET = 2;
+  const ISRAEL_TIMEZONE_OFFSET_DURING_DAYLIGHT_SAVING = 3;
 
-// export const sortRuns = (runs: Run[]): Run[] => {
-//   const result = runs.sort((a, b) => {
-//     const dateA = new Date(`${a.created_at}T${a.run_time}`);
-//     const dateB = new Date(`${b.created_at}T${b.run_time}`);
-//     return dateB.getTime() - dateA.getTime();
-//   });
-
-//   return result.reverse();
-// };
+  const date = new Date();
+  const start = new Date(date.getFullYear(), 2, 25);
+  const end = new Date(date.getFullYear(), 9, 25);
+  return date >= start && date < end ? ISRAEL_TIMEZONE_OFFSET_DURING_DAYLIGHT_SAVING : ISRAEL_TIMEZONE_OFFSET;
+}
 
 export function formatTime(minutes: number): string {
   const formattedMinutes = +minutes?.toFixed(0) || 0;
@@ -23,7 +21,9 @@ export function formatTime(minutes: number): string {
 }
 
 export function formatDate(dateString: string, future = false): string {
-  const date = new Date(dateString);
+  const offset = getIsraelTimezoneOffset();
+
+  const date = new Date(future ? new Date(dateString).getTime() + offset * 60 * 60 * 1000 : dateString);
   const day = date.getDate();
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
   const month = monthNames[date.getMonth()];

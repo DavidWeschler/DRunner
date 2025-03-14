@@ -100,7 +100,7 @@ const Home = () => {
       setUserLocation({
         latitude: location.coords?.latitude,
         longitude: location.coords?.longitude,
-        address: `${address[0].name}, ${address[0].region}`, // ron - i think its better to use address[0].formattedAddress for savibng the address. look at the full 'address' object and tell me wha you think
+        address: `${address[0].name}, ${address[0].region}`,
       });
 
       setUserLocationStr(`${address[0].formattedAddress}`);

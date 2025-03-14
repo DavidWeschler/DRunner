@@ -2,7 +2,7 @@ import RunCard from "@/components/RunCard";
 import { icons, images } from "@/constants";
 import { Run } from "@/types/type";
 import { useUser } from "@clerk/clerk-expo";
-import { FlatList, Text, View, Image, ActivityIndicator, TouchableOpacity, Modal, Pressable, Alert, TextInput, Switch } from "react-native";
+import { FlatList, Text, View, Image, ActivityIndicator, TouchableOpacity, Modal, Pressable, Alert, TextInput, Switch, Button } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@clerk/clerk-expo";
 import { router } from "expo-router";
@@ -12,6 +12,10 @@ import { SchedulableTriggerInputTypes } from "expo-notifications";
 
 // import MyDateTimePicker from "../../../components/MyDatePicker";
 import MyDateTimePicker from "@/components/MyDatePicker";
+import Spinner from "@/components/Spinner";
+import { all } from "axios";
+
+import { getIsraelTimezoneOffset } from "@/lib/utils";
 
 const Runs = () => {
   const { user } = useUser();
@@ -27,6 +31,9 @@ const Runs = () => {
   const [selectedRunSavedStatus, setSelectedRunSavedStatus] = useState(selectedRun?.is_saved || false);
   const [newTitle, setNewTitle] = useState("");
   const [showPicker, setShowPicker] = useState(false);
+
+  // spinner
+  const [showSpinner, setShowSpinner] = useState(false);
 
   const fetchRoutes = async (apiType: string) => {
     try {
@@ -87,6 +94,7 @@ const Runs = () => {
 
   const handleDelete = async () => {
     console.log("Deleting:", selectedRun);
+    setShowSpinner(true);
 
     try {
       const res = await fetch(`/(api)/delete_route`, {
@@ -103,12 +111,14 @@ const Runs = () => {
       Alert.alert("Error deleting route", "Please try again later", [{ text: "OK" }]);
     }
 
+    setShowSpinner(false);
     setModalVisible(false);
     await refreshRoutes();
   };
 
   const handleEditTitle = async () => {
     console.log("New title:", newTitle);
+    setShowSpinner(true);
 
     try {
       const res = await fetch(`/(api)/edit_title_route`, {
@@ -125,6 +135,7 @@ const Runs = () => {
       Alert.alert("Error editing route", "Please try again later", [{ text: "OK" }]);
     }
 
+    setShowSpinner(false);
     setModalVisible(false);
     await refreshRoutes();
   };
@@ -154,19 +165,22 @@ const Runs = () => {
   };
 
   const scheduleRoute = async (date: Date) => {
-    const allScheduled = await Notifications.getAllScheduledNotificationsAsync();
-    const scheduleToClear = allScheduled.find((notification) => {
-      const trigger = notification?.trigger;
+    if (selectedRun?.is_scheduled) {
+      const allScheduled = await Notifications.getAllScheduledNotificationsAsync();
+      const selectedRunTime = new Date(selectedRun?.is_scheduled).getTime();
+      const scheduleToClear = allScheduled.find((notification) => {
+        const notificationTime = (notification.trigger as any).value - getIsraelTimezoneOffset() * 60 * 60 * 1000;
 
-      if (trigger && "value" in trigger) {
-        return new Date(trigger.value as number).getTime() === new Date(selectedRun?.is_scheduled || "").getTime();
+        console.log("Notification time:", notificationTime);
+        console.log("Selected run time:", selectedRunTime);
+
+        return notificationTime === selectedRunTime;
+      });
+
+      if (scheduleToClear) {
+        console.log("Clearing scheduled notification:", scheduleToClear);
+        await Notifications.cancelScheduledNotificationAsync(scheduleToClear.identifier);
       }
-
-      return false;
-    });
-
-    if (scheduleToClear) {
-      await Notifications.cancelScheduledNotificationAsync(scheduleToClear.identifier);
     }
 
     try {
@@ -175,7 +189,7 @@ const Runs = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ clerkId: user?.id, routeId: selectedRun?.route_id, scheduleDate: new Date(date.getTime() - date.getTimezoneOffset() * 60000) }),
+        body: JSON.stringify({ clerkId: user?.id, routeId: selectedRun?.route_id, scheduleDate: date }),
       }).then((res) => res.json());
 
       console.log("Route scheduling edited:", res);
@@ -216,6 +230,8 @@ const Runs = () => {
 
   return (
     <SafeAreaView>
+      <Spinner visible={showSpinner} />
+
       <FlatList
         data={viewRadio(kind)}
         renderItem={({ item }) => (
