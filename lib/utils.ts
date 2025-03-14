@@ -1,12 +1,12 @@
-const ISRAEL_TIMEZONE_OFFSET = 2;
-const ISRAEL_TIMEZONE_OFFSET_DURING_DAYLIGHT_SAVING = 3;
+export function getIsraelTimezoneOffset(): number {
+  const ISRAEL_TIMEZONE_OFFSET = 2;
+  const ISRAEL_TIMEZONE_OFFSET_DURING_DAYLIGHT_SAVING = 3;
 
-const is_daylight_saving_in_israel = () => {
   const date = new Date();
   const start = new Date(date.getFullYear(), 2, 25);
   const end = new Date(date.getFullYear(), 9, 25);
-  return date >= start && date < end;
-};
+  return date >= start && date < end ? ISRAEL_TIMEZONE_OFFSET_DURING_DAYLIGHT_SAVING : ISRAEL_TIMEZONE_OFFSET;
+}
 
 export function formatTime(minutes: number): string {
   const formattedMinutes = +minutes?.toFixed(0) || 0;
@@ -21,7 +21,7 @@ export function formatTime(minutes: number): string {
 }
 
 export function formatDate(dateString: string, future = false): string {
-  const offset = is_daylight_saving_in_israel() ? ISRAEL_TIMEZONE_OFFSET_DURING_DAYLIGHT_SAVING : ISRAEL_TIMEZONE_OFFSET;
+  const offset = getIsraelTimezoneOffset();
 
   const date = new Date(future ? new Date(dateString).getTime() + offset * 60 * 60 * 1000 : dateString);
   const day = date.getDate();
