@@ -28,7 +28,7 @@ describe("Home Component", () => {
   // Test if the Home component renders correctly
   it("renders correctly", () => {
     const { getByText } = render(<Home />);
-    expect(getByText("Welcome John👋")).toBeTruthy();
+    expect(getByText("Welcome John 👋")).toBeTruthy();
   });
 
   // Test if the weather information is displayed

@@ -10,12 +10,12 @@ import { StyleSheet } from "react-native";
 import CustomButton from "@/components/CustomButton";
 // import {aiModel } from "@/types/type";
 
-//models
-//deep seek: "deepseek/deepseek-r1-distill-llama-70b:free"
-//google gemma 3: "google/gemma-3-4b-it:free"
-//Qwen QwQ 32B: "qwen/qwq-32b:free" ~~
-//Nous DeepHermes 3 Llama 3 8B Preview (free): "nousresearch/deephermes-3-llama-3-8b-preview:free"
-//Google Gemini Flash Lite 2.0 Preview (free): "google/gemini-2.0-flash-lite-preview-02-05:free"
+// models
+// deep seek: "deepseek/deepseek-r1-distill-llama-70b:free"
+// google gemma 3: "google/gemma-3-4b-it:free"
+// Qwen QwQ 32B: "qwen/qwq-32b:free" ~~
+// Nous DeepHermes 3 Llama 3 8B Preview (free): "nousresearch/deephermes-3-llama-3-8b-preview:free"
+// Google Gemini Flash Lite 2.0 Preview (free): "google/gemini-2.0-flash-lite-preview-02-05:free"
 // Meta: Llama 3.3 70B Instruct (free): "meta-llama/llama-3.3-70b-instruct:free"
 
 const Profile = () => {
@@ -88,7 +88,7 @@ const Profile = () => {
         </View>
 
         <View style={styles.radioContainer}>
-          <TouchableOpacity onPress={() => setAiModelInStrored("google gemma 3")} style={[styles.radio, currentAi === "google gemma 3" && styles.selected]}>
+          <TouchableOpacity onPress={() => setAiModelInStrored("google gemma 3")} style={[styles.radio, currentAi === "google gemma 3" && styles.selected]} testID="ai-model-gemma">
             <Image source={require("@/assets/AiModels/gemma.png")} style={styles.radioImage} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setAiModelInStrored("deepSeek")} style={[styles.radio, currentAi === "deepSeek" && styles.selected]}>
@@ -114,29 +114,23 @@ const Profile = () => {
         </View>
 
         <View style={styles.radioContainer}>
-          <TouchableOpacity onPress={() => setMapThemeInStrored("dark")} style={[styles.radio, currentMapTheme === "dark" && styles.selected]}>
+          <TouchableOpacity onPress={() => setMapThemeInStrored("dark")} style={[styles.radio, currentMapTheme === "dark" && styles.selected]} testID="map-theme-dark">
             <Image source={require("@/assets/MapImages/dark.png")} style={styles.radioImage} />
-            {/* <Text style={[styles.radioText, currentMapTheme === "dark" ? styles.selectedText : styles.unselectedText]}>Dark</Text> */}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setMapThemeInStrored("aubergine")} style={[styles.radio, currentMapTheme === "aubergine" && styles.selected]}>
             <Image source={require("@/assets/MapImages/aubergine.png")} style={styles.radioImage} />
-            {/* <Text style={[styles.radioText, currentMapTheme === "aubergine" ? styles.selectedText : styles.unselectedText]}>Aubergine</Text> */}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setMapThemeInStrored("night")} style={[styles.radio, currentMapTheme === "night" && styles.selected]}>
             <Image source={require("@/assets/MapImages/night.png")} style={styles.radioImage} />
-            {/* <Text style={[styles.radioText, currentMapTheme === "night" ? styles.selectedText : styles.unselectedText]}>Night</Text> */}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setMapThemeInStrored("retro")} style={[styles.radio, currentMapTheme === "retro" && styles.selected]}>
             <Image source={require("@/assets/MapImages/retro.png")} style={styles.radioImage} />
-            {/* <Text style={[styles.radioText, currentMapTheme === "retro" ? styles.selectedText : styles.unselectedText]}>Retro</Text> */}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setMapThemeInStrored("silver")} style={[styles.radio, currentMapTheme === "silver" && styles.selected]}>
             <Image source={require("@/assets/MapImages/silver.png")} style={styles.radioImage} />
-            {/* <Text style={[styles.radioText, currentMapTheme === "silver" ? styles.selectedText : styles.unselectedText]}>Silver</Text> */}
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setMapThemeInStrored("standard")} style={[styles.radio, currentMapTheme === "standard" && styles.selected]}>
             <Image source={require("@/assets/MapImages/standard.png")} style={styles.radioImage} />
-            {/* <Text style={[styles.radioText, currentMapTheme === "standard" ? styles.selectedText : styles.unselectedText]}>Standard</Text> */}
           </TouchableOpacity>
         </View>
 
