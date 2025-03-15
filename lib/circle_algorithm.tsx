@@ -1,14 +1,10 @@
-// Import the necessary Turf.js functions and axios for HTTP requests
 import { circle, destination, lineIntersect, distance, Coord, Units } from "@turf/turf";
 import axios from "axios";
 import polyline from "polyline";
 
-// Google API Key from environment variables.
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
 
-// -------------------
-// Existing Interfaces
-// -------------------
+// Interfaces
 interface Pin {
   latitude: number;
   longitude: number;
@@ -38,37 +34,26 @@ interface NearestRoadsResponse {
   snappedPoints: SnappedPoint[];
 }
 
-// -------------------
-// Existing Helper Functions
-// -------------------
+interface AlgorithmParams {
+  routeLengthKm: number;
+  startPoint: Coord; // [lng, lat]
+  mode: string;
+}
 
-/**
- * Fetches directions between an array of pins (adjusted coordinates) using the Google Directions API.
- */
-const getDirectionsBetweenPins = async (pins: Pin[]): Promise<string[]> => {
-  console.log(`Setting directions between pins... Calling Google API ${pins.length} times`);
-  const directions: string[] = [];
+interface RouteResult {
+  waypoints: number[][]; // [lng, lat]
+  directions: string;
+  elevationGain: number;
+  length: number;
+}
 
-  for (let i = 0; i < pins.length; i++) {
-    const start = pins[i];
-    const end = pins[(i + 1) % pins.length]; // Ensures the last pin connects back to the first pin
-    const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${start.latitude},${start.longitude}&destination=${end.latitude},${end.longitude}&mode=walking&key=${API_KEY}`;
-    try {
-      const response = await axios.get<DirectionsResponse>(url);
-      const data = response.data;
-      if (data.routes.length > 0) {
-        directions.push(data.routes[0].overview_polyline.points);
-      }
-    } catch (error) {
-      console.log(`Error fetching directions between pin ${i} and pin ${(i + 1) % pins.length}:`, error);
-    }
-  }
-  return directions;
-};
+type Difficulty = "easy" | "medium" | "hard";
 
-/**
- * Adjusts a single coordinate to the nearest road using the Google Roads API.
- */
+interface RouteWithDifficulty extends RouteResult {
+  difficulty: Difficulty;
+}
+
+// Adjusts a single coordinate to the nearest road using the Google Roads API.
 const adjustPinToRoad = async (coord: Coordinate): Promise<Coordinate> => {
   const { latitude, longitude } = coord;
   const url = `https://roads.googleapis.com/v1/nearestRoads?points=${encodeURIComponent(latitude)},${encodeURIComponent(longitude)}&key=${API_KEY}`;
@@ -86,48 +71,15 @@ const adjustPinToRoad = async (coord: Coordinate): Promise<Coordinate> => {
   return coord; // Return original coordinate if snapping fails
 };
 
-/**
- * Adjusts an array of pins (coordinates) to streets.
- */
+// Adjusts an array of pins (coordinates) to streets.
 const adjustPinsToStreetsWithGoogleAPI = async (pins: Coordinate[]): Promise<Coordinate[]> => {
   const adjustedPins: Coordinate[] = await Promise.all(pins.map((pin) => adjustPinToRoad(pin)));
   return adjustedPins;
 };
 
-// -------------------
-// New Code: Circular Routes with Difficulty Based on Elevation Gain
-// -------------------
-
-/**
- * A helper polyline decoder.
- * This function uses the 'polyline' npm package to decode the encoded polyline string
- * into an array of [lat, lng] pairs.
- */
+// This function uses the 'polyline' npm package to decode the encoded polyline string into an array of [lat, lng] pairs.
 function decodePolyline(polylineStr: string): number[][] {
   return polyline.decode(polylineStr);
-}
-
-// Interfaces for route results
-interface RouteResult {
-  waypoints: number[][]; // Array of coordinates in [lng, lat] format.
-  directions: string; // Encoded polyline from Google Directions.
-  elevationGain: number; // Total positive elevation gain in meters.
-  length: number; // Actual route length in kilometers.
-}
-
-type Difficulty = "easy" | "medium" | "hard";
-
-interface RouteWithDifficulty extends RouteResult {
-  difficulty: Difficulty;
-}
-
-/**
- * Parameters for the algorithm.
- */
-interface AlgorithmParams {
-  routeLengthKm: number;
-  startPoint: Coord; // [lng, lat]
-  mode: string;
 }
 
 /**
@@ -177,6 +129,7 @@ async function generateCircularRoute(startPoint: Coord, routeLengthKm: number, m
   // Convert waypoints to an array of Coordinate objects for snapping to roads.
   const coordinateWaypoints: Coordinate[] = waypoints.map(([longitude, latitude]) => ({ latitude, longitude }));
   const adjustedPins = await adjustPinsToStreetsWithGoogleAPI(coordinateWaypoints);
+
   // Convert the adjusted pins back to [lng, lat] format.
   const finalWaypoints = adjustedPins.map((pin) => [pin.longitude, pin.latitude]);
 
@@ -251,11 +204,11 @@ async function CircularAlgorithm({ routeLengthKm, startPoint, mode = "walking" }
     } catch (error) {
       console.log("Error generating route:", error);
       errorCount++;
-      if (errorCount >= 5) {
+      if (errorCount >= 10) {
         console.log("Too many errors. Exiting loop.");
         break;
       }
-      // i--; // Try again if a route fails to generate. This is dangerous, could cause infinite loop and cost money.
+      // i--; // "Try again if a route fails to generate." This is dangerous, could cause infinite loop and cost a lot of money.
     }
   }
 
@@ -276,7 +229,5 @@ async function CircularAlgorithm({ routeLengthKm, startPoint, mode = "walking" }
   return routesWithDifficulty;
 }
 
-// -------------------
 // Export
-// -------------------
 export default CircularAlgorithm;

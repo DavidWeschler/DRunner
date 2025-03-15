@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { View, Image, Text, TouchableOpacity, ScrollView, Button, Alert, StyleSheet } from "react-native";
+import { View, Image, Text, TouchableOpacity, ScrollView, Alert, StyleSheet } from "react-native";
 import Swiper from "react-native-swiper";
 import Map from "@/components/Map";
 import { useLocationStore } from "@/store";
 import { icons, images } from "@/constants";
 import { useRouter } from "expo-router";
-import CircularAlgorithm from "./circle_algorithm";
-import Line_Algorithm from "./line_algorithm";
+import CircularAlgorithm from "../../lib/circle_algorithm";
+import Line_Algorithm from "../../lib/line_algorithm";
 import { useUser } from "@clerk/clerk-react";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as Notifications from "expo-notifications";
 import { SchedulableTriggerInputTypes } from "expo-notifications";
 import { A } from "@clerk/clerk-react/dist/useAuth-BQT424bY";
-
-// import MyDateTimePicker from "../../components/MyDatePicker";
 import MyDateTimePicker from "@/components/MyDatePicker";
 import Spinner from "@/components/Spinner";
 import Entypo from "@expo/vector-icons/Entypo";

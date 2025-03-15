@@ -1,10 +1,10 @@
 import { distance, bearing, destination } from "@turf/turf";
-
-type Coord = [number, number];
 import axios from "axios";
 import polyline from "polyline";
 
 const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
+
+type Coord = [number, number];
 
 interface AlgorithmParams {
   routeLengthKm: number;
@@ -28,15 +28,11 @@ interface DirectionsResponse {
 
 export interface RouteObject {
   difficulty: "easy" | "medium" | "hard";
-  directions: string; // Encoded polyline from Google Directions
-  elevationGain: number; // Total positive elevation gain in meters
-  waypoints: Coord[]; // [startPoint, detourWaypoint, endPoint]
-  length: number; // Actual route length in kilometers
+  directions: string;
+  elevationGain: number;
+  waypoints: Coord[];
+  length: number;
 }
-
-// ----------------------
-// Helper Functions
-// ----------------------
 
 // Formats a coordinate [lng, lat] as a "lat,lng" string required by Google APIs.
 const formatCoord = (coord: number[]): string => `${coord[1]},${coord[0]}`;
@@ -54,13 +50,8 @@ async function fetchDirectionsWithWaypoint(mode: string, origin: number[], desti
   return response.data;
 }
 
-/**
- * Decodes an encoded polyline string into an array of [lat, lng] coordinates.
- * This example uses the "polyline" npm package.
- * (Install with: npm install polyline)
- */
+// Decodes an encoded polyline string into an array of [lat, lng] coordinates.
 function decodePolyline(polylineStr: string): number[][] {
-  // Make sure to install the polyline package
   return polyline.decode(polylineStr);
 }
 
@@ -69,11 +60,9 @@ function decodePolyline(polylineStr: string): number[][] {
  * decodes the polyline into coordinates, and computes the total positive elevation gain.
  */
 async function getElevationGain(polyline: string): Promise<number> {
-  // Decode the polyline (assumed to return [lat, lng] pairs)
   const decoded: number[][] = decodePolyline(polyline);
   if (decoded.length === 0) return 0;
 
-  // Build the locations string (Google expects "lat,lng|lat,lng|...")
   const locationsParam = decoded.map((coord) => `${coord[0]},${coord[1]}`).join("|");
   const elevationUrl = `https://maps.googleapis.com/maps/api/elevation/json?locations=${locationsParam}&key=${API_KEY}`;
   const response = await axios.get(elevationUrl);
@@ -89,10 +78,6 @@ async function getElevationGain(polyline: string): Promise<number> {
   }
   return totalGain;
 }
-
-// ----------------------
-// Main Algorithm Function
-// ----------------------
 
 /**
  * Generates three routes between startPoint and endPoint.
@@ -193,7 +178,10 @@ async function Line_Algorithm({ routeLengthKm, startPoint, endPoint, mode = "wal
 export default Line_Algorithm;
 
 /*
-Above is a complete TypeScript implementation that generates three routes between a start and end point. Each route is built by adding a random detour waypoint between the start and end. The code then fetches walking directions via the Google Directions API, computes the actual route length and its total positive elevation gain (via the Google Elevation API), and finally returns an array of three route objects. Each object contains:
+Above is a complete TypeScript implementation that generates three routes between a start and end point. 
+Each route is built by adding a random detour waypoint between the start and end. The code then fetches walking 
+directions via the Google Directions API, computes the actual route length and its total positive elevation gain 
+(via the Google Elevation API), and finally returns an array of three route objects. Each object contains:
 
 difficulty: Assigned based on elevation gain (lowest gain → "easy", next → "medium", highest → "hard").
 directions: The encoded polyline returned by Google.
@@ -215,5 +203,4 @@ How It Works
 4.Return Value:
   The function returns an array of three route objects containing the required keys: difficulty, directions (encoded polyline), elevationGain, waypoints, and actual length.
 
-This solution should fulfill your requirements for a randomized detour and sorted route difficulties based on elevation gain.
 */

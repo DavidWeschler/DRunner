@@ -1,30 +1,5 @@
 import { TextInputProps, TouchableOpacityProps } from "react-native";
 
-// declare interface Driver {
-//   driver_id: number;
-//   first_name: string;
-//   last_name: string;
-//   profile_image_url: string;
-//   car_image_url: string;
-//   car_seats: number;
-//   rating: number;
-// }
-
-// declare interface MarkerData {
-//   latitude: number;
-//   longitude: number;
-//   id: number;
-//   title: string;
-//   profile_image_url: string;
-//   car_image_url: string;
-//   car_seats: number;
-//   rating: number;
-//   first_name: string;
-//   last_name: string;
-//   time?: number;
-//   price?: string;
-// }
-
 type MapThemeType = "standard" | "dark" | "aubergine" | "night" | "retro" | "silver";
 
 declare interface AboutModalProps {
@@ -111,14 +86,6 @@ declare interface InputFieldProps extends TextInputProps {
   className?: string;
 }
 
-// declare interface PaymentProps {
-//   fullName: string;
-//   email: string;
-//   amount: string;
-//   driverId: number;
-//   rideTime: number;
-// }
-
 type MapThemeType = "standard" | "dark" | "aubergine" | "night" | "retro" | "silver";
 
 declare interface MarkerData {
@@ -181,17 +148,3 @@ declare interface aiModelStore {
   model: aiModel;
   setAiModel: (m: aiModel) => void;
 }
-
-// declare interface DriverStore {
-//   drivers: MarkerData[];
-//   selectedDriver: number | null;
-//   setSelectedDriver: (driverId: number) => void;
-//   setDrivers: (drivers: MarkerData[]) => void;
-//   clearSelectedDriver: () => void;
-// }
-
-// declare interface DriverCardProps {
-//   item: MarkerData;
-//   selected: number;
-//   setSelected: () => void;
-// }
