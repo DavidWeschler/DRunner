@@ -35,10 +35,11 @@ const Profile = () => {
     setMapTheme(theme);
   };
 
+  // prettier-ignore
   const mapUrl = (model: "google gemma 3" | "deepSeek" | "Qwen QwQ 32B" | "Nous DeepHermes 3 Llama 3 8B" | "Google Gemini Flash Lite 2.0" | "Meta Llama 3.3 70B"): string => {
     const modelUrls: { [key: string]: string } = {
       "google gemma 3": "google/gemma-3-4b-it:free",
-      deepSeek: "deepseek/deepseek-r1-distill-llama-70b:free",
+      "deepSeek": "deepseek/deepseek-r1-distill-llama-70b:free",
       "Qwen QwQ 32B": "qwen/qwq-32b:free",
       "Nous DeepHermes 3 Llama 3 8B": "nousresearch/deephermes-3-llama-3-8b-preview:free",
       "Google Gemini Flash Lite 2.0": "google/gemini-2.0-flash-lite-preview-02-05:free",
@@ -91,19 +92,19 @@ const Profile = () => {
           <TouchableOpacity onPress={() => setAiModelInStrored("google gemma 3")} style={[styles.radio, currentAi === "google gemma 3" && styles.selected]} testID="ai-model-gemma">
             <Image source={require("@/assets/AiModels/gemma.png")} style={styles.radioImage} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setAiModelInStrored("deepSeek")} style={[styles.radio, currentAi === "deepSeek" && styles.selected]}>
+          <TouchableOpacity onPress={() => setAiModelInStrored("deepSeek")} style={[styles.radio, currentAi === "deepSeek" && styles.selected]} testID="ai-model-deepseek">
             <Image source={require("@/assets/AiModels/deepseek.png")} style={styles.radioImage} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setAiModelInStrored("Qwen QwQ 32B")} style={[styles.radio, currentAi === "Qwen QwQ 32B" && styles.selected]}>
+          <TouchableOpacity onPress={() => setAiModelInStrored("Qwen QwQ 32B")} style={[styles.radio, currentAi === "Qwen QwQ 32B" && styles.selected]} testID="ai-model-qwen">
             <Image source={require("@/assets/AiModels/qwen.png")} style={styles.radioImage} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setAiModelInStrored("Nous DeepHermes 3 Llama 3 8B")} style={[styles.radio, currentAi === "Nous DeepHermes 3 Llama 3 8B" && styles.selected]}>
+          <TouchableOpacity onPress={() => setAiModelInStrored("Nous DeepHermes 3 Llama 3 8B")} style={[styles.radio, currentAi === "Nous DeepHermes 3 Llama 3 8B" && styles.selected]} testID="ai-model-hermes">
             <Image source={require("@/assets/AiModels/hermes.png")} style={styles.radioImage} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setAiModelInStrored("Google Gemini Flash Lite 2.0")} style={[styles.radio, currentAi === "Google Gemini Flash Lite 2.0" && styles.selected]}>
+          <TouchableOpacity onPress={() => setAiModelInStrored("Google Gemini Flash Lite 2.0")} style={[styles.radio, currentAi === "Google Gemini Flash Lite 2.0" && styles.selected]} testID="ai-model-gemini">
             <Image source={require("@/assets/AiModels/gemini.png")} style={styles.radioImage} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setAiModelInStrored("Meta Llama 3.3 70B")} style={[styles.radio, currentAi === "Meta Llama 3.3 70B" && styles.selected]}>
+          <TouchableOpacity onPress={() => setAiModelInStrored("Meta Llama 3.3 70B")} style={[styles.radio, currentAi === "Meta Llama 3.3 70B" && styles.selected]} testID="ai-model-meta">
             <Image source={require("@/assets/AiModels/meta.png")} style={styles.radioImage} />
           </TouchableOpacity>
         </View>
@@ -117,19 +118,19 @@ const Profile = () => {
           <TouchableOpacity onPress={() => setMapThemeInStrored("dark")} style={[styles.radio, currentMapTheme === "dark" && styles.selected]} testID="map-theme-dark">
             <Image source={require("@/assets/MapImages/dark.png")} style={styles.radioImage} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setMapThemeInStrored("aubergine")} style={[styles.radio, currentMapTheme === "aubergine" && styles.selected]}>
+          <TouchableOpacity onPress={() => setMapThemeInStrored("aubergine")} style={[styles.radio, currentMapTheme === "aubergine" && styles.selected]} testID="map-theme-aubergine">
             <Image source={require("@/assets/MapImages/aubergine.png")} style={styles.radioImage} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setMapThemeInStrored("night")} style={[styles.radio, currentMapTheme === "night" && styles.selected]}>
+          <TouchableOpacity onPress={() => setMapThemeInStrored("night")} style={[styles.radio, currentMapTheme === "night" && styles.selected]} testID="map-theme-night">
             <Image source={require("@/assets/MapImages/night.png")} style={styles.radioImage} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setMapThemeInStrored("retro")} style={[styles.radio, currentMapTheme === "retro" && styles.selected]}>
+          <TouchableOpacity onPress={() => setMapThemeInStrored("retro")} style={[styles.radio, currentMapTheme === "retro" && styles.selected]} testID="map-theme-retro">
             <Image source={require("@/assets/MapImages/retro.png")} style={styles.radioImage} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setMapThemeInStrored("silver")} style={[styles.radio, currentMapTheme === "silver" && styles.selected]}>
+          <TouchableOpacity onPress={() => setMapThemeInStrored("silver")} style={[styles.radio, currentMapTheme === "silver" && styles.selected]} testID="map-theme-silver">
             <Image source={require("@/assets/MapImages/silver.png")} style={styles.radioImage} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setMapThemeInStrored("standard")} style={[styles.radio, currentMapTheme === "standard" && styles.selected]}>
+          <TouchableOpacity onPress={() => setMapThemeInStrored("standard")} style={[styles.radio, currentMapTheme === "standard" && styles.selected]} testID="map-theme-standard">
             <Image source={require("@/assets/MapImages/standard.png")} style={styles.radioImage} />
           </TouchableOpacity>
         </View>

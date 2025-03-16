@@ -64,24 +64,75 @@ describe("Profile Component", () => {
   it("updates AI model selection", () => {
     const { getByTestId } = render(<Profile />);
 
-    // Ensure your Profile component has testID="ai-model-gemma" on the TouchableOpacity for google gemma 3
     const gemmaButton = getByTestId("ai-model-gemma");
     fireEvent.press(gemmaButton);
-
     expect(setAiModelMock).toHaveBeenCalledWith({
       name: "google gemma 3",
       host: "google/gemma-3-4b-it:free",
+    });
+
+    const deepSeekButton = getByTestId("ai-model-deepseek");
+    fireEvent.press(deepSeekButton);
+    expect(setAiModelMock).toHaveBeenCalledWith({
+      name: "deepSeek",
+      host: "deepseek/deepseek-r1-distill-llama-70b:free",
+    });
+
+    const qwenButton = getByTestId("ai-model-qwen");
+    fireEvent.press(qwenButton);
+    expect(setAiModelMock).toHaveBeenCalledWith({
+      name: "Qwen QwQ 32B",
+      host: "qwen/qwq-32b:free",
+    });
+
+    const hermesButton = getByTestId("ai-model-hermes");
+    fireEvent.press(hermesButton);
+    expect(setAiModelMock).toHaveBeenCalledWith({
+      name: "Nous DeepHermes 3 Llama 3 8B",
+      host: "nousresearch/deephermes-3-llama-3-8b-preview:free",
+    });
+
+    const geminiButton = getByTestId("ai-model-gemini");
+    fireEvent.press(geminiButton);
+    expect(setAiModelMock).toHaveBeenCalledWith({
+      name: "Google Gemini Flash Lite 2.0",
+      host: "google/gemini-2.0-flash-lite-preview-02-05:free",
+    });
+
+    const metaButton = getByTestId("ai-model-meta");
+    fireEvent.press(metaButton);
+    expect(setAiModelMock).toHaveBeenCalledWith({
+      name: "Meta Llama 3.3 70B",
+      host: "meta-llama/llama-3.3-70b-instruct:free",
     });
   });
 
   it("updates map theme selection", () => {
     const { getByTestId } = render(<Profile />);
 
-    // Ensure your Profile component has testID="map-theme-dark" on the TouchableOpacity for dark theme
     const darkThemeButton = getByTestId("map-theme-dark");
     fireEvent.press(darkThemeButton);
-
     expect(setMapThemeMock).toHaveBeenCalledWith("dark");
+
+    const aubergineThemeButton = getByTestId("map-theme-aubergine");
+    fireEvent.press(aubergineThemeButton);
+    expect(setMapThemeMock).toHaveBeenCalledWith("aubergine");
+
+    const nightThemeButton = getByTestId("map-theme-night");
+    fireEvent.press(nightThemeButton);
+    expect(setMapThemeMock).toHaveBeenCalledWith("night");
+
+    const retroThemeButton = getByTestId("map-theme-retro");
+    fireEvent.press(retroThemeButton);
+    expect(setMapThemeMock).toHaveBeenCalledWith("retro");
+
+    const silverThemeButton = getByTestId("map-theme-silver");
+    fireEvent.press(silverThemeButton);
+    expect(setMapThemeMock).toHaveBeenCalledWith("silver");
+
+    const standardThemeButton = getByTestId("map-theme-standard");
+    fireEvent.press(standardThemeButton);
+    expect(setMapThemeMock).toHaveBeenCalledWith("standard");
   });
 
   it("toggles the About modal", () => {
