@@ -17,9 +17,16 @@ export const useLocationStore = create<LocationStore>((set) => ({
   endAddress: null,
   difficulty: null,
   inp: null,
-  routeWayPoints: [],
-  routeDirections: [],
+  routeWayPoints: [], // might be depricated
+  routeDirections: [], // might be depricated
   mode: "walking",
+  routeDetalis: null,
+
+  setRouteDetails: (route: any) => {
+    set(() => ({
+      routeDetalis: route,
+    }));
+  },
 
   setMode: (mode: string) => {
     set(() => ({
@@ -91,11 +98,11 @@ export const useLocationStore = create<LocationStore>((set) => ({
     }));
   },
 
-  setRouteWayPoints: (waypoints: MarkerData[]) => {
-    set(() => ({
-      routeWayPoints: waypoints,
-    }));
-  },
+  // setRouteWayPoints: (waypoints: MarkerData[]) => {
+  //   set(() => ({
+  //     routeWayPoints: waypoints,
+  //   }));
+  // },
 
   setRouteDirections: (directions: string[]) => {
     set(() => ({

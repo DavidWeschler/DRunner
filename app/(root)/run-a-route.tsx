@@ -19,7 +19,7 @@ configureReanimatedLogger({
 
 const RunRoute = () => {
   const router = useRouter();
-  const { mapTheme, routeWayPoints, routeDirections } = useLocationStore();
+  const { mapTheme, routeWayPoints, routeDirections, routeDetalis } = useLocationStore();
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   // Refs for timer interval and start time
@@ -127,7 +127,8 @@ const RunRoute = () => {
             <Text className="text-xl font-JakartaSemiBold ml-5">Go Back</Text>
           </View>
 
-          <Map theme={mapTheme || "standard"} pins={routeWayPoints} directions={routeDirections} />
+          {/* <Map theme={mapTheme || "standard"} pins={routeWayPoints} directions={routeDirections} /> */}
+          <Map theme={mapTheme || "standard"} pins={routeDetalis.pins} directions={routeDetalis.directions} />
         </View>
 
         <BottomSheet ref={bottomSheetRef} snapPoints={["25%", "65%"]}>
@@ -142,6 +143,21 @@ const RunRoute = () => {
               <TouchableOpacity onPress={handleResetLap} className={`flex-1 rounded-full p-3 flex justify-center items-center shadow-md shadow-neutral-400/70 ${(!isRunning && isPaused) || (isRunning && !isPaused && !isFirst) ? "bg-gray-500" : "bg-gray-400"}`} disabled={!isRunning && !isPaused}>
                 <Text className="text-lg font-bold text-white">{(isRunning && !isPaused) || isFirst ? "Lap" : "Reset"}</Text>
               </TouchableOpacity>
+            </View>
+
+            {/* Show Stats */}
+            <View className="mt-4 p-4 bg-white rounded-lg shadow-md">
+              <Text className="text-xl font-JakartaBold mb-2 text-center">Route Details</Text>
+              <View className="border-t border-gray-300 w-[95%] mx-auto mb-4" />
+              <Text className="text-lg font-JakartaSemiBold mb-1">
+                Difficulty: <Text className="font-Jakarta">{routeDetalis.difficulty}</Text>
+              </Text>
+              <Text className="text-lg font-JakartaSemiBold mb-1">
+                Length: <Text className="font-Jakarta">{routeDetalis.length} km</Text>
+              </Text>
+              <Text className="text-lg font-JakartaSemiBold">
+                Elevation Gain: <Text className="font-Jakarta">{routeDetalis.elevationGain} m</Text>
+              </Text>
             </View>
 
             {/* Lap Log ScrollView */}

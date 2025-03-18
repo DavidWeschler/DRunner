@@ -47,7 +47,7 @@ const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
-  const { setUserLocation, setDestinationLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, setEndAddress, mapTheme, setRouteDirections, setRouteWayPoints, setMode, mode } = useLocationStore();
+  const { setUserLocation, setDestinationLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, setEndAddress, mapTheme, setRouteDetails, setMode, mode } = useLocationStore();
 
   const [length, setLength] = useState("");
   const [startPoint, setStartPoint] = useState("");
@@ -71,8 +71,16 @@ const Home = () => {
     console.log("Run pressed:", run);
     const pins = run.waypoints.map((waypoint: any) => ({ longitude: waypoint[0], latitude: waypoint[1] }));
 
-    setRouteWayPoints(pins);
-    setRouteDirections(run.directions || []);
+    // setRouteWayPoints(pins); // depricated ?
+    // setRouteDirections(run.directions || []); // depricated ?
+
+    setRouteDetails({
+      difficulty: run.difficulty,
+      length: run.length,
+      pins,
+      directions: run.directions,
+      elevationGain: run.elevation_gain,
+    });
 
     await fetch(`/(api)/update_recent`, {
       method: "POST",

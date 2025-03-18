@@ -10,8 +10,6 @@ export async function POST(request: Request) {
       return Response.json({ error: "Missing routeId" }, { status: 400 });
     }
 
-    console.log("in schedule api", clerkId, routeId, scheduleDate);
-
     const recentRuns = await sql`
         UPDATE running_routes
         SET is_scheduled = ${scheduleDate}

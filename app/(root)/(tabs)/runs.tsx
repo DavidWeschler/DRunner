@@ -20,7 +20,7 @@ const Runs = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
-  const { setRouteDirections, setRouteWayPoints } = useLocationStore();
+  const { setRouteDetails } = useLocationStore();
 
   const [kind, setKind] = useState("recent");
   const [recentRunRoutes, setRecentRunRoutes] = useState<Run[]>([]);
@@ -209,8 +209,15 @@ const Runs = () => {
     setModalVisible(false);
     await refreshRoutes();
     const pins = selectedRun ? selectedRun.waypoints.map((waypoint: any) => ({ longitude: waypoint[0], latitude: waypoint[1] })) : [];
-    setRouteWayPoints(pins);
-    setRouteDirections(selectedRun?.directions || []);
+    // setRouteWayPoints(pins); // depricated ?
+    // setRouteDirections(selectedRun?.directions || []); // depricated ?
+    setRouteDetails({
+      difficulty: selectedRun?.difficulty,
+      length: selectedRun?.length,
+      pins,
+      directions: selectedRun?.directions,
+      elevationGain: selectedRun?.elevation_gain,
+    });
 
     await fetch(`/(api)/update_recent`, {
       method: "POST",

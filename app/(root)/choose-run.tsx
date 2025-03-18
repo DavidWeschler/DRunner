@@ -17,7 +17,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 
 const ChooseRun = () => {
   const router = useRouter();
-  const { mapTheme, setRouteDirections, setRouteWayPoints, mode } = useLocationStore();
+  const { mapTheme, setRouteDetails, mode } = useLocationStore();
   const inpLength = useLocationStore((state) => state.length);
   const inpStartPoint = useLocationStore((state) => state.startPoint);
   const inpEndPoint = useLocationStore((state) => state.endPoint);
@@ -51,6 +51,10 @@ const ChooseRun = () => {
   const [easySaved, setEasySaved] = useState(false);
   const [mediumSaved, setMediumSaved] = useState(false);
   const [hardSaved, setHardSaved] = useState(false);
+
+  const [easyScheduled, setEasyScheduled] = useState(false);
+  const [mediumScheduled, setMediumScheduled] = useState(false);
+  const [hardScheduled, setHardScheduled] = useState(false);
 
   // spinner
   const [loading, setLoading] = useState(false);
@@ -277,12 +281,15 @@ const ChooseRun = () => {
   };
 
   const handleSaveRoute = async (level: string) => {
-    if (level === "easy" && easySaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
-    if (level === "medium" && mediumSaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
-    if (level === "hard" && hardSaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
+    const isScheduledAlready = level === "easy" ? easyScheduled : level === "medium" ? mediumScheduled : hardScheduled;
+    const isSavedAlready = level === "easy" ? easySaved : level === "medium" ? mediumSaved : hardSaved;
+
+    if (isSavedAlready) return Alert.alert("Route already saved", "You have already saved this route.");
 
     console.log("saving route with difficulty:", level);
-    const status = await addRunToDatabase(level, null, true);
+
+    const status = isScheduledAlready ? await updateRunRoute(level, null, true) : await addRunToDatabase(level, null, true);
+
     if (status) {
       if (level === "easy") setEasySaved(true);
       if (level === "medium") setMediumSaved(true);
@@ -294,19 +301,73 @@ const ChooseRun = () => {
 
   // Function to receive date from MyDateTimePicker
   const handleDateTimeSelection = async (date: Date, level: string) => {
-    if (level === "easy" && easySaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
-    if (level === "medium" && mediumSaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
-    if (level === "hard" && hardSaved) return Alert.alert("Route already saved", "You have already saved/scheduled this route.");
+    const isScheduledAlready = level === "easy" ? easyScheduled : level === "medium" ? mediumScheduled : hardScheduled;
+    const isSavedAlready = level === "easy" ? easySaved : level === "medium" ? mediumSaved : hardSaved;
+
+    if (isScheduledAlready) return Alert.alert("Route already scheduled!", "You Can See Your Scheduled Routes In The Manage Section.");
+
     setSelectedDateTime(date.toLocaleString()); // Store formatted date
 
-    const status = await addRunToDatabase(level, date, false);
+    const status = isSavedAlready ? await updateRunRoute(level, date, null) : await addRunToDatabase(level, date, false);
+
     if (status) {
       await setNotification(date);
-      if (level === "easy") setEasySaved(true);
-      if (level === "medium") setMediumSaved(true);
-      if (level === "hard") setHardSaved(true);
+      if (level === "easy") setEasyScheduled(true);
+      if (level === "medium") setMediumScheduled(true);
+      if (level === "hard") setHardScheduled(true);
 
       Alert.alert("Route scheduled successfully", "You will receive a notification on the scheduled date.");
+    }
+  };
+
+  const handleError = (error: any) => {
+    console.log("Error updating route:", error);
+    Alert.alert("Error updating route", "Please try again later.");
+    return false;
+  };
+
+  const updateRunRoute = async (level: string, future: Date | null, save: boolean | null) => {
+    console.log("updating route with difficulty:", level);
+
+    let url = "";
+    const params: { clerkId: string | undefined; difficulty: string; scheduled?: Date; saved?: boolean } = { clerkId: user?.id, difficulty: level };
+    if (future) {
+      url = "/(api)/update_route_scheduled";
+      params["scheduled"] = future;
+    } else if (save) {
+      url = "/(api)/update_route_saved";
+      params["saved"] = save;
+    } else {
+      console.log("Error updating route:", "No future date or save status provided");
+      return false;
+    }
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
+      });
+
+      if (response.ok) {
+        console.log("Route updated successfully");
+
+        if (level === "easy") save ? setEasySaved(true) : setEasyScheduled(true);
+        if (level === "medium") save ? setMediumSaved(true) : setMediumScheduled(true);
+        if (level === "hard") save ? setHardSaved(true) : setHardScheduled(true);
+
+        console.log("easySaved:", easySaved);
+        console.log("easyScheduled:", easyScheduled);
+
+        return true;
+      } else {
+        const errorData = await response.json();
+        return handleError(errorData);
+      }
+    } catch (error) {
+      return handleError(error);
     }
   };
 
@@ -325,14 +386,10 @@ const ChooseRun = () => {
         return true;
       } else {
         const errorData = await response.json();
-        console.log("Failed to update route", errorData);
-        Alert.alert("Error updating route", "Please try again later.");
-        return false;
+        return handleError(errorData);
       }
     } catch (error) {
-      console.log("Error updating route:", error);
-      Alert.alert("Error updating route", "Please try again later.");
-      return false;
+      return handleError(error);
     }
   };
 
@@ -375,11 +432,12 @@ const ChooseRun = () => {
               {level === "hard" && <Map theme={mapTheme || "standard"} pins={routePinsH} directions={routeDirectionsH} />}
             </View>
 
+            {/* Save and Schedule Buttons */}
             <View className="flex-row justify-end items-center space-x-4 w-[90%] mx-auto">
               <TouchableOpacity style={styles.button} onPress={async () => await handleSaveRoute(level)}>
-                <Entypo name="save" size={24} color="black" />
+                <Entypo name="save" size={24} color={(level === "easy" && easySaved) || (level === "medium" && mediumSaved) || (level === "hard" && hardSaved) ? "#C0C0C0" : "#balck"} />
               </TouchableOpacity>
-              <MyDateTimePicker alreadyChoseDate={level === "easy" ? easySaved : level === "medium" ? mediumSaved : hardSaved} onDateTimeSelected={async (date) => await handleDateTimeSelection(date, level)} />
+              <MyDateTimePicker alreadyChoseDate={level === "easy" ? easyScheduled : level === "medium" ? mediumScheduled : hardScheduled} onDateTimeSelected={async (date) => await handleDateTimeSelection(date, level)} />
             </View>
 
             {/* Route Details */}
@@ -396,8 +454,6 @@ const ChooseRun = () => {
       <TouchableOpacity
         className="w-[95%] p-4 bg-blue-500 rounded-full items-center mx-auto mb-4"
         onPress={async () => {
-          console.log("Start Run: current difficulty:", difficulty, "Ron: here you pass the parameters to the next screen");
-
           const route = {
             difficulty,
             pins: difficulty === "easy" ? routePinsE : difficulty === "medium" ? routePinsM : routePinsH,
@@ -408,19 +464,18 @@ const ChooseRun = () => {
 
           console.log("pins: ", route.pins);
           console.log("directions: ", route.directions);
-          setRouteWayPoints(route.pins);
-          setRouteDirections(route.directions || []);
+          // setRouteWayPoints(route.pins); // depricated ?
+          // setRouteDirections(route.directions || []); // depricated ?
+          setRouteDetails(route);
 
           const routeAlreadySaved = difficulty === "easy" ? easySaved : difficulty === "medium" ? mediumSaved : hardSaved;
-          if (!routeAlreadySaved) {
+          const routeAlreadyScheduled = difficulty === "easy" ? easyScheduled : difficulty === "medium" ? mediumScheduled : hardScheduled;
+
+          if (!routeAlreadySaved && !routeAlreadyScheduled) {
             setLoading(true);
             const status = await addRunToDatabase(difficulty, null, false, true);
-            if (status) {
-              if (difficulty === "easy") setEasySaved(true);
-              if (difficulty === "medium") setMediumSaved(true);
-              if (difficulty === "hard") setHardSaved(true);
-            }
-            setLoading(true);
+
+            setLoading(false);
           } else {
             await updateRecentRoute();
           }
