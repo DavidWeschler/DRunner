@@ -3,7 +3,7 @@ import { View, Text, FlatList, Keyboard, Platform, Button, TouchableOpacity, Ima
 import { SafeAreaView } from "react-native-safe-area-context";
 import HadasTextInput from "@/components/HadasInp";
 import { icons } from "@/constants";
-import { useLocationStore, useaiModelStore } from "@/store";
+import { useLocationStore, useaiModelStore, useHadasStore } from "@/store";
 import * as Location from "expo-location";
 import { router } from "expo-router";
 import CustomButton from "@/components/CustomButton";
@@ -39,6 +39,7 @@ const getLatLngFromAddress = async (address: string) => {
 
 const Chat = () => {
   const { inp, setUserLocation, setHadasInp, setLengthInput, setStartAddress, setEndAddress, setDifficultyInput, setStartPointInput, setEndPointInput } = useLocationStore();
+  const { chatReset, setChatReset } = useHadasStore();
   const { model } = useaiModelStore();
   const [messages, setMessages] = useState<{ text: string | JSX.Element; sender: "user" | "bot"; timestamp: string }[]>([
     {
@@ -52,7 +53,6 @@ const Chat = () => {
     },
   ]);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-
   const [deepAnswered, setDeepAnswered] = useState(true);
   const [generatePressed, setGeneratePressed] = useState(false);
   const [userLocationStr, setUserLocationStr] = useState("");
@@ -111,6 +111,27 @@ const Chat = () => {
       keyboardDidShowListener.remove();
     };
   }, [inp]);
+
+  useEffect(() => {
+    setStartAddress("");
+    setEndAddress("");
+    setLengthInput(Number(null));
+    setDifficultyInput("");
+
+    setMessages(() => [
+      {
+        text: generateStartingMessage(),
+        sender: "bot",
+        timestamp: new Date().toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false, // 24-hour format
+        }),
+      },
+    ]);
+    scrollToBottom();
+    setChatReset(false);
+  }, [chatReset]);
 
   const askAi = async (instructions: string, message: string) => {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -175,7 +196,6 @@ const Chat = () => {
       9. Do not include any additional text or formatting. Only respond with JSON.
       10. if the user is refreing his location, this is his address to use: ${userLocationStr ? userLocationStr : "Haneviim 37 Jerusalem"}`,
       };
-      console.log("@@@@@@@@@@@@@@", userLocationStr);
 
       const userMessage: ApiMessage = {
         role: "user",
@@ -187,37 +207,22 @@ const Chat = () => {
       rawContent = await askAi(systemPrompt.content, userMessage.content);
       const jsonString = rawContent?.match(/\{[\s\S]*\}/)?.[0] || "";
 
-      console.log("jsonString:", jsonString);
-      // Clean common formatting issues
       const cleanedJson = jsonString
-        .replace(/```json/g, "") // Remove markdown code blocks
-        .replace(/```/g, "") // Remove any remaining backticks
-        .replace(/\\n/g, "") // Remove newline characters
-        .replace(/\n/g, "") // Remove literal newlines
-        .replace(/\\/g, ""); // Remove any remaining \
-
-      console.log("Cleaned JSON:", cleanedJson);
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .replace(/\\n/g, "")
+        .replace(/\n/g, "")
+        .replace(/\\/g, "");
 
       if (!cleanedJson) {
         throw new Error("No JSON found in response");
       }
 
       const reply = JSON.parse(cleanedJson);
-      console.log("reply JSON:", reply);
       if (reply?.startLocation && reply.startLocation !== "unknown") setStartAddress(reply.startLocation);
       if (reply?.endLocation && reply.endLocation !== "unknown") setEndAddress(reply.endLocation);
       if (reply?.routeLength && reply.routeLength !== "unknown") setLengthInput(Number(reply.routeLength));
       if (reply?.difficultyLvl && ["easy", "medium", "hard"].includes(reply.difficultyLvl)) setDifficultyInput(reply.difficultyLvl as "easy" | "medium" | "hard");
-
-      //erase
-      currentInputs = {
-        "running route length ": useLocationStore.getState().length,
-        "running route start location ": useLocationStore.getState().startAddress,
-        "running route end location ": useLocationStore.getState().endAddress,
-        "running route difficulty level ": useLocationStore.getState().difficulty,
-      };
-      console.log("Entered inputs:", currentInputs);
-      //end erase
 
       finalAnswer =
         reply?.AIresponse && reply.AIresponse !== "unknown"

@@ -148,3 +148,8 @@ declare interface aiModelStore {
   model: aiModel;
   setAiModel: (m: aiModel) => void;
 }
+
+declare interface hadasStore {
+  chatReset: boolean;
+  setChatReset: (state: boolean) => void;
+}
