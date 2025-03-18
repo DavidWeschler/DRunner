@@ -59,6 +59,10 @@ const ChooseRun = () => {
   // spinner
   const [loading, setLoading] = useState(false);
 
+  // banner
+  const [showBanner, setShowBanner] = useState(false);
+  const [bannerText, setBannerText] = useState("");
+
   const straightRoute = async () => {
     console.log("Calculating straight route");
     if (inpStartPoint === null || inpEndPoint === null) {
@@ -288,14 +292,18 @@ const ChooseRun = () => {
 
     console.log("saving route with difficulty:", level);
 
+    setLoading(true);
     const status = isScheduledAlready ? await updateRunRoute(level, null, true) : await addRunToDatabase(level, null, true);
+    setLoading(false);
 
     if (status) {
       if (level === "easy") setEasySaved(true);
       if (level === "medium") setMediumSaved(true);
       if (level === "hard") setHardSaved(true);
 
-      Alert.alert("Route saved successfully", "You can see your saved routes in the manage section.");
+      setBannerText("Route saved successfully!");
+      setShowBanner(true);
+      setTimeout(() => setShowBanner(false), 5000);
     }
   };
 
@@ -308,7 +316,9 @@ const ChooseRun = () => {
 
     setSelectedDateTime(date.toLocaleString()); // Store formatted date
 
+    setLoading(true);
     const status = isSavedAlready ? await updateRunRoute(level, date, null) : await addRunToDatabase(level, date, false);
+    setLoading(false);
 
     if (status) {
       await setNotification(date);
@@ -316,7 +326,9 @@ const ChooseRun = () => {
       if (level === "medium") setMediumScheduled(true);
       if (level === "hard") setHardScheduled(true);
 
-      Alert.alert("Route scheduled successfully", "You will receive a notification on the scheduled date.");
+      setBannerText("Route scheduled successfully!");
+      setShowBanner(true);
+      setTimeout(() => setShowBanner(false), 5000);
     }
   };
 
@@ -394,98 +406,117 @@ const ChooseRun = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="flex-1 bg-white">
-      <Spinner visible={loading} />
-
-      <View className="flex flex-row items-center justify-between my-2">
-        <Text className="text-2xl font-JakartaExtraBold ml-12">Select a route 🏃‍♂️‍➡️</Text>
-        <TouchableOpacity
-          onPress={() => {
-            router.push("/home");
+    <>
+      {/* Banner */}
+      {showBanner && (
+        <View
+          style={{
+            position: "absolute",
+            top: 50,
+            left: "10%",
+            right: "10%",
+            zIndex: 30,
+            alignItems: "center",
           }}
-          className="justify-center items-center w-10 h-10 rounded-full absolute left-0"
+          className="bg-green-500/80 p-2 rounded-full items-center justify-center mb-4"
         >
-          <Image source={icons.backArrow} className="w-6 h-6" />
+          <Text className="text-white text-lg font-bold text-center">{bannerText}</Text>
+        </View>
+      )}
+
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="flex-1 bg-white">
+        <Spinner visible={loading} />
+
+        <View className="flex flex-row items-center justify-between my-2">
+          <Text className="text-2xl font-JakartaExtraBold ml-12">Select a route 🏃‍♂️‍➡️</Text>
+          <TouchableOpacity
+            onPress={() => {
+              router.push("/home");
+            }}
+            className="justify-center items-center w-10 h-10 rounded-full absolute left-0"
+          >
+            <Image source={icons.backArrow} className="w-6 h-6" />
+          </TouchableOpacity>
+        </View>
+        <View className="border-t border-gray-300 w-[95%] mx-auto my-0" />
+        <Swiper
+          style={{ height: 650 }}
+          containerStyle={{ flex: 1, marginTop: -20 }}
+          loop={false}
+          showsPagination={true}
+          dotColor="gray"
+          activeDotColor="black"
+          onIndexChanged={(index) => {
+            const levels = ["easy", "medium", "hard"];
+            setDifficulty((levels[index] as "easy" | "medium" | "hard") || "easy");
+          }}
+        >
+          {difficulties.map((level, index) => (
+            <View key={index} className="items-center justify-center flex-1">
+              <Text className={`text-xl font-bold mt-10 ${level === "easy" ? "text-blue-500" : level === "medium" ? "text-yellow-500" : "text-red-500"}`}>{level.charAt(0).toUpperCase() + level.slice(1)} Route</Text>
+
+              {/* Map Component */}
+              <View className="flex flex-row items-center bg-transparent h-[400px] w-[90%] mx-auto mt-4">
+                {level === "easy" && <Map theme={mapTheme || "standard"} pins={routePinsE} directions={routeDirectionsE} />}
+                {level === "medium" && <Map theme={mapTheme || "standard"} pins={routePinsM} directions={routeDirectionsM} />}
+                {level === "hard" && <Map theme={mapTheme || "standard"} pins={routePinsH} directions={routeDirectionsH} />}
+              </View>
+
+              {/* Save and Schedule Buttons */}
+              <View className="flex-row justify-end items-center space-x-4 w-[90%] mx-auto">
+                <TouchableOpacity style={styles.button} onPress={async () => await handleSaveRoute(level)}>
+                  <Entypo name="save" size={24} color={(level === "easy" && easySaved) || (level === "medium" && mediumSaved) || (level === "hard" && hardSaved) ? "#C0C0C0" : "#balck"} />
+                </TouchableOpacity>
+                <MyDateTimePicker alreadyChoseDate={level === "easy" ? easyScheduled : level === "medium" ? mediumScheduled : hardScheduled} onDateTimeSelected={async (date) => await handleDateTimeSelection(date, level)} />
+              </View>
+
+              {/* Route Details */}
+              <View className="bg-gray-100 rounded-2xl p-4 w-[90%] mx-auto mb-10">
+                <Text className="text-lg font-semibold text-gray-700">Route Length: {actualRouteLength[difficulty]} km</Text>
+                <Text className="text-lg font-semibold text-gray-700">Elevation Gain: {routeElevation[difficulty]} m</Text>
+              </View>
+              <View className="mb-5"></View>
+            </View>
+          ))}
+        </Swiper>
+
+        {/* <View className="border-t border-gray-300 w-[95%] mx-auto my-0" /> */}
+
+        {/* Start Run Button */}
+        <TouchableOpacity
+          className="w-[95%] p-4 bg-blue-500 rounded-full items-center mx-auto mb-4"
+          onPress={async () => {
+            const route = {
+              difficulty,
+              pins: difficulty === "easy" ? routePinsE : difficulty === "medium" ? routePinsM : routePinsH,
+              directions: difficulty === "easy" ? routeDirectionsE : difficulty === "medium" ? routeDirectionsM : routeDirectionsH,
+              elevationGain: difficulty === "easy" ? routeElevation.easy : difficulty === "medium" ? routeElevation.medium : routeElevation.hard,
+              length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
+            };
+
+            console.log("pins: ", route.pins);
+            console.log("directions: ", route.directions);
+            setRouteDetails(route);
+
+            const routeAlreadySaved = difficulty === "easy" ? easySaved : difficulty === "medium" ? mediumSaved : hardSaved;
+            const routeAlreadyScheduled = difficulty === "easy" ? easyScheduled : difficulty === "medium" ? mediumScheduled : hardScheduled;
+
+            if (!routeAlreadySaved && !routeAlreadyScheduled) {
+              setLoading(true);
+              const status = await addRunToDatabase(difficulty, null, false, true);
+
+              setLoading(false);
+            } else {
+              await updateRecentRoute();
+            }
+
+            router.push("/run-a-route");
+          }}
+        >
+          <Text className="text-white text-lg font-bold">Start Run</Text>
         </TouchableOpacity>
-      </View>
-      <View className="border-t border-gray-300 w-[95%] mx-auto my-0" />
-      <Swiper
-        style={{ height: 650 }}
-        containerStyle={{ flex: 1, marginTop: -20 }}
-        loop={false}
-        showsPagination={true}
-        dotColor="gray"
-        activeDotColor="black"
-        onIndexChanged={(index) => {
-          const levels = ["easy", "medium", "hard"];
-          setDifficulty((levels[index] as "easy" | "medium" | "hard") || "easy");
-        }}
-      >
-        {difficulties.map((level, index) => (
-          <View key={index} className="items-center justify-center flex-1">
-            <Text className={`text-xl font-bold mt-10 ${level === "easy" ? "text-blue-500" : level === "medium" ? "text-yellow-500" : "text-red-500"}`}>{level.charAt(0).toUpperCase() + level.slice(1)} Route</Text>
-
-            {/* Map Component */}
-            <View className="flex flex-row items-center bg-transparent h-[400px] w-[90%] mx-auto mt-4">
-              {level === "easy" && <Map theme={mapTheme || "standard"} pins={routePinsE} directions={routeDirectionsE} />}
-              {level === "medium" && <Map theme={mapTheme || "standard"} pins={routePinsM} directions={routeDirectionsM} />}
-              {level === "hard" && <Map theme={mapTheme || "standard"} pins={routePinsH} directions={routeDirectionsH} />}
-            </View>
-
-            {/* Save and Schedule Buttons */}
-            <View className="flex-row justify-end items-center space-x-4 w-[90%] mx-auto">
-              <TouchableOpacity style={styles.button} onPress={async () => await handleSaveRoute(level)}>
-                <Entypo name="save" size={24} color={(level === "easy" && easySaved) || (level === "medium" && mediumSaved) || (level === "hard" && hardSaved) ? "#C0C0C0" : "#balck"} />
-              </TouchableOpacity>
-              <MyDateTimePicker alreadyChoseDate={level === "easy" ? easyScheduled : level === "medium" ? mediumScheduled : hardScheduled} onDateTimeSelected={async (date) => await handleDateTimeSelection(date, level)} />
-            </View>
-
-            {/* Route Details */}
-            <View className="bg-gray-100 rounded-2xl p-4 w-[90%] mx-auto mb-10">
-              <Text className="text-lg font-semibold text-gray-700">Route Length: {actualRouteLength[difficulty]} km</Text>
-              <Text className="text-lg font-semibold text-gray-700">Elevation Gain: {routeElevation[difficulty]} m</Text>
-            </View>
-            <View className="mb-5"></View>
-          </View>
-        ))}
-      </Swiper>
-
-      {/* Start Run Button */}
-      <TouchableOpacity
-        className="w-[95%] p-4 bg-blue-500 rounded-full items-center mx-auto mb-4"
-        onPress={async () => {
-          const route = {
-            difficulty,
-            pins: difficulty === "easy" ? routePinsE : difficulty === "medium" ? routePinsM : routePinsH,
-            directions: difficulty === "easy" ? routeDirectionsE : difficulty === "medium" ? routeDirectionsM : routeDirectionsH,
-            elevationGain: difficulty === "easy" ? routeElevation.easy : difficulty === "medium" ? routeElevation.medium : routeElevation.hard,
-            length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
-          };
-
-          console.log("pins: ", route.pins);
-          console.log("directions: ", route.directions);
-          // setRouteWayPoints(route.pins); // depricated ?
-          // setRouteDirections(route.directions || []); // depricated ?
-          setRouteDetails(route);
-
-          const routeAlreadySaved = difficulty === "easy" ? easySaved : difficulty === "medium" ? mediumSaved : hardSaved;
-          const routeAlreadyScheduled = difficulty === "easy" ? easyScheduled : difficulty === "medium" ? mediumScheduled : hardScheduled;
-
-          if (!routeAlreadySaved && !routeAlreadyScheduled) {
-            setLoading(true);
-            const status = await addRunToDatabase(difficulty, null, false, true);
-
-            setLoading(false);
-          } else {
-            await updateRecentRoute();
-          }
-
-          router.push("/run-a-route");
-        }}
-      >
-        <Text className="text-white text-lg font-bold">Start Run</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 };
 
