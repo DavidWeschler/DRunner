@@ -1,4 +1,4 @@
-import { LocationStore, aiModelStore, MapThemeType, MarkerData, aiModel } from "@/types/type";
+import { LocationStore, aiModelStore, MapThemeType, MarkerData, aiModel, hadasStore } from "@/types/type";
 import { create } from "zustand";
 import mapThemes from "../components/MapThemes/mapThemes";
 
@@ -116,6 +116,15 @@ export const useaiModelStore = create<aiModelStore>((set) => ({
   setAiModel: (m: aiModel) => {
     set(() => ({
       model: m,
+    }));
+  },
+}));
+
+export const useHadasStore = create<hadasStore>((set) => ({
+  chatReset: false,
+  setChatReset: (state: boolean) => {
+    set(() => ({
+      chatReset: state,
     }));
   },
 }));

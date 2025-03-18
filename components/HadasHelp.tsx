@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import { AboutModalProps } from "@/types/type";
-import { useLocationStore, useaiModelStore } from "@/store";
+import { useLocationStore, useaiModelStore, useHadasStore } from "@/store";
+import CustomButton from "./CustomButton";
 
 const HadasHelp = ({ visible, onClose }: AboutModalProps) => {
   const { length, startAddress, endAddress, difficulty } = useLocationStore();
   const { model } = useaiModelStore();
+  const { setChatReset } = useHadasStore();
   const [currentInputs, setCurrentInputs] = useState({
-    "Running route length": length,
+    "Running route length": String(length),
     "Start location": startAddress,
     "End location": endAddress,
     "Difficulty level": difficulty,
@@ -15,12 +17,17 @@ const HadasHelp = ({ visible, onClose }: AboutModalProps) => {
 
   useEffect(() => {
     setCurrentInputs({
-      "Running route length": length,
+      "Running route length": String(length),
       "Start location": startAddress,
       "End location": endAddress,
       "Difficulty level": difficulty,
     });
   }, [length, startAddress, endAddress, difficulty]);
+
+  const onReset = () => {
+    setChatReset(true);
+    onClose();
+  };
 
   return (
     <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
@@ -58,16 +65,16 @@ const HadasHelp = ({ visible, onClose }: AboutModalProps) => {
                     {key}:
                   </Text>
                   <Text style={styles.bodyText} className="text-md font-JakartaBold text-blue-700">
-                    {value ?? "Not set"}
+                    {value !== "" && value !== "0" ? value : "Not set"}
                   </Text>
                 </View>
               ))}
             </View>
+
+            <CustomButton title="Reset Chat" onPress={onReset} className="w-11/12 mx-auto" bgVariant="danger" />
           </ScrollView>
 
-          <TouchableOpacity style={styles.closeButton} onPress={onClose} accessibilityRole="button">
-            <Text style={styles.closeText}>Close</Text>
-          </TouchableOpacity>
+          <CustomButton title="Close" onPress={onClose} className="w-4/12 mt-6 mx-auto" />
         </View>
       </View>
     </Modal>
@@ -111,22 +118,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   currentInputsContainer: {
-    padding: 15,
+    padding: 10,
     borderRadius: 8,
-    marginBottom: 2,
+    marginBottom: 1,
     width: "100%",
-  },
-  closeButton: {
-    marginTop: 10,
-    backgroundColor: "#0286FF",
-    paddingVertical: 12,
-    paddingHorizontal: 25,
-    borderRadius: 8,
-  },
-  closeText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
   },
 });
 
