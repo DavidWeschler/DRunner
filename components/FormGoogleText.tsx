@@ -14,11 +14,9 @@ const PointInput = ({ label, placeholder, setAddress, setPointInput, setPoint }:
 
   useEffect(() => {
     if (label.includes("Start") && start) {
-      console.log("start sdf:", start);
-      setInpValue(start);
+      setInpValue((start || "").replace(/([^\w, ]|[A-Z0-9\+]{2,})+/g, "") || "unknown");
     } else if (label.includes("End") && end) {
-      console.log("end sdf:", end);
-      setInpValue(end);
+      setInpValue((end || "").replace(/([^\w, ]|[A-Z0-9\+]{2,})+/g, "") || "unknown");
     }
   }, [start, end]);
 

@@ -186,15 +186,15 @@ const Chat = () => {
         role: "system",
         content: `You are a JSON generator for running routes. Follow these rules STRICTLY:
       1. Respond ONLY with valid JSON using these keys: startLocation, endLocation, routeLength, difficultyLvl, AIresponse. Do not include any other keys!
-      2. Use "unknown" for missing values
-      3. NEVER include explanations, thoughts, or markdown
-      4. Difficulty must be one of: easy, medium, hard. you may choose the closest one
+      2. Use "unknown" for missing values.
+      3. NEVER include explanations, thoughts, or markdown.
+      4. Difficulty must be one of: easy, medium, hard. you may choose the closest one.
       5. routeLength must be numbers only in kilometers.
       6. AIresponse is your text response to the user's message. Answer as shortly as possible. Make sure to include what you understood.
       7. In AIresponse ask the user on a specific next step from any single MISSING value here: ${JSON.stringify(currentInputs)} make sure its missing! If everything is correct, ask if the user wants to generate the route by clicking the button "Generate".
       8. If the user ask for advices on planning a route, Give him a usfull advices HOW or SUGGEST some options (no more than 40 words) in the AIresponse.
       9. Do not include any additional text or formatting. Only respond with JSON.
-      10. if the user is refreing his location, this is his address to use: ${userLocationStr ? userLocationStr : "Haneviim 37 Jerusalem"}`,
+      10. If the user is referring to his location, ${userLocationStr ? `this is his address to use: ${userLocationStr}` : "ask him to grant permission to location services"}.`,
       };
 
       const userMessage: ApiMessage = {
