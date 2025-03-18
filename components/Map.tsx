@@ -162,9 +162,12 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
             : undefined
         }
       >
-        {pins.map((pin, index) => (
-          <Marker key={index} coordinate={{ latitude: pin.latitude, longitude: pin.longitude }} title={index === 3 || index === 0 ? "Start" : `Pin ${index + 1}`} />
-        ))}
+        {pins.length > 0 && (
+          <>
+            <Marker key={pins.length - 1} coordinate={{ latitude: pins[pins.length - 1].latitude, longitude: pins[pins.length - 1].longitude }} pinColor="orange" title={"End"} />
+            <Marker key={0} coordinate={{ latitude: pins[0].latitude, longitude: pins[0].longitude }} pinColor="rgb(59, 187, 187)" title={"Start"} />
+          </>
+        )}
 
         {directions && directions.map((points: string, index: number) => <Polyline key={index} coordinates={decodePolyline(points)} strokeColor="#CC6600" strokeWidth={4} />)}
 
