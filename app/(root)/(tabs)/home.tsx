@@ -107,11 +107,6 @@ const Home = () => {
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setHasPermission(false);
-        return;
-      }
-
       let location = await Location.getCurrentPositionAsync({});
 
       const address = await Location.reverseGeocodeAsync({
@@ -195,6 +190,17 @@ const Home = () => {
     } catch (error) {
       console.log("Error fetching routes:", error);
     }
+  };
+
+  const onReset = () => {
+    setStartAddress("");
+    setEndAddress("");
+    setLengthInput(0);
+    setDifficultyInput("");
+    setLength("");
+    setStartPoint("");
+    setEndPoint("");
+    setDifficulty("");
   };
 
   const generator = async () => {
@@ -313,7 +319,7 @@ const Home = () => {
                       keyboardType="numeric"
                       placeholder="numbers only"
                       placeholderTextColor="gray"
-                      value={length}
+                      value={length ? length : ""}
                       onChangeText={setLength}
                     />
                   </View>
@@ -355,6 +361,7 @@ const Home = () => {
                   </View>
 
                   <CustomButton onPress={generator} title="Generate" bgVariant="primary" textVariant="default" className="mt-4" />
+                  {(startAddress || endAddress || length) && <CustomButton title="Reset" onPress={onReset} className="w-[full] mt-3 mx-auto" bgVariant="danger" />}
                 </View>
               </View>
             </>
