@@ -40,7 +40,6 @@ describe("POST Update Recent Route API", () => {
 
   //     // Extract the query string properly
   //     const query = mockSql.mock.calls[0][0][0].trim(); // Trim whitespace to avoid formatting issues
-  //     console.log("Executed Query:", query); // Debugging output
 
   //     // Check if SQL query contains correct values directly
   //     expect(query).toMatch(/UPDATE\s+running_routes/i);

@@ -58,7 +58,6 @@ const adjustPinToRoad = async (coord: Coordinate): Promise<Coordinate> => {
   const { latitude, longitude } = coord;
   const url = `https://roads.googleapis.com/v1/nearestRoads?points=${encodeURIComponent(latitude)},${encodeURIComponent(longitude)}&key=${API_KEY}`;
   try {
-    console.log("using api key..");
     const response = await axios.get<NearestRoadsResponse>(url);
     if (response.data.snappedPoints) {
       const { location } = response.data.snappedPoints[0];
@@ -205,10 +204,8 @@ async function CircularAlgorithm({ routeLengthKm, startPoint, mode = "walking" }
       console.log("Error generating route:", error);
       errorCount++;
       if (errorCount >= 10) {
-        console.log("Too many errors. Exiting loop.");
         break;
       }
-      // i--; // "Try again if a route fails to generate." This is dangerous, could cause infinite loop and cost a lot of money.
     }
   }
 

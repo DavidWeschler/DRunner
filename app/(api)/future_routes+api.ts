@@ -6,7 +6,6 @@ export async function POST(request: Request) {
     const { clerkId, maxNumOfRoutes } = await request.json();
 
     if (!clerkId) {
-      console.log("Missing clerkId in request body");
       return Response.json({ error: "Missing clerkId" }, { status: 400 });
     }
 

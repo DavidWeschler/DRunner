@@ -5,7 +5,6 @@ export async function POST(request: Request) {
     const sql = neon(`${process.env.DATABASE_URL}`);
     const { clerkId, difficulty, saved } = await request.json();
 
-    console.log(`in update_route_saved: ${clerkId}, ${difficulty}, ${saved}`);
 
     const recentRun = await sql`
         UPDATE running_routes

@@ -19,11 +19,8 @@ import CustomButton from "@/components/CustomButton";
 import PointInput from "@/components/FormGoogleText";
 
 const getLatLngFromAddress = async (address: string) => {
-  console.log("Getting lat and long from address:", address);
   try {
     const [result] = await Location.geocodeAsync(address);
-    console.log("Latitude:", result.latitude);
-    console.log("Longitude:", result.longitude);
     return { latitude: result.latitude, longitude: result.longitude };
   } catch (error) {
     console.log("Error getting lat and long from address:", error);
@@ -43,7 +40,6 @@ Notifications.setNotificationHandler({
 });
 
 const Home = () => {
-  console.log("Home screen rendered");
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
@@ -68,11 +64,7 @@ const Home = () => {
   const [futureRunsRoutes, setFutureRunsRoutes] = useState<Run[]>([]);
 
   const handleRunPress = async ({ run }: { run: Run }) => {
-    console.log("Run pressed:", run);
     const pins = run.waypoints.map((waypoint: any) => ({ longitude: waypoint[0], latitude: waypoint[1] }));
-
-    // setRouteWayPoints(pins); // depricated ?
-    // setRouteDirections(run.directions || []); // depricated ?
 
     setRouteDetails({
       difficulty: run.difficulty,
@@ -107,11 +99,6 @@ const Home = () => {
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setHasPermission(false);
-        return;
-      }
-
       let location = await Location.getCurrentPositionAsync({});
 
       const address = await Location.reverseGeocodeAsync({
@@ -136,7 +123,6 @@ const Home = () => {
         const url = `https://api.openweathermap.org/data/2.5/weather?lat=${userLatLong?.latitude || 32.009444}&lon=${userLatLong?.longitude || 34.882778}&units=metric&appid=${process.env.EXPO_PUBLIC_OPEN_WEATHER_API_KEY}`;
         const response = await fetch(url);
         const data = await response.json();
-        // console.log("Weather data:", data);
         const weatherMain = data?.weather[0]?.main || "Unknown";
         const weatherEmoji = weatherMain === "Clear" ? "☀️" : weatherMain === "Clouds" ? "☁️" : weatherMain === "Rain" ? "🌧️" : weatherMain === "Snow" ? "❄️" : weatherMain === "Thunderstorm" ? "⛈️" : "⛅";
 
@@ -197,12 +183,18 @@ const Home = () => {
     }
   };
 
-  const generator = async () => {
-    console.log("Length:", length);
-    console.log("Start Point:", startPoint);
-    console.log("End Point:", endPoint);
-    console.log("Difficulty:", difficulty);
+  const onReset = () => {
+    setStartAddress("");
+    setEndAddress("");
+    setLengthInput(0);
+    setDifficultyInput("");
+    setLength("");
+    setStartPoint("");
+    setEndPoint("");
+    setDifficulty("");
+  };
 
+  const generator = async () => {
     let startLatLong = null;
     if (!startPoint) {
       startLatLong = userLatLong;
@@ -220,16 +212,12 @@ const Home = () => {
         const endLatLong = await getLatLngFromAddress(endPoint);
         endPoint ? setEndPointInput(endLatLong) : setEndPointInput(null);
       } catch (error) {
-        console.log("(not a real error) couldnt get lat long from end point, setting it to null");
         setEndPointInput(null);
       }
     } else {
       setEndPointInput(null);
     }
 
-    console.log("Generating route...");
-
-    // reset local variables..
     setLength("");
     setStartPoint("");
     setEndPoint("");
@@ -313,7 +301,7 @@ const Home = () => {
                       keyboardType="numeric"
                       placeholder="numbers only"
                       placeholderTextColor="gray"
-                      value={length}
+                      value={length ? length : ""}
                       onChangeText={setLength}
                     />
                   </View>
@@ -355,6 +343,7 @@ const Home = () => {
                   </View>
 
                   <CustomButton onPress={generator} title="Generate" bgVariant="primary" textVariant="default" className="mt-4" />
+                  {(startAddress || endAddress || length) && <CustomButton title="Reset" onPress={onReset} className="w-[full] mt-3 mx-auto" bgVariant="danger" />}
                 </View>
               </View>
             </>

@@ -71,7 +71,6 @@ const getGoogleGeocode = async (latitude: number, longitude: number) => {
     if (data.status === "OK" && data.results.length > 0) {
       return data.results[0].formatted_address;
     } else {
-      console.log("Google Geocode API error:", data.status);
       return null;
     }
   } catch (error) {
@@ -81,7 +80,7 @@ const getGoogleGeocode = async (latitude: number, longitude: number) => {
 };
 
 const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
-  const { startPoint, endPoint, setStartPointInput, setEndPointInput, setStartAddress, setEndAddress } = useLocationStore();
+  const { startPoint, endPoint, setStartPointInput, setEndPointInput, startAddress, setStartAddress, endAddress, setEndAddress } = useLocationStore();
   const [isAlertVisible, setAlertVisible] = useState(false);
   const [locationData, setLocationData] = useState({ latitude: 0, longitude: 0, address: "" });
 
@@ -96,15 +95,26 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
 
   const handleSetLocation = (latitude: number, longitude: number, address: string, isStart: boolean) => {
     if (isStart) {
-      console.log("setting start point from map");
       setStartPointInput({ latitude, longitude });
       setStartAddress(address);
     } else {
       setEndPointInput({ latitude, longitude });
       setEndAddress(address);
     }
-    setAlertVisible(false); // Close the custom alert after setting location
+    setAlertVisible(false);
   };
+
+  useEffect(() => {
+    if (startAddress === "") {
+      setStartPointInput(null);
+    }
+  }, [startAddress]);
+
+  useEffect(() => {
+    if (endAddress === "") {
+      setEndPointInput(null);
+    }
+  }, [endAddress]);
 
   const mapTheme = mapThemes[theme] || mapThemes.standard;
 

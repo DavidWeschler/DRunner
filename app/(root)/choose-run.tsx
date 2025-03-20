@@ -64,13 +64,11 @@ const ChooseRun = () => {
   const [bannerText, setBannerText] = useState("");
 
   const straightRoute = async () => {
-    console.log("Calculating straight route");
     if (inpStartPoint === null || inpEndPoint === null) {
       throw new Error("Invalid input values");
     }
 
     if (inpStartPoint.longitude == inpEndPoint.longitude && inpStartPoint.latitude === inpEndPoint.latitude) {
-      console.log("Start and end points are the same");
       return await circularRoute();
     }
 
@@ -80,8 +78,6 @@ const ChooseRun = () => {
       endPoint: [inpEndPoint.longitude, inpEndPoint.latitude] as [number, number],
       mode: mode,
     };
-
-    console.log("inputsLine:", inputsLine);
 
     const results = await Line_Algorithm(inputsLine);
     // If the user chose a route that is too short, the algorithm will return the same route for all difficulties
@@ -107,14 +103,9 @@ const ChooseRun = () => {
   };
 
   const circularRoute = async () => {
-    console.log("Calculating circular route");
     if (inpStartPoint === null || inpLength === null) {
-      console.log("Invalid input values sdf");
-      throw new Error("Invalid input values sdf");
+      throw new Error("Invalid input values");
     }
-    console.log("okoko");
-    console.log("inpStartPoint:", inpStartPoint);
-    console.log("inpLength:", inpLength);
 
     const inputs = {
       routeLengthKm: inpLength <= 0 || inpLength > 100 ? 5 : inpLength,
@@ -124,7 +115,6 @@ const ChooseRun = () => {
 
     const results = await CircularAlgorithm(inputs);
 
-    console.log("results:", results);
     const easyRoute = results[0];
     const mediumRoute = results[1];
     const hardRoute = results[2];
@@ -152,13 +142,10 @@ const ChooseRun = () => {
 
       inpEndPoint ? await straightRoute() : await circularRoute();
     } catch (error) {
-      console.log("Error calculating route:", error);
       Alert.alert("We couldn't generate your route", "Please try again later. 😶‍🌫️");
       router.push("/home");
     } finally {
       setLoading(false);
-
-      console.log("Resetting input values in FINALLY");
       setLengthInput(0);
       setStartPointInput(null);
       setEndPointInput(null);
@@ -175,7 +162,6 @@ const ChooseRun = () => {
   const getAddressFromPoint = async (point: { latitude: number; longitude: number }) => {
     try {
       const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${point.latitude}&lon=${point.longitude}`;
-      console.log("url:", url);
       const response = await fetch(url, {
         headers: {
           "User-Agent": "MyRunningApp/1.0 (contact@example.com)", // Change this to your app name & email
@@ -184,7 +170,6 @@ const ChooseRun = () => {
       });
 
       if (!response.ok) {
-        console.log("response:", response);
         throw new Error(`Network response was not ok: ${response.status}`);
       }
 
@@ -197,16 +182,8 @@ const ChooseRun = () => {
   };
 
   const addRunToDatabase = async (difficulty: string, future: Date | null, save = false, recent = false) => {
-    console.log("saving route with difficulty:", difficulty);
-
-    console.log("Add run to database");
     const clerkId = user?.id;
-    console.log("clerkId:", clerkId);
-
     const startAddress = await getAddressFromPoint(routePinsE[0]);
-
-    // make the furture date a local time
-    // const localTime = future ? new Date(future.getTime() - future.getTimezoneOffset() * 60000) : null;
 
     const route = {
       clerkId,
@@ -233,11 +210,9 @@ const ChooseRun = () => {
       });
 
       if (response.ok) {
-        console.log("Route added successfully");
         return true;
       } else {
         const errorData = await response.json();
-        console.log("Failed to add route", errorData);
         Alert.alert("Error adding route", "Please try again later.");
         return false;
       }
@@ -247,22 +222,6 @@ const ChooseRun = () => {
       return false;
     }
   };
-
-  // // this is for debugging notifications
-  // useEffect(() => {
-  //   const subscription = Notifications.addNotificationReceivedListener((notification) => {
-  //     console.log("Notification received:", notification);
-  //     checkPendingNotifications();
-  //     // Notifications.cancelAllScheduledNotificationsAsync(); // cancel all notifications, this is not good but theres a bug in the expo-notifications library
-  //   });
-  //   return () => subscription.remove();
-  // }, []);
-
-  // // to check pending notifications
-  // const checkPendingNotifications = async () => {
-  //   const pending = await Notifications.getAllScheduledNotificationsAsync();
-  //   console.log("Pending notifications:", pending);
-  // };
 
   const setNotification = async (date: Date) => {
     const notification = {
@@ -278,7 +237,6 @@ const ChooseRun = () => {
 
     try {
       const id = await Notifications.scheduleNotificationAsync({ content: notification, trigger });
-      console.log("Notification scheduled with id:", id);
     } catch (error) {
       Alert.alert("Error scheduling notification", "Please try again later.");
     }
@@ -289,8 +247,6 @@ const ChooseRun = () => {
     const isSavedAlready = level === "easy" ? easySaved : level === "medium" ? mediumSaved : hardSaved;
 
     if (isSavedAlready) return Alert.alert("Route already saved", "You have already saved this route.");
-
-    console.log("saving route with difficulty:", level);
 
     setLoading(true);
     const status = isScheduledAlready ? await updateRunRoute(level, null, true) : await addRunToDatabase(level, null, true);
@@ -339,7 +295,6 @@ const ChooseRun = () => {
   };
 
   const updateRunRoute = async (level: string, future: Date | null, save: boolean | null) => {
-    console.log("updating route with difficulty:", level);
 
     let url = "";
     const params: { clerkId: string | undefined; difficulty: string; scheduled?: Date; saved?: boolean } = { clerkId: user?.id, difficulty: level };
@@ -350,7 +305,6 @@ const ChooseRun = () => {
       url = "/(api)/update_route_saved";
       params["saved"] = save;
     } else {
-      console.log("Error updating route:", "No future date or save status provided");
       return false;
     }
 
@@ -364,14 +318,10 @@ const ChooseRun = () => {
       });
 
       if (response.ok) {
-        console.log("Route updated successfully");
 
         if (level === "easy") save ? setEasySaved(true) : setEasyScheduled(true);
         if (level === "medium") save ? setMediumSaved(true) : setMediumScheduled(true);
         if (level === "hard") save ? setHardSaved(true) : setHardScheduled(true);
-
-        console.log("easySaved:", easySaved);
-        console.log("easyScheduled:", easyScheduled);
 
         return true;
       } else {
@@ -394,7 +344,6 @@ const ChooseRun = () => {
       });
 
       if (response.ok) {
-        console.log("Route updated successfully");
         return true;
       } else {
         const errorData = await response.json();
@@ -493,9 +442,6 @@ const ChooseRun = () => {
               elevationGain: difficulty === "easy" ? routeElevation.easy : difficulty === "medium" ? routeElevation.medium : routeElevation.hard,
               length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
             };
-
-            console.log("pins: ", route.pins);
-            console.log("directions: ", route.directions);
             setRouteDetails(route);
 
             const routeAlreadySaved = difficulty === "easy" ? easySaved : difficulty === "medium" ? mediumSaved : hardSaved;
