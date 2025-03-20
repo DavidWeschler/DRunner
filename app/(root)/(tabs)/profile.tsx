@@ -1,22 +1,12 @@
 import { useUser } from "@clerk/clerk-expo";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import InputField from "@/components/InputField";
 import ScrollableAlert from "@/components/AboutModal";
 import { useState } from "react";
 import { useLocationStore, useaiModelStore } from "@/store";
 import { StyleSheet } from "react-native";
 import CustomButton from "@/components/CustomButton";
-// import {aiModel } from "@/types/type";
-
-// models
-// deep seek: "deepseek/deepseek-r1-distill-llama-70b:free"
-// google gemma 3: "google/gemma-3-4b-it:free"
-// Qwen QwQ 32B: "qwen/qwq-32b:free" ~~
-// Nous DeepHermes 3 Llama 3 8B Preview (free): "nousresearch/deephermes-3-llama-3-8b-preview:free"
-// Google Gemini Flash Lite 2.0 Preview (free): "google/gemini-2.0-flash-lite-preview-02-05:free"
-// Meta: Llama 3.3 70B Instruct (free): "meta-llama/llama-3.3-70b-instruct:free"
 
 const Profile = () => {
   const { user } = useUser();

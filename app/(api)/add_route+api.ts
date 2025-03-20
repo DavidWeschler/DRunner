@@ -5,12 +5,9 @@ export async function POST(request: Request) {
     const sql = neon(`${process.env.DATABASE_URL}`);
     const { clerkId, route_title, address, difficulty, directions, elevationGain, length, waypoints, is_recent = false, is_saved = false, is_scheduled = null, is_deleted = false } = await request.json();
 
-    // Validate required fields
     if (!clerkId || !route_title || !difficulty || !directions || elevationGain === undefined || length === undefined || !waypoints) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
-
-    // Insert the route into the running_routes table
     await sql`
       INSERT INTO running_routes (
         clerk_id, route_title, address, difficulty, directions, elevation_gain, length, waypoints, is_recent, is_saved, is_scheduled, is_deleted

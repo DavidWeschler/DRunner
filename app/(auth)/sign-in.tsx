@@ -2,7 +2,6 @@ import { useSignIn } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, Image, ScrollView, Text, View } from "react-native";
-
 import CustomButton from "@/components/CustomButton";
 import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
@@ -30,7 +29,6 @@ const SignIn = () => {
         await setActive({ session: signInAttempt.createdSessionId });
         router.replace("/(root)/(tabs)/home");
       } else {
-        // See https://clerk.com/docs/custom-flows/error-handling for more info on error handling
         Alert.alert("Error", "Log in failed. Please try again.");
       }
     } catch (err: any) {

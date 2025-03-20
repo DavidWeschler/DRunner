@@ -1,12 +1,11 @@
 import { Tabs } from "expo-router";
 import { Image, ImageSourcePropType, View, Keyboard, Platform } from "react-native";
 import { useState, useEffect } from "react";
-
 import { icons } from "@/constants";
 
 const TabIcon = ({ source, focused }: { source: ImageSourcePropType; focused: boolean }) => (
-  <View className={`flex flex-row justify-center items-center rounded-full ${focused ? "bg-[#333333]" : ""}`}>
-    <View className={`rounded-full w-12 h-12 items-center justify-center ${focused ? "bg-general-400" : ""}`} style={{ transform: [{ translateY: -15 }] }}>
+  <View className={`flex flex-row justify-center items-center rounded-full ${focused ? "bg-[#004A8E]" : ""}`}>
+    <View className={`rounded-full w-12 h-12 items-center justify-center ${focused ? "bg-[#D69C32]" : ""}`} style={{ transform: [{ translateY: -15 }] }}>
       <Image source={source} tintColor="white" resizeMode="contain" className="w-7 h-7" />
     </View>
   </View>
@@ -33,7 +32,7 @@ const Layout = () => {
         tabBarInactiveTintColor: "white",
         tabBarShowLabel: false,
         tabBarStyle: {
-          backgroundColor: "#333333",
+          backgroundColor: "#004A8E",
           borderRadius: 50,
           overflow: "hidden",
           marginHorizontal: 20,
