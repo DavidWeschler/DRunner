@@ -140,7 +140,6 @@ async function Line_Algorithm({ routeLengthKm, startPoint, endPoint, mode = "wal
     // --- FETCH DIRECTIONS FOR THE DETOUR ROUTE ---
     const directionsData: DirectionsResponse = await fetchDirectionsWithWaypoint(mode, startPoint, endPoint, detourPoint);
 
-    console.log("directionsData", JSON.stringify(directionsData));
 
     if (directionsData.routes.length === 0) {
       throw new Error("No routes found by Google Directions API for detour route");

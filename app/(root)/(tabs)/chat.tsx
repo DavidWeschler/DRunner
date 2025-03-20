@@ -29,10 +29,7 @@ const generateStartingMessage = (): string => {
 };
 
 const getLatLngFromAddress = async (address: string) => {
-  console.log("Getting lat and long from address:", address);
   const [result] = await Location.geocodeAsync(address);
-  console.log("Latitude:", result.latitude);
-  console.log("Longitude:", result.longitude);
   return { latitude: result.latitude, longitude: result.longitude };
 };
 // ---------------------------------------------------------------------
@@ -161,7 +158,6 @@ const Chat = () => {
     }
 
     const data = await response.json();
-    console.log("Full response:", JSON.stringify(data, null, 2)); // Log the full response
     const messageContent = data.choices[0].message.content;
     return messageContent;
   };
@@ -292,7 +288,6 @@ const Chat = () => {
         startCoords = await getLatLngFromAddress(s);
         setStartPointInput(startCoords);
       } else {
-        console.log("Cannot generate route without a start point");
         return;
       }
       if (e) {

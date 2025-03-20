@@ -71,7 +71,6 @@ const getGoogleGeocode = async (latitude: number, longitude: number) => {
     if (data.status === "OK" && data.results.length > 0) {
       return data.results[0].formatted_address;
     } else {
-      console.log("Google Geocode API error:", data.status);
       return null;
     }
   } catch (error) {

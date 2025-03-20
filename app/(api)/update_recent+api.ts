@@ -7,8 +7,6 @@ export async function POST(request: Request) {
     const { clerkId, difficulty, is_recent, route_id = null } = await request.json();
     const offset = getIsraelTimezoneOffset();
 
-    console.log("updating is_recent:", offset); // = 2
-
     let recentRun = [];
     if (route_id) {
       recentRun = await sql`

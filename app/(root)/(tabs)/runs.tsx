@@ -93,7 +93,6 @@ const Runs = () => {
   };
 
   const handleDelete = async () => {
-    console.log("Deleting:", selectedRun);
     setShowSpinner(true);
 
     try {
@@ -104,8 +103,6 @@ const Runs = () => {
         },
         body: JSON.stringify({ clerkId: user?.id, routeId: selectedRun?.route_id }),
       }).then((res) => res.json());
-
-      console.log("Route deleted:", res);
     } catch (error) {
       console.log("Error deleting route:", error);
       Alert.alert("Error deleting route", "Please try again later", [{ text: "OK" }]);
@@ -117,7 +114,6 @@ const Runs = () => {
   };
 
   const handleEditTitle = async () => {
-    console.log("New title:", newTitle);
     setShowSpinner(true);
 
     try {
@@ -128,8 +124,6 @@ const Runs = () => {
         },
         body: JSON.stringify({ clerkId: user?.id, routeId: selectedRun?.route_id, newTitle }),
       }).then((res) => res.json());
-
-      console.log("Route title edited:", res);
     } catch (error) {
       console.log("Error editing route:", error);
       Alert.alert("Error editing route", "Please try again later", [{ text: "OK" }]);
@@ -158,7 +152,6 @@ const Runs = () => {
 
     try {
       const id = await Notifications.scheduleNotificationAsync({ content: notification, trigger });
-      console.log("Notification scheduled with id:", id);
     } catch (error) {
       Alert.alert("Error scheduling notification", "Please try again later.");
     }
@@ -170,15 +163,10 @@ const Runs = () => {
       const selectedRunTime = new Date(selectedRun?.is_scheduled).getTime();
       const scheduleToClear = allScheduled.find((notification) => {
         const notificationTime = (notification.trigger as any).value - getIsraelTimezoneOffset() * 60 * 60 * 1000;
-
-        console.log("Notification time:", notificationTime);
-        console.log("Selected run time:", selectedRunTime);
-
         return notificationTime === selectedRunTime;
       });
 
       if (scheduleToClear) {
-        console.log("Clearing scheduled notification:", scheduleToClear);
         await Notifications.cancelScheduledNotificationAsync(scheduleToClear.identifier);
       }
     }
@@ -191,8 +179,6 @@ const Runs = () => {
         },
         body: JSON.stringify({ clerkId: user?.id, routeId: selectedRun?.route_id, scheduleDate: date }),
       }).then((res) => res.json());
-
-      console.log("Route scheduling edited:", res);
     } catch (error) {
       console.log("Error scheduling route:", error);
       Alert.alert("Error scheduling route", "Please try again later", [{ text: "OK" }]);
@@ -205,7 +191,6 @@ const Runs = () => {
   };
 
   const handleRunRoute = async () => {
-    console.log("Running this route:", selectedRun);
     setModalVisible(false);
     await refreshRoutes();
     const pins = selectedRun ? selectedRun.waypoints.map((waypoint: any) => ({ longitude: waypoint[0], latitude: waypoint[1] })) : [];
@@ -239,7 +224,6 @@ const Runs = () => {
         body: JSON.stringify({ clerkId: user?.id, routeId: selectedRun?.route_id, save: !selectedRun?.is_saved }),
       });
       const result = await response.json();
-      console.log("Route saved/unsaved:", result);
     } catch (error) {
       console.log("Error saved/unsaved route:", error);
       Alert.alert("Error", "Could not update route status. Please try again.");
