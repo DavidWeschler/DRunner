@@ -5,7 +5,6 @@ import { icons } from "@/constants";
 import { useRouter } from "expo-router";
 import CustomButton from "@/components/CustomButton";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import { router } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Map from "@/components/Map";
 
@@ -18,24 +17,18 @@ configureReanimatedLogger({
 
 const RunRoute = () => {
   const router = useRouter();
-  const { mapTheme, routeWayPoints, routeDirections, routeDetalis } = useLocationStore();
+  const { mapTheme, routeDetalis } = useLocationStore();
   const bottomSheetRef = useRef<BottomSheet>(null);
-
-  // Refs for timer interval and start time
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
-
-  // Stopwatch state
   const [isRunning, setIsRunning] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0); // in milliseconds
+  const [elapsedTime, setElapsedTime] = useState(0);
   const [laps, setLaps] = useState<{ time: number; lapTime: number; overallTime: number }[]>([]);
   const [isPaused, setIsPaused] = useState(false);
   const [isFirst, setIsFirst] = useState(true);
   const scrollViewRef = useRef<ScrollView>(null);
-
   const [isDetailsExpanded, setIsDetailsExpanded] = useState(true);
 
-  // Format time function: converts ms to HH:MM:SS
   const formatTime = (time: number) => {
     const totalSeconds = Math.floor(time / 1000);
     const hours = Math.floor(totalSeconds / 3600);
@@ -45,10 +38,8 @@ const RunRoute = () => {
     return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   };
 
-  // Handle start, pause, and resume functionality
   const handleStartPause = () => {
     if (!isRunning) {
-      // Start the stopwatch
       setIsRunning(true);
       setIsPaused(false);
       setIsFirst(false);
@@ -59,14 +50,12 @@ const RunRoute = () => {
         }
       }, 1000);
     } else if (!isPaused) {
-      // Pause the stopwatch
       setIsPaused(true);
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     } else if (isPaused) {
-      // Resume the stopwatch
       setIsPaused(false);
       startTimeRef.current = Date.now() - elapsedTime;
       intervalRef.current = setInterval(() => {
@@ -77,16 +66,13 @@ const RunRoute = () => {
     }
   };
 
-  // Handle lap and reset functionality
   const handleResetLap = () => {
     if (isRunning && !isPaused) {
-      // Record a lap: compute lap time relative to the last lap
       const lastOverallTime = laps.length > 0 ? laps[laps.length - 1].overallTime : 0;
       const lapTime = elapsedTime - lastOverallTime;
       const newLap = { time: Date.now(), lapTime, overallTime: elapsedTime };
       setLaps((prev) => [...prev, newLap]);
     } else if (isPaused) {
-      // Reset the stopwatch and laps when paused
       setIsRunning(false);
       setIsPaused(false);
       setElapsedTime(0);
@@ -99,7 +85,6 @@ const RunRoute = () => {
     }
   };
 
-  // Cleanup interval on component unmount
   useEffect(() => {
     return () => {
       if (intervalRef.current) {
@@ -108,7 +93,6 @@ const RunRoute = () => {
     };
   }, []);
 
-  // Auto-scroll lap log to the bottom when a new lap is added
   useEffect(() => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollToEnd({ animated: true });
@@ -119,7 +103,6 @@ const RunRoute = () => {
     <GestureHandlerRootView className="flex-1">
       <View className="flex-1 bg-white">
         <View className="flex flex-col h-screen bg-blue-500">
-          {/* Back Button */}
           <View className="flex flex-row absolute z-10 top-25 mt-3 items-center justify-start px-5">
             <TouchableOpacity onPress={() => router.back()}>
               <View className="w-10 h-10 bg-white rounded-full items-center justify-center">
@@ -129,16 +112,15 @@ const RunRoute = () => {
             <Text className="text-xl font-JakartaSemiBold ml-5">Go Back</Text>
           </View>
 
-          {/* Map */}
           <Map theme={mapTheme || "standard"} pins={routeDetalis.pins} directions={routeDetalis.directions} />
         </View>
         <TouchableOpacity
           onPressOut={() => setIsDetailsExpanded(!isDetailsExpanded)}
           style={{
             position: "absolute",
-            top: 80, // lowered from previous top value
+            top: 80,
             alignSelf: "center",
-            width: "85%", // narrower width
+            width: "85%",
             maxWidth: 400,
             zIndex: 30,
           }}
@@ -156,7 +138,6 @@ const RunRoute = () => {
           )}
         </TouchableOpacity>
 
-        {/* Stopwatch and Lap Log BottomSheet */}
         <BottomSheet ref={bottomSheetRef} snapPoints={["25%", "65%"]}>
           <BottomSheetView style={{ flex: 1, padding: 20, backgroundColor: "rgb(226, 226, 226)" }}>
             <Text className="text-5xl font-JakartaBold text-center mb-3">{formatTime(elapsedTime)}</Text>
@@ -171,7 +152,6 @@ const RunRoute = () => {
               </TouchableOpacity>
             </View>
 
-            {/* Lap Log ScrollView */}
             <ScrollView className="mt-4 flex-1" ref={scrollViewRef}>
               <View className="border-t border-black" />
               {laps.length > 0 ? (

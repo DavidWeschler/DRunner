@@ -3,14 +3,13 @@ import { View, Image, Text, TouchableOpacity, ScrollView, Alert, StyleSheet } fr
 import Swiper from "react-native-swiper";
 import Map from "@/components/Map";
 import { useLocationStore } from "@/store";
-import { icons, images } from "@/constants";
+import { icons } from "@/constants";
 import { useRouter } from "expo-router";
 import CircularAlgorithm from "../../lib/circle_algorithm";
 import Line_Algorithm from "../../lib/line_algorithm";
 import { useUser } from "@clerk/clerk-react";
 import * as Notifications from "expo-notifications";
 import { SchedulableTriggerInputTypes } from "expo-notifications";
-import { A } from "@clerk/clerk-react/dist/useAuth-BQT424bY";
 import MyDateTimePicker from "@/components/MyDatePicker";
 import Spinner from "@/components/Spinner";
 import Entypo from "@expo/vector-icons/Entypo";
@@ -24,42 +23,23 @@ const ChooseRun = () => {
   const inpDifficulty = useLocationStore((state) => state.difficulty);
   const { setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput } = useLocationStore();
   const { user } = useUser();
-
-  // this puts the user input difficulty in the correct order
   const difficulties = ["easy", "medium", "hard"].sort((a, b) => (a === inpDifficulty ? -1 : b === inpDifficulty ? 1 : 0));
-
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("easy");
-
   const [actualRouteLength, setActualRouteLength] = useState({ easy: 0, medium: 0, hard: 0 });
   const [routeElevation, setRouteElevation] = useState({ easy: 0, medium: 0, hard: 0 });
-
-  // easy route:
   const [routePinsE, setRoutePinsE] = useState<{ latitude: number; longitude: number }[]>([]);
   const [routeDirectionsE, setRouteDirectionsE] = useState<string[] | null>(null);
-
-  // medium route:
   const [routePinsM, setRoutePinsM] = useState<{ latitude: number; longitude: number }[]>([]);
   const [routeDirectionsM, setRouteDirectionsM] = useState<string[] | null>(null);
-
-  // hard route:
   const [routePinsH, setRoutePinsH] = useState<{ latitude: number; longitude: number }[]>([]);
   const [routeDirectionsH, setRouteDirectionsH] = useState<string[] | null>(null);
-
-  // date and time:
-  const [selectedDateTime, setSelectedDateTime] = useState<string | null>(null);
-
   const [easySaved, setEasySaved] = useState(false);
   const [mediumSaved, setMediumSaved] = useState(false);
   const [hardSaved, setHardSaved] = useState(false);
-
   const [easyScheduled, setEasyScheduled] = useState(false);
   const [mediumScheduled, setMediumScheduled] = useState(false);
   const [hardScheduled, setHardScheduled] = useState(false);
-
-  // spinner
   const [loading, setLoading] = useState(false);
-
-  // banner
   const [showBanner, setShowBanner] = useState(false);
   const [bannerText, setBannerText] = useState("");
 
@@ -80,8 +60,6 @@ const ChooseRun = () => {
     };
 
     const results = await Line_Algorithm(inputsLine);
-    // If the user chose a route that is too short, the algorithm will return the same route for all difficulties
-    // in this case, we will set the same route for all difficulties
     const [easyRoute, mediumRoute, hardRoute] = results.length === 1 ? [results[0], results[0], results[0]] : results;
     setActualRouteLength({
       easy: parseFloat(easyRoute.length.toFixed(2)),
@@ -164,8 +142,8 @@ const ChooseRun = () => {
       const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${point.latitude}&lon=${point.longitude}`;
       const response = await fetch(url, {
         headers: {
-          "User-Agent": "MyRunningApp/1.0 (contact@example.com)", // Change this to your app name & email
-          "Accept-Language": "en", // Optional: Get responses in English
+          "User-Agent": "MyRunningApp/1.0 (contact@example.com)",
+          "Accept-Language": "en",
         },
       });
 
@@ -212,7 +190,7 @@ const ChooseRun = () => {
       if (response.ok) {
         return true;
       } else {
-        const errorData = await response.json();
+        await response.json();
         Alert.alert("Error adding route", "Please try again later.");
         return false;
       }
@@ -236,7 +214,7 @@ const ChooseRun = () => {
     };
 
     try {
-      const id = await Notifications.scheduleNotificationAsync({ content: notification, trigger });
+      await Notifications.scheduleNotificationAsync({ content: notification, trigger });
     } catch (error) {
       Alert.alert("Error scheduling notification", "Please try again later.");
     }
@@ -263,14 +241,11 @@ const ChooseRun = () => {
     }
   };
 
-  // Function to receive date from MyDateTimePicker
   const handleDateTimeSelection = async (date: Date, level: string) => {
     const isScheduledAlready = level === "easy" ? easyScheduled : level === "medium" ? mediumScheduled : hardScheduled;
     const isSavedAlready = level === "easy" ? easySaved : level === "medium" ? mediumSaved : hardSaved;
 
     if (isScheduledAlready) return Alert.alert("Route already scheduled!", "You Can See Your Scheduled Routes In The Manage Section.");
-
-    setSelectedDateTime(date.toLocaleString()); // Store formatted date
 
     setLoading(true);
     const status = isSavedAlready ? await updateRunRoute(level, date, null) : await addRunToDatabase(level, date, false);
@@ -295,7 +270,6 @@ const ChooseRun = () => {
   };
 
   const updateRunRoute = async (level: string, future: Date | null, save: boolean | null) => {
-
     let url = "";
     const params: { clerkId: string | undefined; difficulty: string; scheduled?: Date; saved?: boolean } = { clerkId: user?.id, difficulty: level };
     if (future) {
@@ -318,7 +292,6 @@ const ChooseRun = () => {
       });
 
       if (response.ok) {
-
         if (level === "easy") save ? setEasySaved(true) : setEasyScheduled(true);
         if (level === "medium") save ? setMediumSaved(true) : setMediumScheduled(true);
         if (level === "hard") save ? setHardSaved(true) : setHardScheduled(true);
@@ -354,9 +327,33 @@ const ChooseRun = () => {
     }
   };
 
+  const handleRoutePress = async () => {
+    const route = {
+      difficulty,
+      pins: difficulty === "easy" ? routePinsE : difficulty === "medium" ? routePinsM : routePinsH,
+      directions: difficulty === "easy" ? routeDirectionsE : difficulty === "medium" ? routeDirectionsM : routeDirectionsH,
+      elevationGain: difficulty === "easy" ? routeElevation.easy : difficulty === "medium" ? routeElevation.medium : routeElevation.hard,
+      length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
+    };
+    setRouteDetails(route);
+
+    const routeAlreadySaved = difficulty === "easy" ? easySaved : difficulty === "medium" ? mediumSaved : hardSaved;
+    const routeAlreadyScheduled = difficulty === "easy" ? easyScheduled : difficulty === "medium" ? mediumScheduled : hardScheduled;
+
+    if (!routeAlreadySaved && !routeAlreadyScheduled) {
+      setLoading(true);
+      await addRunToDatabase(difficulty, null, false, true);
+
+      setLoading(false);
+    } else {
+      await updateRecentRoute();
+    }
+
+    router.push("/run-a-route");
+  };
+
   return (
     <>
-      {/* Banner */}
       {showBanner && (
         <View
           style={{
@@ -404,22 +401,19 @@ const ChooseRun = () => {
             <View key={index} className="items-center justify-center flex-1">
               <Text className={`text-xl font-bold mt-10 ${level === "easy" ? "text-blue-500" : level === "medium" ? "text-yellow-500" : "text-red-500"}`}>{level.charAt(0).toUpperCase() + level.slice(1)} Route</Text>
 
-              {/* Map Component */}
               <View className="flex flex-row items-center bg-transparent h-[400px] w-[90%] mx-auto mt-4">
                 {level === "easy" && <Map theme={mapTheme || "standard"} pins={routePinsE} directions={routeDirectionsE} />}
                 {level === "medium" && <Map theme={mapTheme || "standard"} pins={routePinsM} directions={routeDirectionsM} />}
                 {level === "hard" && <Map theme={mapTheme || "standard"} pins={routePinsH} directions={routeDirectionsH} />}
               </View>
 
-              {/* Save and Schedule Buttons */}
               <View className="flex-row justify-end items-center space-x-4 w-[90%] mx-auto">
-                <TouchableOpacity style={styles.button} onPress={async () => await handleSaveRoute(level)}>
+                <TouchableOpacity className="items-center justify-center p-0" onPress={async () => await handleSaveRoute(level)}>
                   <Entypo name="save" size={24} color={(level === "easy" && easySaved) || (level === "medium" && mediumSaved) || (level === "hard" && hardSaved) ? "#C0C0C0" : "#balck"} />
                 </TouchableOpacity>
                 <MyDateTimePicker alreadyChoseDate={level === "easy" ? easyScheduled : level === "medium" ? mediumScheduled : hardScheduled} onDateTimeSelected={async (date) => await handleDateTimeSelection(date, level)} />
               </View>
 
-              {/* Route Details */}
               <View className="bg-gray-100 rounded-2xl p-4 w-[90%] mx-auto mb-10">
                 <Text className="text-lg font-semibold text-gray-700">Route Length: {actualRouteLength[difficulty]} km</Text>
                 <Text className="text-lg font-semibold text-gray-700">Elevation Gain: {routeElevation[difficulty]} m</Text>
@@ -429,49 +423,12 @@ const ChooseRun = () => {
           ))}
         </Swiper>
 
-        {/* <View className="border-t border-gray-300 w-[95%] mx-auto my-0" /> */}
-
-        {/* Start Run Button */}
-        <TouchableOpacity
-          className="w-[95%] p-4 bg-blue-500 rounded-full items-center mx-auto mb-4"
-          onPress={async () => {
-            const route = {
-              difficulty,
-              pins: difficulty === "easy" ? routePinsE : difficulty === "medium" ? routePinsM : routePinsH,
-              directions: difficulty === "easy" ? routeDirectionsE : difficulty === "medium" ? routeDirectionsM : routeDirectionsH,
-              elevationGain: difficulty === "easy" ? routeElevation.easy : difficulty === "medium" ? routeElevation.medium : routeElevation.hard,
-              length: difficulty === "easy" ? actualRouteLength.easy : difficulty === "medium" ? actualRouteLength.medium : actualRouteLength.hard,
-            };
-            setRouteDetails(route);
-
-            const routeAlreadySaved = difficulty === "easy" ? easySaved : difficulty === "medium" ? mediumSaved : hardSaved;
-            const routeAlreadyScheduled = difficulty === "easy" ? easyScheduled : difficulty === "medium" ? mediumScheduled : hardScheduled;
-
-            if (!routeAlreadySaved && !routeAlreadyScheduled) {
-              setLoading(true);
-              const status = await addRunToDatabase(difficulty, null, false, true);
-
-              setLoading(false);
-            } else {
-              await updateRecentRoute();
-            }
-
-            router.push("/run-a-route");
-          }}
-        >
+        <TouchableOpacity className="w-[95%] p-4 bg-blue-500 rounded-full items-center mx-auto mb-4" onPress={handleRoutePress}>
           <Text className="text-white text-lg font-bold">Start Run</Text>
         </TouchableOpacity>
       </ScrollView>
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 0,
-  },
-});
 
 export default ChooseRun;
