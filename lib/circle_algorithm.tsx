@@ -199,7 +199,7 @@ async function CircularAlgorithm({ routeLengthKm, startPoint, mode = "walking" }
   let errorCount = 0;
   for (let i = 0; i < 3; i++) {
     try {
-      const route = await generateCircularRoute(startPoint, routeLengthKm * 0.6, mode);
+      const route = await generateCircularRoute(startPoint, routeLengthKm * 0.75, mode);
       routes.push(route);
     } catch (error) {
       console.log("Error generating route:", error);
