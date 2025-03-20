@@ -1,11 +1,9 @@
 import { Image, Text, View } from "react-native";
-
 import { icons } from "@/constants";
 import { formatDate, formatTime } from "@/lib/utils";
 import { Run } from "@/types/type";
 
-// to exlore there icons, go to https://icons.expo.fyi/Index
-import { Ionicons } from "@expo/vector-icons";
+// to exlore these icons, go to https://icons.expo.fyi/Index
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 

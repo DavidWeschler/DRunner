@@ -1,6 +1,5 @@
 import { LocationStore, aiModelStore, MapThemeType, MarkerData, aiModel, hadasStore } from "@/types/type";
 import { create } from "zustand";
-import mapThemes from "../components/MapThemes/mapThemes";
 
 export const useLocationStore = create<LocationStore>((set) => ({
   userLatitude: null,
@@ -17,8 +16,6 @@ export const useLocationStore = create<LocationStore>((set) => ({
   endAddress: null,
   difficulty: null,
   inp: null,
-  routeWayPoints: [], // might be depricated
-  routeDirections: [], // might be depricated
   mode: "walking",
   routeDetalis: null,
 
@@ -52,7 +49,7 @@ export const useLocationStore = create<LocationStore>((set) => ({
 
   setMapTheme: (theme: MapThemeType) => {
     set(() => ({
-      mapTheme: theme, // Store only the theme name
+      mapTheme: theme,
     }));
   },
 
@@ -95,18 +92,6 @@ export const useLocationStore = create<LocationStore>((set) => ({
   setHadasInp: (inp: string) => {
     set(() => ({
       inp,
-    }));
-  },
-
-  // setRouteWayPoints: (waypoints: MarkerData[]) => {
-  //   set(() => ({
-  //     routeWayPoints: waypoints,
-  //   }));
-  // },
-
-  setRouteDirections: (directions: string[]) => {
-    set(() => ({
-      routeDirections: directions,
     }));
   },
 }));

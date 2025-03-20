@@ -119,8 +119,6 @@ declare interface LocationStore {
   inp: string | null;
 
   //for the running phase /fix
-  routeWayPoints: MarkerData[];
-  routeDirections: string[];
   routeDetalis: any;
 
   mode: string;
@@ -138,9 +136,6 @@ declare interface LocationStore {
   setMapTheme: (theme: MapThemeType) => void;
   setUserLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => void;
   setDestinationLocation: ({ latitude, longitude, address }: { latitude: number; longitude: number; address: string }) => void;
-
-  // setRouteWayPoints: (waypoints: MarkerData[]) => void;
-  // setRouteDirections: (directions: string[]) => void;
   setRouteDetails: (details: any) => void;
 
   setMode: (mode: string) => void;

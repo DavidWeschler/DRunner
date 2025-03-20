@@ -27,7 +27,6 @@ const styles = StyleSheet.create({
   spinnerContainer: {
     width: 80,
     height: 80,
-    // backgroundColor: "rgba(0,0,0,0.7)", // Darker box for spinner
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
