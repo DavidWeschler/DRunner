@@ -1,5 +1,6 @@
 import { neon } from "@neondatabase/serverless";
 
+//david what is this? can we get rid of it?
 const routes = [
   {
     route_title: "Test",
@@ -23,7 +24,6 @@ export async function POST(request: Request) {
   try {
     const sql = neon(`${process.env.DATABASE_URL}`);
 
-    // Create the running_routes table if it doesn't exist.
     await sql`
       CREATE TABLE IF NOT EXISTS running_routes (
         route_id SERIAL PRIMARY KEY,
@@ -49,7 +49,6 @@ export async function POST(request: Request) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Insert user and return the clerk_id
     const userResponse = await sql`
       INSERT INTO users (name, email, clerk_id) 
       VALUES (${name}, ${email}, ${clerkId})
@@ -61,7 +60,6 @@ export async function POST(request: Request) {
       return Response.json({ error: "Failed to create user" }, { status: 500 });
     }
 
-    // Insert running routes if provided
     if (routes && Array.isArray(routes) && routes.length > 0) {
       for (const route of routes) {
         const { route_title, difficulty, directions, elevationGain, length, waypoints, is_saved = false, is_scheduled = null, is_deleted = false } = route;

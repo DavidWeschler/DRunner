@@ -2,6 +2,11 @@ import { TextInputProps, TouchableOpacityProps } from "react-native";
 
 type MapThemeType = "standard" | "dark" | "aubergine" | "night" | "retro" | "silver";
 
+declare interface ApiMessage {
+  role: string;
+  content: string;
+}
+
 declare interface AboutModalProps {
   visible: boolean;
   onClose: () => void;

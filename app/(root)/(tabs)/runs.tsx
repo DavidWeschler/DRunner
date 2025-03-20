@@ -1,19 +1,16 @@
 import RunCard from "@/components/RunCard";
 import { icons, images } from "@/constants";
 import { Run } from "@/types/type";
-import { useUser } from "@clerk/clerk-expo";
-import { FlatList, Text, View, Image, ActivityIndicator, TouchableOpacity, Modal, Pressable, Alert, TextInput, Switch, Button } from "react-native";
+import { useUser, useAuth } from "@clerk/clerk-expo";
+import { FlatList, Text, View, Image, ActivityIndicator, TouchableOpacity, Modal, Pressable, Alert, TextInput, Switch } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAuth } from "@clerk/clerk-expo";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import * as Notifications from "expo-notifications";
 import { SchedulableTriggerInputTypes } from "expo-notifications";
 import MyDateTimePicker from "@/components/MyDatePicker";
 import Spinner from "@/components/Spinner";
-import { all } from "axios";
 import { useLocationStore } from "@/store";
-
 import { getIsraelTimezoneOffset } from "@/lib/utils";
 
 const Runs = () => {
@@ -30,9 +27,6 @@ const Runs = () => {
   const [selectedRun, setSelectedRun] = useState<Run | null>(null);
   const [selectedRunSavedStatus, setSelectedRunSavedStatus] = useState(selectedRun?.is_saved || false);
   const [newTitle, setNewTitle] = useState("");
-  const [showPicker, setShowPicker] = useState(false);
-
-  // spinner
   const [showSpinner, setShowSpinner] = useState(false);
 
   const fetchRoutes = async (apiType: string) => {
@@ -96,7 +90,7 @@ const Runs = () => {
     setShowSpinner(true);
 
     try {
-      const res = await fetch(`/(api)/delete_route`, {
+      await fetch(`/(api)/delete_route`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -117,7 +111,7 @@ const Runs = () => {
     setShowSpinner(true);
 
     try {
-      const res = await fetch(`/(api)/edit_title_route`, {
+      await fetch(`/(api)/edit_title_route`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -134,15 +128,11 @@ const Runs = () => {
     await refreshRoutes();
   };
 
-  const handleEditSchedule = async () => {
-    setShowPicker(true);
-  };
-
   const setNotification = async (date: Date) => {
     const notification = {
       title: "It's time to run! 🏃‍♂️",
       body: "Don't forget to run the route you scheduled for today.",
-      data: { data: "goes here" },
+      data: { data: "goes here" }, //david whats this?
     };
 
     const trigger: Notifications.DateTriggerInput = {
@@ -172,7 +162,7 @@ const Runs = () => {
     }
 
     try {
-      const res = await fetch(`/(api)/edit_schedule_route`, {
+      await fetch(`/(api)/edit_schedule_route`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -186,7 +176,6 @@ const Runs = () => {
 
     setModalVisible(false);
     await refreshRoutes();
-    setShowPicker(false);
     await setNotification(date);
   };
 
@@ -194,8 +183,6 @@ const Runs = () => {
     setModalVisible(false);
     await refreshRoutes();
     const pins = selectedRun ? selectedRun.waypoints.map((waypoint: any) => ({ longitude: waypoint[0], latitude: waypoint[1] })) : [];
-    // setRouteWayPoints(pins); // depricated ?
-    // setRouteDirections(selectedRun?.directions || []); // depricated ?
     setRouteDetails({
       difficulty: selectedRun?.difficulty,
       length: selectedRun?.length,
@@ -223,7 +210,7 @@ const Runs = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ clerkId: user?.id, routeId: selectedRun?.route_id, save: !selectedRun?.is_saved }),
       });
-      const result = await response.json();
+      await response.json();
     } catch (error) {
       console.log("Error saved/unsaved route:", error);
       Alert.alert("Error", "Could not update route status. Please try again.");
@@ -287,7 +274,6 @@ const Runs = () => {
         }
       />
 
-      {/* Modal for long press options */}
       <Modal visible={modalVisible} transparent animationType="slide">
         <View className="flex-1 justify-center items-center bg-black/40">
           <View className="bg-white p-5 rounded-lg w-4/5 shadow-lg">
@@ -310,7 +296,7 @@ const Runs = () => {
               </TouchableOpacity>
             </View>
 
-            <Pressable onPress={handleEditSchedule} className="border-b flex-row items-center p-1 pl-0">
+            <Pressable className="border-b flex-row items-center p-1 pl-0">
               <MyDateTimePicker alreadyChoseDate={false} onDateTimeSelected={async (date) => await scheduleRoute(date)} />
               <Text>Schedule route</Text>
             </Pressable>

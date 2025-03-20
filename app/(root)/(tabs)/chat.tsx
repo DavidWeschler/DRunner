@@ -10,20 +10,17 @@ import CustomButton from "@/components/CustomButton";
 import HadasHelp from "@/components/HadasHelp";
 import TypingDots from "@/components/AiThinking";
 import React from "react";
+import { ApiMessage } from "@/types/type";
 const OPENROUTER_API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_API_KEY;
-
-// --------------------- Helper functions -------------------------------
 
 // prettier-ignore
 const generateStartingMessage = (): string => {
   const messages: string[] = [
-    "Welcome to the R&D route planner bot! I can help you plan a route for your next run. Let's get started!",
-    "Hello! I'm the R&D route planner bot. I can assist you in planning a route for your run. Let's begin!",
-    "Greetings! I'm the R&D route planner bot. I'm here to help you plan a route for your run. Let's start!",
-    "Hi there! I'm the R&D route planner bot. I can guide you in planning a route for your run. Let's get going!",
-    "Hey! I'm the R&D route planner bot. I'm here to assist you in planning a route for your run. Let's begin!",
-    "Hello! I'm the R&D route planner bot. I can help you map out a route for your run. Let's start!",
-    "Wassup! I can help you plan a route for your next run. Let's get started!"
+    "Hi there! My name is Hadas and I can help you plan a route for your next run. Let's get started!",
+    "Hello! I'm Hadas. I can assist you in planning a route for your run. Let's begin!",
+    "Greetings! I'm Hadas and I'm here to help you plan a route for your run. Let's start!",
+    "Hi there! I am Hadas, I can guide you in planning a route for your run. Let's get going!",
+    "Hey! I'm Hadas and I'm here to assist you in planning a route for your run. Let's begin!",
   ];
   return messages[Math.floor(Math.random() * messages.length)];
 };
@@ -32,7 +29,6 @@ const getLatLngFromAddress = async (address: string) => {
   const [result] = await Location.geocodeAsync(address);
   return { latitude: result.latitude, longitude: result.longitude };
 };
-// ---------------------------------------------------------------------
 
 const Chat = () => {
   const { inp, setUserLocation, setHadasInp, setLengthInput, setStartAddress, setEndAddress, setDifficultyInput, setStartPointInput, setEndPointInput } = useLocationStore();
@@ -45,7 +41,7 @@ const Chat = () => {
       timestamp: new Date().toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false, // 24-hour format
+        hour12: false,
       }),
     },
   ]);
@@ -87,7 +83,6 @@ const Chat = () => {
     const keyboardDidHideListener = Keyboard.addListener(Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide", () => setKeyboardVisible(false));
 
     if (inp) {
-      // Clear the conversation and add new message
       setMessages(() => [
         {
           text: generateStartingMessage(),
@@ -95,13 +90,13 @@ const Chat = () => {
           timestamp: new Date().toLocaleTimeString("en-GB", {
             hour: "2-digit",
             minute: "2-digit",
-            hour12: false, // 24-hour format
+            hour12: false,
           }),
         },
       ]);
       scrollToBottom();
       handleSend({ inp });
-      setHadasInp(""); // Clear input after sending
+      setHadasInp("");
     }
     return () => {
       keyboardDidHideListener.remove();
@@ -122,7 +117,7 @@ const Chat = () => {
         timestamp: new Date().toLocaleTimeString("en-GB", {
           hour: "2-digit",
           minute: "2-digit",
-          hour12: false, // 24-hour format
+          hour12: false,
         }),
       },
     ]);
@@ -149,7 +144,7 @@ const Chat = () => {
             content: message,
           },
         ],
-        temperature: 0.4, // Reduce creativity for better compliance
+        temperature: 0.4,
         max_tokens: 500,
       }),
     });
@@ -161,11 +156,6 @@ const Chat = () => {
     const messageContent = data.choices[0].message.content;
     return messageContent;
   };
-
-  interface ApiMessage {
-    role: string;
-    content: string;
-  }
 
   const generateRes = async (userInput: string) => {
     scrollToBottom();
@@ -198,9 +188,7 @@ const Chat = () => {
         content: `${userInput}\n\nONLY RESPOND WITH JSON. NO ADDITIONAL TEXT.`,
       };
 
-      let rawContent = "";
-
-      rawContent = await askAi(systemPrompt.content, userMessage.content);
+      const rawContent = await askAi(systemPrompt.content, userMessage.content);
       const jsonString = rawContent?.match(/\{[\s\S]*\}/)?.[0] || "";
 
       const cleanedJson = jsonString
@@ -228,14 +216,14 @@ const Chat = () => {
               .split(/<\/think>/)
               .map((s: string) => s.replace(/\n/g, ""))
               .filter((s: string) => s.trim() !== "")
-              .pop() ?? finalAnswer // Ensures finalAnswer remains a string
+              .pop() ?? finalAnswer
           : finalAnswer;
     } catch (error) {
     } finally {
       const timestamp = new Date().toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false, // 24-hour format
+        hour12: false,
       });
       setMessages((prev) => [...prev, { text: finalAnswer, sender: "bot", timestamp }]);
       scrollToBottom();
@@ -249,19 +237,14 @@ const Chat = () => {
     const timestamp = new Date().toLocaleTimeString("en-GB", {
       hour: "2-digit",
       minute: "2-digit",
-      hour12: false, // 24-hour format
+      hour12: false,
     });
 
     try {
-      // Add user message
       setMessages((prev) => [...prev, { text: inp, sender: "user", timestamp }]);
       setDeepAnswered(false);
-      // Show thinking indicator
       setMessages((prev) => [...prev, { text: <TypingDots />, sender: "bot", timestamp }]);
-
       await generateRes(inp);
-
-      // Remove thinking indicator
       setMessages((prev) => prev.filter((msg) => !React.isValidElement(msg.text)));
     } catch (error) {
       console.log("Error handling message:", error);
@@ -275,9 +258,8 @@ const Chat = () => {
   const generateRoute = async () => {
     setGeneratePressed(true);
     setDeepAnswered(false);
-    setBtnTitle("Working on it...");
-    const s = useLocationStore.getState().startAddress; // || users current location
-    const e = useLocationStore.getState().endAddress; // || users current location
+    const s = useLocationStore.getState().startAddress;
+    const e = useLocationStore.getState().endAddress;
     const l = useLocationStore.getState().length || 5;
     const d = useLocationStore.getState().difficulty || "easy";
     let startCoords = null;
@@ -292,7 +274,7 @@ const Chat = () => {
       }
       if (e) {
         endCoords = await getLatLngFromAddress(e);
-        if (endCoords !== startCoords) setEndPointInput(endCoords); // this is supposed to help with creating a circular route
+        if (endCoords !== startCoords) setEndPointInput(endCoords);
       }
       setLengthInput(l);
       setDifficultyInput(d as "easy" | "medium" | "hard");
@@ -300,11 +282,10 @@ const Chat = () => {
     } catch {
       setGeneratePressed(false);
       setDeepAnswered(true);
-      setBtnTitle("Generate");
       const timestamp = new Date().toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false, // 24-hour format
+        hour12: false,
       });
       setMessages((prev) => [...prev, { text: "Sorry, something went wrong with generating your route", sender: "bot", timestamp }]);
       scrollToBottom();
@@ -312,7 +293,6 @@ const Chat = () => {
   };
 
   const [isModalVisible, setModalVisible] = useState(false);
-  const [btnTitle, setBtnTitle] = useState("Generate");
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
@@ -340,7 +320,7 @@ const Chat = () => {
       </View>
 
       <View className="border-t border-gray-300 w-full my-4 mt-5" />
-      {(messages.length > 3 || useLocationStore.getState().length || useLocationStore.getState().startAddress) && !generatePressed && deepAnswered && <CustomButton onPress={generateRoute} title={btnTitle} bgVariant="primary" textVariant="default" className="mt-[-10]" />}
+      {(messages.length > 3 || useLocationStore.getState().length || useLocationStore.getState().startAddress) && !generatePressed && deepAnswered && <CustomButton onPress={generateRoute} title="Generate" bgVariant="primary" textVariant="default" className="mt-[-10]" />}
       <FlatList
         ref={flatListRef}
         data={messages}

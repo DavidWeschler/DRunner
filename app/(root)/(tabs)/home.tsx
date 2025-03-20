@@ -1,20 +1,16 @@
-import { useUser } from "@clerk/clerk-expo";
-import { useAuth } from "@clerk/clerk-expo";
+import { useUser, useAuth } from "@clerk/clerk-expo";
 import * as Location from "expo-location";
 import { router } from "expo-router";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import * as Notifications from "expo-notifications";
-import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet, Alert, Platform, Button, Switch } from "react-native";
+import { Text, View, TouchableOpacity, Image, FlatList, ActivityIndicator, TextInput, StyleSheet, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import GoogleTextInput from "@/components/GoogleTextInput";
 import HadasTextInput from "@/components/HadasInp";
 import Map from "@/components/Map";
 import RunCard from "@/components/RunCard";
 import { icons, images } from "@/constants";
-import { useFetch } from "@/lib/fetch";
 import { useLocationStore } from "@/store";
 import { Run } from "@/types/type";
-import React from "react";
 import CustomButton from "@/components/CustomButton";
 import PointInput from "@/components/FormGoogleText";
 
@@ -29,8 +25,6 @@ const getLatLngFromAddress = async (address: string) => {
   }
 };
 
-// First, set the handler that will cause the notification
-// to show the alert
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -43,23 +37,16 @@ const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
-  const { setUserLocation, setDestinationLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, setEndAddress, mapTheme, setRouteDetails, setMode, mode } = useLocationStore();
-
+  const { setUserLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, setEndAddress, mapTheme, setRouteDetails, setMode, mode } = useLocationStore();
   const [length, setLength] = useState("");
   const [startPoint, setStartPoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
   const [difficulty, setDifficulty] = useState("");
-
   const [kind, setKind] = useState("recent");
-
   const [userLocationStr, setUserLocationStr] = useState("");
   const [weather, setWeather] = useState("");
   const [userLatLong, setUserLatLong] = useState<{ latitude: number; longitude: number } | null>(null);
-
-  const [hasPermission, setHasPermission] = useState<boolean>(false);
-
   const [recentRunRoutes, setRecentRunRoutes] = useState<Run[]>([]);
-
   const [savedRunsRoutes, setSavedRunsRoutes] = useState<Run[]>([]);
   const [futureRunsRoutes, setFutureRunsRoutes] = useState<Run[]>([]);
 
@@ -98,7 +85,7 @@ const Home = () => {
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
+      await Location.requestForegroundPermissionsAsync();
       let location = await Location.getCurrentPositionAsync({});
 
       const address = await Location.reverseGeocodeAsync({
@@ -152,7 +139,6 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    // Request permissions on mount.
     (async () => {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== "granted") {
@@ -188,6 +174,10 @@ const Home = () => {
     setEndAddress("");
     setLengthInput(0);
     setDifficultyInput("");
+    resetDisplayValues();
+  };
+
+  const resetDisplayValues = () => {
     setLength("");
     setStartPoint("");
     setEndPoint("");
@@ -199,11 +189,10 @@ const Home = () => {
     if (!startPoint) {
       startLatLong = userLatLong;
     } else {
-      startLatLong = await getLatLngFromAddress(startPoint); // this turns the address into lat and long (for free)
+      startLatLong = await getLatLngFromAddress(startPoint);
       if (!startLatLong) startLatLong = userLatLong;
     }
 
-    // update the inputs in the singleton store
     setDifficultyInput(difficulty || "easy");
     setLengthInput(parseFloat(length) || 3);
     setStartPointInput(startLatLong);
@@ -217,11 +206,7 @@ const Home = () => {
     } else {
       setEndPointInput(null);
     }
-
-    setLength("");
-    setStartPoint("");
-    setEndPoint("");
-    setDifficulty("");
+    resetDisplayValues();
 
     router.push("/(root)/choose-run");
   };
@@ -314,7 +299,6 @@ const Home = () => {
                     <PointInput label="End Point" placeholder={"Optional"} setAddress={setEndAddress} setPointInput={setEndPointInput} setPoint={setEndPoint} />
                   </View>
 
-                  {/* Switch for Walking / Cycling */}
                   <View className="mt-3 flex flex-row items-center">
                     <Text className="text-black text-lg font-JakartaSemiBold mr-3">Mode:</Text>
                     <View className="flex flex-row space-x-3">
@@ -372,6 +356,7 @@ const Home = () => {
   );
 };
 
+// david is there any way we could get rid of this?
 const styles = StyleSheet.create({
   radioContainer: {
     flexDirection: "row",
