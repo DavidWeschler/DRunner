@@ -1,6 +1,5 @@
 import { neon } from "@neondatabase/serverless";
 
-//david what is this? can we get rid of it?
 const routes = [
   {
     route_title: "Test",
@@ -14,9 +13,10 @@ const routes = [
       [5, 6],
       [7, 8],
     ],
-    is_saved: true,
+    is_recent: false,
+    is_saved: false,
     is_scheduled: new Date(),
-    is_deleted: false,
+    is_deleted: true,
   },
 ];
 

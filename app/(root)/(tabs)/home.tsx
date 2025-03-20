@@ -356,7 +356,6 @@ const Home = () => {
   );
 };
 
-// david is there any way we could get rid of this?
 const styles = StyleSheet.create({
   radioContainer: {
     flexDirection: "row",

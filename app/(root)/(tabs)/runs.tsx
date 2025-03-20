@@ -132,7 +132,7 @@ const Runs = () => {
     const notification = {
       title: "It's time to run! 🏃‍♂️",
       body: "Don't forget to run the route you scheduled for today.",
-      data: { data: "goes here" }, //david whats this?
+      data: { data: "" },
     };
 
     const trigger: Notifications.DateTriggerInput = {
