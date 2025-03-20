@@ -19,11 +19,8 @@ import CustomButton from "@/components/CustomButton";
 import PointInput from "@/components/FormGoogleText";
 
 const getLatLngFromAddress = async (address: string) => {
-  console.log("Getting lat and long from address:", address);
   try {
     const [result] = await Location.geocodeAsync(address);
-    console.log("Latitude:", result.latitude);
-    console.log("Longitude:", result.longitude);
     return { latitude: result.latitude, longitude: result.longitude };
   } catch (error) {
     console.log("Error getting lat and long from address:", error);
@@ -70,9 +67,6 @@ const Home = () => {
   const handleRunPress = async ({ run }: { run: Run }) => {
     console.log("Run pressed:", run);
     const pins = run.waypoints.map((waypoint: any) => ({ longitude: waypoint[0], latitude: waypoint[1] }));
-
-    // setRouteWayPoints(pins); // depricated ?
-    // setRouteDirections(run.directions || []); // depricated ?
 
     setRouteDetails({
       difficulty: run.difficulty,
