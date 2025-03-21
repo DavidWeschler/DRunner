@@ -123,6 +123,9 @@ declare interface LocationStore {
 
   mode: string;
 
+  callReset: boolean;
+  setCallReset: (state: boolean) => void;
+
   //algorithm inputs setters:
   setLengthInput: (length: number) => void;
   setStartPointInput: ({ latitude, longitude }: { latitude: number; longitude: number } | null) => void;

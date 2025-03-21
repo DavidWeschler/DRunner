@@ -17,7 +17,7 @@ configureReanimatedLogger({
 
 const RunRoute = () => {
   const router = useRouter();
-  const { mapTheme, routeDetalis } = useLocationStore();
+  const { mapTheme, routeDetalis, setCallReset } = useLocationStore();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
@@ -169,7 +169,14 @@ const RunRoute = () => {
               )}
             </ScrollView>
 
-            <CustomButton title="End Run" onPressIn={() => router.push(`/home`)} className="mt-5 mb-3" />
+            <CustomButton
+              title="End Run"
+              onPressIn={() => {
+                setCallReset(true);
+                router.push(`/home`);
+              }}
+              className="mt-5 mb-3"
+            />
           </BottomSheetView>
         </BottomSheet>
       </View>

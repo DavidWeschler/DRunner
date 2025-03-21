@@ -21,7 +21,7 @@ const ChooseRun = () => {
   const inpStartPoint = useLocationStore((state) => state.startPoint);
   const inpEndPoint = useLocationStore((state) => state.endPoint);
   const inpDifficulty = useLocationStore((state) => state.difficulty);
-  const { setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput } = useLocationStore();
+  const { setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, callReset, setCallReset } = useLocationStore();
   const { user } = useUser();
   const difficulties = ["easy", "medium", "hard"].sort((a, b) => (a === inpDifficulty ? -1 : b === inpDifficulty ? 1 : 0));
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("easy");
@@ -129,6 +129,11 @@ const ChooseRun = () => {
       setEndPointInput(null);
     }
   };
+
+  // use effect to set the local difficulty state to the one in the store
+  useEffect(() => {
+    setDifficulty((inpDifficulty as "easy" | "medium" | "hard") || "easy");
+  }, [inpDifficulty]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -349,6 +354,7 @@ const ChooseRun = () => {
       await updateRecentRoute();
     }
 
+    console.log("Route details:", route);
     router.push("/run-a-route");
   };
 
@@ -377,6 +383,7 @@ const ChooseRun = () => {
           <Text className="text-2xl font-JakartaExtraBold ml-12">Select a route 🏃‍♂️‍➡️</Text>
           <TouchableOpacity
             onPress={() => {
+              setCallReset(true);
               router.push("/home");
             }}
             className="justify-center items-center w-10 h-10 rounded-full absolute left-0"
@@ -393,8 +400,7 @@ const ChooseRun = () => {
           dotColor="gray"
           activeDotColor="black"
           onIndexChanged={(index) => {
-            const levels = ["easy", "medium", "hard"];
-            setDifficulty((levels[index] as "easy" | "medium" | "hard") || "easy");
+            setDifficulty((difficulties[index] as "easy" | "medium" | "hard") || "easy");
           }}
         >
           {difficulties.map((level, index) => (

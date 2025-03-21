@@ -19,6 +19,13 @@ export const useLocationStore = create<LocationStore>((set) => ({
   mode: "walking",
   routeDetalis: null,
 
+  callReset: false,
+  setCallReset: (state: boolean) => {
+    set(() => ({
+      callReset: state,
+    }));
+  },
+
   setRouteDetails: (route: any) => {
     set(() => ({
       routeDetalis: route,

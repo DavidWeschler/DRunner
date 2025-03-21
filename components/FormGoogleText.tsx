@@ -16,7 +16,7 @@ const PointInput = ({ label, placeholder, setAddress, setPointInput, setPoint }:
     if (label.includes("Start") && start) {
       setInpValue((start || "").replace(/[A-Za-z0-9]{2,}\+[A-Za-z0-9]+,?/g, "") || "unknown");
     } else if (label.includes("End") && end) {
-      setInpValue((start || "").replace(/[A-Za-z0-9]{2,}\+[A-Za-z0-9]+,?/g, "") || "unknown");
+      setInpValue((end || "").replace(/[A-Za-z0-9]{2,}\+[A-Za-z0-9]+,?/g, "") || "unknown");
     } else {
       setInpValue("");
     }

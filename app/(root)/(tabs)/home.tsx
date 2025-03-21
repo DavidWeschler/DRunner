@@ -37,7 +37,7 @@ const Home = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const loading = false;
-  const { setUserLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, setEndAddress, mapTheme, setRouteDetails, setMode, mode } = useLocationStore();
+  const { setUserLocation, setLengthInput, setStartPointInput, setEndPointInput, setDifficultyInput, setHadasInp, startAddress, endAddress, setStartAddress, setEndAddress, mapTheme, setRouteDetails, setMode, mode, callReset, setCallReset } = useLocationStore();
   const [length, setLength] = useState("");
   const [startPoint, setStartPoint] = useState("");
   const [endPoint, setEndPoint] = useState("");
@@ -133,6 +133,13 @@ const Home = () => {
   }, [startAddress, endAddress]);
 
   useEffect(() => {
+    if (callReset) {
+      onReset();
+      setCallReset(false);
+    }
+  }, [callReset]);
+
+  useEffect(() => {
     fetchRoutes("recent_routes");
     fetchRoutes("saved_routes");
     fetchRoutes("future_routes");
@@ -206,7 +213,7 @@ const Home = () => {
     } else {
       setEndPointInput(null);
     }
-    resetDisplayValues();
+    resetDisplayValues(); // david
 
     router.push("/(root)/choose-run");
   };
