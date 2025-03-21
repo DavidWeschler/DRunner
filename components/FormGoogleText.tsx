@@ -14,9 +14,9 @@ const PointInput = ({ label, placeholder, setAddress, setPointInput, setPoint }:
 
   useEffect(() => {
     if (label.includes("Start") && start) {
-      setInpValue((start || "").replace(/([^\w, ]|[A-Z0-9\+]{2,})+/g, "") || "unknown");
+      setInpValue((start || "").replace(/[A-Za-z0-9]{2,}\+[A-Za-z0-9]+,?/g, "") || "unknown");
     } else if (label.includes("End") && end) {
-      setInpValue((end || "").replace(/([^\w, ]|[A-Z0-9\+]{2,})+/g, "") || "unknown");
+      setInpValue((start || "").replace(/[A-Za-z0-9]{2,}\+[A-Za-z0-9]+,?/g, "") || "unknown");
     } else {
       setInpValue("");
     }
