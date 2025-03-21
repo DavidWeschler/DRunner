@@ -73,6 +73,7 @@ This project is our final project as 3rd-year computer science students.
 - **AI Chatbot (6 APIs)** – For generating optimized running routes
 - **Clerk** – For secure authentication
 - **Neon** – For database management
+- **Jest** - For Unitests
 
 ## Contributing
 We welcome contributions! Feel free to fork the repository and submit a pull request with your improvements.
