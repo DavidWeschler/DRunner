@@ -78,7 +78,9 @@ This project is our final project as 3rd-year computer science students.
 We welcome contributions! Feel free to fork the repository and submit a pull request with your improvements.
 
 ## License
-This project is licensed under the MIT License. [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+This project is open-source and licensed under the **MIT License**.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Contact
 For any questions or suggestions, reach out to us.
