@@ -1,56 +1,82 @@
-# Welcome to your Expo app 👋
+# Running Route App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## About the App
+This app helps runners find the best routes based on their needs. Whether you’re looking for a specific distance, difficulty level, or starting point, the smart chatbot—powered by six AI APIs—creates optimized routes for you. Integrated with Google Maps, it ensures accurate and easy-to-follow paths, making every run more enjoyable. You can also ask the chatbot for advice on where to run, how long, or anything else related to running. Additionally, you can **save and schedule routes** and **view your running history** to track past runs.
 
-## Get started
+This project is our final project as 3rd-year computer science students.
 
-1. Install dependencies
+## Why Use This App?
+- **Personalized Routes** – Get paths based on your distance, difficulty, and location.
+- **Smart Chatbot** – Ask for running tips and advice.
+- **Accurate & Reliable** – Routes adjust to real roads with Google Maps.
+- **Save & Schedule** – Store routes or plan them for later.
+- **Running History** – Track past runs and stats.
+- **Easy to Use** – Simple design for quick route planning.
 
-   ```bash
+## Features
+- AI-powered chatbot for personalized running routes
+- Google Maps integration for real-road accuracy
+- Save and schedule routes for future runs
+- View past running history and track stats
+- Simple, user-friendly interface
+- Secure authentication with Clerk
+- Database powered by Neon
+
+## Screenshots
+![Home Screen](screenshots/home.png)
+![Route Generation](screenshots/route.png)
+![Chatbot Interaction](screenshots/chatbot.png)
+
+## Installation
+
+### Prerequisites
+- [Node.js](https://nodejs.org/) installed on your machine
+- [Expo Go](https://expo.dev/client) installed on your mobile device
+- API keys for:
+  - Google Maps
+  - AI chatbot services
+  - Clerk authentication
+  - Neon database connection
+
+### Steps
+1. Clone this repository:
+   ```sh
+   git clone https://github.com/ron-avital29/run_app.git
+   cd run_app
+   ```
+2. Install dependencies:
+   ```sh
    npm install
    ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
+3. Create a `.env` file in the root directory and add the required API keys:
+   ```sh
+   EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+   DATABASE_URL=your_database_url
+   EXPO_PUBLIC_SERVER_URL=your_server_url
+   EXPO_PUBLIC_GEOAPIFY_API_KEY=your_geoapify_api_key
+   EXPO_PUBLIC_OPEN_WEATHER_API_KEY=your_open_weather_api_key
+   EXPO_PUBLIC_GOOGLE_API_KEY=your_google_api_key
+   EXPO_PUBLIC_OPENROUTER_API_KEY=your_openrouter_api_key
    ```
+4. Start the app:
+   ```sh
+   npx expo start
+   ```
+5. Scan the QR code using Expo Go on your mobile device to run the app.
 
-In the output, you'll find options to open the app in a
+## Technologies Used
+- **React Native & Expo** – For cross-platform mobile development
+- **TypeScript** – For type-safe coding
+- **Google Maps API** – For accurate route adjustments
+- **AI Chatbot (6 APIs)** – For generating optimized running routes
+- **Clerk** – For secure authentication
+- **Neon** – For database management
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Contributing
+We welcome contributions! Feel free to fork the repository and submit a pull request with your improvements.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## License
+This project is licensed under the MIT License.
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-
-## David added:
-
-# Jtest
-
-To see the code coverage, run unitests, then under coverage/Icon-report/index.html you will see the coverage.
+## Contact
+For any questions or suggestions, reach out to us.
