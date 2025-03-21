@@ -1,5 +1,7 @@
 # Running Route App
 
+<img src="https://img.shields.io/badge/platform-android-green"/>
+
 ## About the App
 This app helps runners find the best routes based on their needs. Whether you’re looking for a specific distance, difficulty level, or starting point, the smart chatbot—powered by six AI APIs—creates optimized routes for you. Integrated with Google Maps, it ensures accurate and easy-to-follow paths, making every run more enjoyable. You can also ask the chatbot for advice on where to run, how long, or anything else related to running. Additionally, you can **save and schedule routes** and **view your running history** to track past runs.
 
@@ -76,7 +78,7 @@ This project is our final project as 3rd-year computer science students.
 We welcome contributions! Feel free to fork the repository and submit a pull request with your improvements.
 
 ## License
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Contact
 For any questions or suggestions, reach out to us.
