@@ -1,4 +1,6 @@
 export function getIsraelTimezoneOffset(): number {
+  // this function might need a fix - it should recieve a date as a parameter and not use the current date
+
   const ISRAEL_TIMEZONE_OFFSET = 2;
   const ISRAEL_TIMEZONE_OFFSET_DURING_DAYLIGHT_SAVING = 3;
 
