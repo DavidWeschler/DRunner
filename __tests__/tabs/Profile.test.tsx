@@ -145,12 +145,12 @@ describe("Profile Component", () => {
     fireEvent.press(aboutButton);
 
     // Check for text that is rendered in the modal, e.g. the title
-    expect(queryByText("About Running Route Generator")).toBeTruthy();
+    expect(queryByText("About R&D Route Generator")).toBeTruthy();
 
     // Simulate closing the modal by pressing the "Close" button inside it
     fireEvent.press(getByText("Close"));
 
     // Verify that the modal content is no longer rendered
-    expect(queryByText("About Running Route Generator")).toBeNull();
+    expect(queryByText("About R&D Route Generator")).toBeNull();
   });
 });
