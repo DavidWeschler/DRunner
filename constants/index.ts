@@ -12,6 +12,7 @@ import out from "@/assets/icons/out.png";
 import person from "@/assets/icons/person.png";
 import profile from "@/assets/icons/profile.png";
 import search from "@/assets/icons/search.png";
+import to from "@/assets/icons/to.png";
 import check from "@/assets/images/check.png";
 import getStarted from "@/assets/images/get-started.png";
 import message from "@/assets/images/message.png";
@@ -47,6 +48,7 @@ export const icons = {
   person,
   profile,
   search,
+  to,
 };
 
 export const onboarding = [
