@@ -1,4 +1,4 @@
-import { LocationStore, aiModelStore, MapThemeType, MarkerData, aiModel, hadasStore } from "@/types/type";
+import { LocationStore, aiModelStore, MapThemeType, aiModel, hadasStore } from "@/types/type";
 import { create } from "zustand";
 
 export const useLocationStore = create<LocationStore>((set) => ({

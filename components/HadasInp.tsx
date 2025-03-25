@@ -15,9 +15,9 @@ const HadasTextInput = ({ icon, initialLocation, containerStyle, textInputBackgr
 
   return (
     <View className={`flex flex-row h-14 items-center relative z-50 rounded-xl ${containerStyle}`}>
-      <TextInput value={text} onChangeText={setText} onSubmitEditing={onSubmit} placeholder={placeholder} placeholderTextColor="gray" className="flex-1 rounded-xl px-3 py-2 ml-1" style={{ backgroundColor: textInputBackgroundColor || "white", fontSize: 16, fontWeight: "600" }} returnKeyType="done" blurOnSubmit={false} />
+      <TextInput testID="hadas-input" value={text} onChangeText={setText} onSubmitEditing={onSubmit} placeholder={placeholder} placeholderTextColor="gray" className="flex-1 rounded-xl px-3 py-2 ml-1" style={{ backgroundColor: textInputBackgroundColor || "white", fontSize: 16, fontWeight: "600" }} returnKeyType="done" blurOnSubmit={false} />
 
-      <TouchableOpacity onPress={onSubmit} className="justify-center items-center w-6 h-6 ml-auto mr-4">
+      <TouchableOpacity testID="hadas-input-button" onPress={onSubmit} className="justify-center items-center w-6 h-6 ml-auto mr-4">
         <Image source={icon ? icon : icons.search} className="w-6 h-6" resizeMode="contain" />
       </TouchableOpacity>
     </View>

@@ -418,7 +418,7 @@ const ChooseRun = () => {
                 <TouchableOpacity className="items-center justify-center p-0" onPress={async () => await handleSaveRoute(level)}>
                   <Entypo name="save" size={24} color={(level === "easy" && easySaved) || (level === "medium" && mediumSaved) || (level === "hard" && hardSaved) ? "#C0C0C0" : "#balck"} />
                 </TouchableOpacity>
-                <MyDateTimePicker alreadyChoseDate={level === "easy" ? easyScheduled : level === "medium" ? mediumScheduled : hardScheduled} onDateTimeSelected={async (date) => await handleDateTimeSelection(date, level)} />
+                <MyDateTimePicker testID={`dateTimePicker-${level}`} alreadyChoseDate={level === "easy" ? easyScheduled : level === "medium" ? mediumScheduled : hardScheduled} onDateTimeSelected={async (date) => await handleDateTimeSelection(date, level)} />
               </View>
 
               <View className="bg-gray-100 rounded-2xl p-4 w-[90%] mx-auto mb-10">

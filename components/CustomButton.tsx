@@ -44,7 +44,7 @@ const CustomButton = ({
   ...props
 }: ButtonProps) => {
   return (
-    <TouchableOpacity onPress={onPress} className={`w-${width} rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 ${getBgVariantStyle(bgVariant)} ${className}`} {...props}>
+    <TouchableOpacity testID="custom-button" onPress={onPress} className={`w-${width} rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 ${getBgVariantStyle(bgVariant)} ${className}`} {...props}>
       {IconLeft && <IconLeft />}
       <Text className={`text-lg font-bold ${getTextVariantStyle(textVariant)} ${textClassName}`}>{title}</Text>
       {IconRight && <IconRight />}
