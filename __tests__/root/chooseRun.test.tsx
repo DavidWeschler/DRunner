@@ -39,8 +39,16 @@ jest.mock("@/components/Spinner", () => {
 jest.mock("@/components/MyDatePicker", () => {
   const React = require("react");
   const { TouchableOpacity, Text } = require("react-native");
-  return ({ onDateTimeSelected }: { onDateTimeSelected: (date: Date) => void }) => (
-    <TouchableOpacity testID="dateTimePicker" onPress={() => onDateTimeSelected(new Date("2023-01-01T00:00:00Z"))}>
+  return ({ onDateTimeSelected, testID }: { onDateTimeSelected: (date: Date) => void; testID: string }) => (
+    <TouchableOpacity
+      testID={testID}
+      onPress={() => {
+        const mockDate = new Date("2023-01-01T00:00:00Z"); // Use the Date object directly
+        if (onDateTimeSelected) {
+          onDateTimeSelected(mockDate); // Pass the Date object directly
+        }
+      }}
+    >
       <Text>DatePicker</Text>
     </TouchableOpacity>
   );
@@ -286,23 +294,23 @@ describe("ChooseRun Component", () => {
     expect(alertSpy).toHaveBeenCalledWith("Route already saved", "You have already saved this route.");
   });
 
-  // it("handles scheduling a route (new schedule)", async () => {
-  //   // Simulate successful addRunToDatabase for scheduling
-  //   (global.fetch as jest.Mock).mockResolvedValueOnce({
-  //     ok: true,
-  //     json: async () => ({}),
-  //   });
-  //   const { getByTestId, getByText } = render(<ChooseRun />);
-  //   const datePicker = getByTestId("dateTimePicker");
-  //   await act(async () => {
-  //     fireEvent.press(datePicker);
-  //     // Wait a tick to flush pending promises (e.g. state updates and timeouts)
-  //     await new Promise((resolve) => setTimeout(resolve, 0));
-  //   });
-  //   await waitFor(() => {
-  //     expect(getByText("Route scheduled successfully!")).toBeTruthy();
-  //   });
-  // });
+  it("handles scheduling a route (new schedule)", async () => {
+    // Simulate successful addRunToDatabase for scheduling
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}),
+    });
+    const { getByTestId, getByText } = render(<ChooseRun />);
+    const datePicker = getByTestId("dateTimePicker-medium");
+    await act(async () => {
+      fireEvent.press(datePicker);
+      // Wait a tick to flush pending promises (e.g. state updates and timeouts)
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    await waitFor(() => {
+      expect(getByText("Route scheduled successfully!")).toBeTruthy();
+    });
+  });
 
   // it("alerts when trying to schedule an already scheduled route", async () => {
   //   const alertSpy = jest.spyOn(Alert, "alert");

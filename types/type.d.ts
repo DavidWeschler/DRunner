@@ -91,8 +91,6 @@ declare interface InputFieldProps extends TextInputProps {
   className?: string;
 }
 
-type MapThemeType = "standard" | "dark" | "aubergine" | "night" | "retro" | "silver";
-
 declare interface MarkerData {
   latitude: number;
   longitude: number;

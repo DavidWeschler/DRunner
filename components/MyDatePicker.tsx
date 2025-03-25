@@ -6,6 +6,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 interface MyDateTimePickerProps {
   alreadyChoseDate: boolean;
   onDateTimeSelected: (dateTime: Date) => void; // Callback function
+  testID?: string;
 }
 
 const MyDateTimePicker: React.FC<MyDateTimePickerProps> = ({ alreadyChoseDate, onDateTimeSelected }) => {
