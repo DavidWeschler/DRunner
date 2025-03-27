@@ -353,8 +353,6 @@ const ChooseRun = () => {
     } else {
       await updateRecentRoute();
     }
-
-    console.log("Route details:", route);
     router.push("/run-a-route");
   };
 
