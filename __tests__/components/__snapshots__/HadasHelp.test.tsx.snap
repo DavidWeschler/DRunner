@@ -1,0 +1,397 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HadasHelp Component matches snapshot 1`] = `
+<Modal
+  animationType="slide"
+  hardwareAccelerated={false}
+  onRequestClose={[MockFunction]}
+  transparent={true}
+  visible={true}
+>
+  <View
+    style={
+      {
+        "alignItems": "center",
+        "backgroundColor": "rgba(0, 0, 0, 0.5)",
+        "flex": 1,
+        "justifyContent": "center",
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "alignItems": "center",
+          "backgroundColor": "white",
+          "borderRadius": 12,
+          "height": "85%",
+          "overflow": "hidden",
+          "padding": 20,
+          "position": "relative",
+          "width": "85%",
+        }
+      }
+    >
+      <RCTScrollView
+        contentContainerStyle={
+          {
+            "paddingBottom": 20,
+          }
+        }
+      >
+        <View>
+          <Text
+            style={
+              [
+                {
+                  "fontFamily": "Jakarta-Bold",
+                },
+                {
+                  "fontSize": 18,
+                  "marginBottom": 10,
+                  "textAlign": "center",
+                },
+              ]
+            }
+          >
+            How to use Hadas?
+          </Text>
+          <Text
+            style={
+              {
+                "fontSize": 14,
+                "marginBottom": 10,
+                "textAlign": "left",
+              }
+            }
+          >
+            Hadas is your AI assistant to help you plan your next running route or give you useful advice on how to create the best route for your needs!
+          </Text>
+          <Text
+            style={
+              [
+                {
+                  "fontFamily": "Jakarta-Bold",
+                },
+                {
+                  "fontSize": 18,
+                  "marginBottom": 10,
+                  "textAlign": "center",
+                },
+              ]
+            }
+          >
+            How to write to Hadas?
+          </Text>
+          <Text
+            style={
+              {
+                "fontSize": 14,
+                "marginBottom": 10,
+                "textAlign": "left",
+              }
+            }
+          >
+            You can ask Hadas in natural language, for example:
+          </Text>
+          <Text
+            style={
+              {
+                "color": "#555",
+                "fontSize": 14,
+                "fontStyle": "italic",
+                "marginBottom": 10,
+              }
+            }
+          >
+            - "I would like to run 3km starting from where I am and also end here. Make it easy."
+            
+
+            - "I'm not sure how long my running route should be. Any advice?"
+            
+
+            - "I haven't run in a while, should I go for a long run or a short one?"
+            
+
+          </Text>
+          <Text
+            style={
+              {
+                "fontSize": 14,
+                "marginBottom": 10,
+                "textAlign": "left",
+              }
+            }
+          >
+            Hadas will ask you for more details if needed. The more details you provide, the better the recommendations will be!
+            
+
+            When the Generate button appears, you can see matching routes! 🏃‍♂️‍➡️
+          </Text>
+          <Text
+            style={
+              [
+                {
+                  "fontFamily": "Jakarta-Bold",
+                },
+                [
+                  {
+                    "fontSize": 18,
+                    "marginBottom": 10,
+                    "textAlign": "center",
+                  },
+                ],
+              ]
+            }
+          >
+            Current model: 
+            <Text
+              style={
+                [
+                  {
+                    "fontFamily": "Jakarta-Bold",
+                  },
+                  {
+                    "color": "#1d4ed8",
+                  },
+                ]
+              }
+            >
+              AI Model
+            </Text>
+          </Text>
+          <Text
+            style={
+              [
+                {
+                  "fontFamily": "Jakarta-Bold",
+                },
+                {
+                  "fontSize": 18,
+                  "marginBottom": 10,
+                  "textAlign": "center",
+                },
+              ]
+            }
+          >
+            Current features:
+          </Text>
+          <View
+            style={
+              {
+                "borderRadius": 8,
+                "marginBottom": 1,
+                "padding": 10,
+                "width": "100%",
+              }
+            }
+          >
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "marginBottom": 1,
+                }
+              }
+            >
+              <Text
+                style={
+                  [
+                    {
+                      "fontFamily": "Jakarta-Medium",
+                    },
+                    {
+                      "color": "#6b7280",
+                    },
+                    {
+                      "fontSize": 14,
+                      "marginBottom": 10,
+                      "textAlign": "left",
+                    },
+                  ]
+                }
+              >
+                Running route length
+                :
+              </Text>
+              <Text
+                style={
+                  [
+                    {
+                      "fontFamily": "Jakarta-Bold",
+                    },
+                    {
+                      "color": "#1d4ed8",
+                    },
+                    {
+                      "fontSize": 14,
+                      "marginBottom": 10,
+                      "textAlign": "left",
+                    },
+                  ]
+                }
+              >
+                5
+              </Text>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "marginBottom": 1,
+                }
+              }
+            >
+              <Text
+                style={
+                  [
+                    {
+                      "fontFamily": "Jakarta-Medium",
+                    },
+                    {
+                      "color": "#6b7280",
+                    },
+                    {
+                      "fontSize": 14,
+                      "marginBottom": 10,
+                      "textAlign": "left",
+                    },
+                  ]
+                }
+              >
+                Start location
+                :
+              </Text>
+              <Text
+                style={
+                  [
+                    {
+                      "fontFamily": "Jakarta-Bold",
+                    },
+                    {
+                      "color": "#1d4ed8",
+                    },
+                    {
+                      "fontSize": 14,
+                      "marginBottom": 10,
+                      "textAlign": "left",
+                    },
+                  ]
+                }
+              >
+                Test Start
+              </Text>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "marginBottom": 1,
+                }
+              }
+            >
+              <Text
+                style={
+                  [
+                    {
+                      "fontFamily": "Jakarta-Medium",
+                    },
+                    {
+                      "color": "#6b7280",
+                    },
+                    {
+                      "fontSize": 14,
+                      "marginBottom": 10,
+                      "textAlign": "left",
+                    },
+                  ]
+                }
+              >
+                End location
+                :
+              </Text>
+              <Text
+                style={
+                  [
+                    {
+                      "fontFamily": "Jakarta-Bold",
+                    },
+                    {
+                      "color": "#1d4ed8",
+                    },
+                    {
+                      "fontSize": 14,
+                      "marginBottom": 10,
+                      "textAlign": "left",
+                    },
+                  ]
+                }
+              >
+                Test End
+              </Text>
+            </View>
+            <View
+              style={
+                {
+                  "flexDirection": "row",
+                  "marginBottom": 1,
+                }
+              }
+            >
+              <Text
+                style={
+                  [
+                    {
+                      "fontFamily": "Jakarta-Medium",
+                    },
+                    {
+                      "color": "#6b7280",
+                    },
+                    {
+                      "fontSize": 14,
+                      "marginBottom": 10,
+                      "textAlign": "left",
+                    },
+                  ]
+                }
+              >
+                Difficulty level
+                :
+              </Text>
+              <Text
+                style={
+                  [
+                    {
+                      "fontFamily": "Jakarta-Bold",
+                    },
+                    {
+                      "color": "#1d4ed8",
+                    },
+                    {
+                      "fontSize": 14,
+                      "marginBottom": 10,
+                      "textAlign": "left",
+                    },
+                  ]
+                }
+              >
+                Medium
+              </Text>
+            </View>
+          </View>
+          <button
+            onClick={[Function]}
+          >
+            Reset Chat
+          </button>
+        </View>
+      </RCTScrollView>
+      <button
+        onClick={[MockFunction]}
+      >
+        Close
+      </button>
+    </View>
+  </View>
+</Modal>
+`;

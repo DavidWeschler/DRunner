@@ -32,7 +32,7 @@ const RunCard = ({ run }: { run: Run }) => {
             </View>
 
             <View className="flex flex-row items-center gap-x-2">
-              <MaterialIcons name="location-city" size={20} color="black" />
+              <MaterialIcons testID="MaterialIcons" name="location-city" size={20} color="black" />
               <Text className="text-md font-JakartaMedium" numberOfLines={1}>
                 {address}
               </Text>
@@ -40,8 +40,8 @@ const RunCard = ({ run }: { run: Run }) => {
 
             {is_scheduled && (
               <View className="flex flex-row items-center gap-x-2">
-                <AntDesign name="clockcircleo" size={20} color="black" />
-                <Text className="text-md font-JakartaMedium" numberOfLines={1}>
+                <AntDesign testID="AntDesign" name="clockcircleo" size={20} color="black" />
+                <Text testID="formatted-date" className="text-md font-JakartaMedium" numberOfLines={1}>
                   {formatDate(is_scheduled, true)}
                 </Text>
               </View>

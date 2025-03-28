@@ -153,6 +153,7 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
   return (
     <>
       <MapView
+        testID="map-view"
         ref={mapRef}
         provider={PROVIDER_DEFAULT}
         className="w-full h-full rounded-2xl"
@@ -174,15 +175,15 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
       >
         {pins.length > 0 && (
           <>
-            <Marker key={pins.length - 1} coordinate={{ latitude: pins[pins.length - 1].latitude, longitude: pins[pins.length - 1].longitude }} pinColor="orange" title={"End"} />
-            <Marker key={0} coordinate={{ latitude: pins[0].latitude, longitude: pins[0].longitude }} pinColor="rgb(59, 187, 187)" title={"Start"} />
+            <Marker key={pins.length - 1} coordinate={{ latitude: pins[pins.length - 1].latitude, longitude: pins[pins.length - 1].longitude }} pinColor="orange" title={"End"} testID="marker-end" />
+            <Marker key={0} coordinate={{ latitude: pins[0].latitude, longitude: pins[0].longitude }} pinColor="rgb(59, 187, 187)" title={"Start"} testID="marker-start" />
           </>
         )}
 
         {directions && directions.map((points: string, index: number) => <Polyline key={index} coordinates={decodePolyline(points)} strokeColor="#CC6600" strokeWidth={4} />)}
 
-        {startPoint && <Marker coordinate={startPoint} pinColor="green" title="Start" />}
-        {endPoint && <Marker coordinate={endPoint} pinColor="red" title="End" />}
+        {startPoint && <Marker testID="marker-start" coordinate={startPoint} pinColor="green" title="Start" />}
+        {endPoint && <Marker testID="marker-end" coordinate={endPoint} pinColor="red" title="End" />}
       </MapView>
 
       <CustomAlert visible={isAlertVisible} onClose={() => setAlertVisible(false)} onSetStart={() => handleSetLocation(locationData.latitude, locationData.longitude, locationData.address, true)} onSetEnd={() => handleSetLocation(locationData.latitude, locationData.longitude, locationData.address, false)} />

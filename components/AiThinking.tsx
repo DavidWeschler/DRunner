@@ -8,6 +8,7 @@ const TypingDots = () => {
       {[0, 1, 2].map((index) => (
         <MotiView
           key={index}
+          testID={`typing-dot-${index}`}
           from={{ opacity: 0.3, translateY: 0 }}
           animate={{ opacity: 1, translateY: -3 }}
           transition={{

@@ -10,7 +10,7 @@ const Spinner: React.FC<SpinnerProps> = ({ visible }) => {
     <Modal transparent={true} animationType="fade" visible={visible}>
       <View style={styles.overlay}>
         <View style={styles.spinnerContainer}>
-          <ActivityIndicator size="large" color="#ffffff" />
+          <ActivityIndicator testID="spinner" size="large" color="#ffffff" />
         </View>
       </View>
     </Modal>

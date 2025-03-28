@@ -21,11 +21,11 @@ const MyDateTimePicker: React.FC<MyDateTimePickerProps> = ({ alreadyChoseDate, o
   };
 
   return (
-    <View>
-      <TouchableOpacity style={styles.button} onPress={showDatePicker}>
+    <View testID="my-datetime-picker">
+      <TouchableOpacity testID="date-picker-button" style={styles.button} onPress={showDatePicker}>
         <MaterialIcons name="schedule" size={24} color={alreadyChoseDate ? "#C0C0C0" : "#009900"} />
       </TouchableOpacity>
-      {!alreadyChoseDate && <DateTimePickerModal isVisible={isDatePickerVisible} mode="datetime" onConfirm={handleConfirm} onCancel={hideDatePicker} />}
+      {!alreadyChoseDate && <DateTimePickerModal testID="datetime-picker" isVisible={isDatePickerVisible} mode="datetime" onConfirm={handleConfirm} onCancel={hideDatePicker} />}
     </View>
   );
 };
