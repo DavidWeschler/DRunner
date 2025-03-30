@@ -1,62 +1,113 @@
-// __tests__/components/OAuth.test.tsx
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import OAuth from "@/components/OAuth";
 import { Alert } from "react-native";
+import { router } from "expo-router";
 import { useSSO } from "@clerk/clerk-expo";
+import { googleOAuth } from "@/lib/auth";
 
-// --- Nativewind Mocks ---
-// These mocks override nativewind modules to prevent errors related to getColorScheme and related functions.
-jest.mock("nativewind/dist/style-sheet/color-scheme", () => ({
-  getColorScheme: jest.fn().mockReturnValue("light"),
-}));
-jest.mock("nativewind/dist/style-sheet/index.js", () => ({}));
-jest.mock("nativewind/dist/styled/use-tailwind", () => ({}));
-jest.mock("nativewind/dist/styled/with-styled-props", () => ({}));
-
-// --- Other Mocks ---
+// Mock useSSO to return a mock startSSOFlow function
 jest.mock("@clerk/clerk-expo", () => ({
   useSSO: jest.fn(),
 }));
-jest.mock("@/lib/auth", () => ({
-  googleOAuth: jest.fn(),
-}));
+
+// Mock router.replace from expo-router
 jest.mock("expo-router", () => ({
   router: {
     replace: jest.fn(),
   },
 }));
-// For simplicity, mock basic React Native components.
-jest.mock("react-native", () => ({
-  ...jest.requireActual("react-native"),
-  Alert: {
-    alert: jest.fn(),
-  },
-  Image: "Image",
-  Text: "Text",
-  View: "View",
+
+// Mock googleOAuth from our auth library
+jest.mock("@/lib/auth", () => ({
+  googleOAuth: jest.fn(),
 }));
+
+// Mock CustomButton to render a simple touchable element that calls the onPress callback
+jest.mock("@/components/CustomButton", () => {
+  const React = require("react");
+  const { Text, TouchableOpacity } = require("react-native");
+  return (props: any) => (
+    <TouchableOpacity onPress={props.onPress} testID="custom-button">
+      <Text>{props.title}</Text>
+    </TouchableOpacity>
+  );
+});
 
 describe("OAuth Component", () => {
   const mockStartSSOFlow = jest.fn();
 
   beforeEach(() => {
+    // Set up the useSSO hook to return our mock startSSOFlow
     (useSSO as jest.Mock).mockReturnValue({ startSSOFlow: mockStartSSOFlow });
+    jest.clearAllMocks();
   });
 
   it("renders correctly", () => {
-    const { getByText } = render(<OAuth />);
+    const { getByText, getByTestId } = render(<OAuth />);
     expect(getByText("Or")).toBeTruthy();
     expect(getByText("Log In with Google")).toBeTruthy();
+    expect(getByTestId("custom-button")).toBeTruthy();
   });
 
-  it("handles Google sign-in button press", () => {
-    const { getByText } = render(<OAuth />);
+  it("handles session_exists case", async () => {
+    // Spy on Alert.alert
+    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+    (googleOAuth as jest.Mock).mockResolvedValue({
+      code: "session_exists",
+      success: true,
+      message: "Session exists. Redirecting to home screen.",
+    });
 
-    // Simulate button press
-    fireEvent.press(getByText("Log In with Google"));
+    const { getByTestId } = render(<OAuth />);
+    fireEvent.press(getByTestId("custom-button"));
 
-    // Check if Alert.alert was called (as a simple proxy for the sign-in flow)
-    expect(Alert.alert).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(googleOAuth).toHaveBeenCalledWith(mockStartSSOFlow);
+      expect(alertSpy).toHaveBeenCalledWith("Success", "Session exists. Redirecting to home screen.");
+      expect(router.replace).toHaveBeenCalledWith("/(root)/(tabs)/home");
+    });
+
+    alertSpy.mockRestore();
+  });
+
+  it("handles successful login case without session_exists code", async () => {
+    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+    (googleOAuth as jest.Mock).mockResolvedValue({
+      code: "other",
+      success: true,
+      message: "Logged in successfully.",
+    });
+
+    const { getByTestId } = render(<OAuth />);
+    fireEvent.press(getByTestId("custom-button"));
+
+    await waitFor(() => {
+      expect(googleOAuth).toHaveBeenCalledWith(mockStartSSOFlow);
+      expect(alertSpy).toHaveBeenCalledWith("Success", "Logged in successfully.");
+      expect(router.replace).not.toHaveBeenCalled();
+    });
+
+    alertSpy.mockRestore();
+  });
+
+  it("handles error case", async () => {
+    const alertSpy = jest.spyOn(Alert, "alert").mockImplementation(() => {});
+    (googleOAuth as jest.Mock).mockResolvedValue({
+      code: "error",
+      success: false,
+      message: "An error occurred.",
+    });
+
+    const { getByTestId } = render(<OAuth />);
+    fireEvent.press(getByTestId("custom-button"));
+
+    await waitFor(() => {
+      expect(googleOAuth).toHaveBeenCalledWith(mockStartSSOFlow);
+      expect(alertSpy).toHaveBeenCalledWith("Error", "An error occurred.");
+      expect(router.replace).not.toHaveBeenCalled();
+    });
+
+    alertSpy.mockRestore();
   });
 });
