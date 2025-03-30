@@ -1,85 +1,125 @@
-// __tests__/components/RunLayout.test.tsx
+// __tests__/RunLayout.test.tsx
 import React from "react";
+import { Text, View, TouchableOpacity } from "react-native";
 import { render, fireEvent } from "@testing-library/react-native";
-import RunLayout from "../../components/RunLayout";
-
-// Ensure RunLayout is properly mocked or imported
-jest.mock("../../components/RunLayout", () => {
-  const React = require("react");
-  const { View, Text } = require("react-native");
-  return {
-    __esModule: true,
-    default: ({ title, children }: { title: string; children: React.ReactNode }) => (
-      <View>
-        <Text testID="title">{title || "Go Back"}</Text>
-        {children}
-      </View>
-    ),
-  };
-});
+import RunLayout from "@/components/RunLayout";
 import { router } from "expo-router";
-import { Text } from "react-native";
 
-// --- Mock react-native-gesture-handler ---
-// We only need to mock the components used in RunLayout.
+// --- Gesture Handler Mock ---
 jest.mock("react-native-gesture-handler", () => {
   const React = require("react");
   const { View } = require("react-native");
   return {
-    GestureHandlerRootView: (props: any) => <View {...props} />,
-    TouchableWithoutFeedback: (props: any) => <View {...props} />,
+    GestureHandlerRootView: ({ children }: { children: React.ReactNode }) => <View>{children}</View>,
   };
 });
 
-// --- Mock BottomSheet components ---
-jest.mock("@gorhom/bottom-sheet", () => ({
-  BottomSheet: jest.fn().mockImplementation(({ children }) => <>{children}</>),
-  BottomSheetScrollView: jest.fn(),
-  BottomSheetView: jest.fn().mockImplementation(({ children, style }) => <>{children}</>),
-}));
-
-// --- Mock expo-router ---
+// --- Router Mock ---
 jest.mock("expo-router", () => ({
   router: {
     back: jest.fn(),
   },
 }));
 
-// --- Mock the Map component ---
-jest.mock("../../components/Map", () => {
+// --- Map Component Mock ---
+jest.mock("@/components/Map", () => {
+  const React = require("react");
   const { View } = require("react-native");
-  return {
-    __esModule: true,
-    default: () => <View testID="map-view" />,
-  };
+  return () => <View testID="map" />;
+});
+
+// --- Icons Mock ---
+jest.mock("@/constants", () => ({
+  icons: {
+    backArrow: "backArrow.png", // dummy image source
+  },
+}));
+
+// --- Bottom Sheet Mock ---
+// Here we return a default export that is a component and attach the named exports.
+jest.mock("@gorhom/bottom-sheet", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+
+  const BottomSheet = React.forwardRef((props: React.PropsWithChildren<{}>, ref: React.Ref<View>) => {
+    return (
+      <View testID="bottom-sheet" ref={ref} {...props}>
+        {props.children}
+      </View>
+    );
+  });
+  BottomSheet.displayName = "BottomSheet";
+
+  const BottomSheetView = (props: React.PropsWithChildren<{}>) => <View {...props}>{props.children}</View>;
+  const BottomSheetScrollView = (props: React.PropsWithChildren<{}>) => <View {...props}>{props.children}</View>;
+
+  // Return a default export (the component) with the named exports attached.
+  return Object.assign(BottomSheet, {
+    BottomSheetView,
+    BottomSheetScrollView,
+  });
 });
 
 describe("RunLayout", () => {
-  it("renders correctly with title", () => {
-    const { getByText } = render(
-      <RunLayout title="Choose a Rider" snapPoints={["20%", "50%"]}>
-        <Text>Some Child Component</Text>
-      </RunLayout>
-    );
-    expect(getByText("Choose a Rider")).toBeTruthy();
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it("renders correctly with default title", () => {
+  it("renders the title and children correctly", () => {
+    const title = "Test Title";
+    const childText = "Child content";
+
     const { getByText } = render(
-      <RunLayout title="" snapPoints={["20%", "50%"]}>
-        <Text>Some Child Component</Text>
+      <RunLayout title={title}>
+        <Text>{childText}</Text>
       </RunLayout>
     );
-    // When title is empty, the component shows the default "Go Back"
-    expect(getByText("Go Back")).toBeTruthy();
+
+    // Verify the title is rendered.
+    expect(getByText(title)).toBeTruthy();
+    // Verify the children content is rendered.
+    expect(getByText(childText)).toBeTruthy();
   });
 
-  it("renders the bottom sheet with children", () => {
-    const { getByText } = render(
-      <RunLayout title="Choose a Rider" snapPoints={["20%", "50%"]}>
-        <Text>Child Content Inside Bottom Sheet</Text>
+  it("calls router.back when the back button is pressed", () => {
+    const title = "Test Title";
+
+    const { getByTestId } = render(
+      <RunLayout title={title}>
+        <Text>Content</Text>
       </RunLayout>
     );
-    expect(getByText("Child Content Inside Bottom Sheet")).toBeTruthy();
+
+    // The TouchableOpacity has a testID "back-button".
+    const backButton = getByTestId("back-button");
+    fireEvent.press(backButton);
+    expect(router.back).toHaveBeenCalled();
+  });
+
+  it("passes default snapPoints when none are provided", () => {
+    const { getByTestId } = render(
+      <RunLayout title="Test Title">
+        <Text>Content</Text>
+      </RunLayout>
+    );
+
+    // Grab the BottomSheet component from the rendered output.
+    const bottomSheet = getByTestId("bottom-sheet");
+    expect(bottomSheet.props.snapPoints).toEqual(["18%", "68%"]);
+    // Also check the initial index is 0.
+    expect(bottomSheet.props.index).toBe(0);
+  });
+
+  it("passes custom snapPoints when provided", () => {
+    const customSnapPoints = ["25%", "75%"];
+
+    const { getByTestId } = render(
+      <RunLayout title="Test Title" snapPoints={customSnapPoints}>
+        <Text>Content</Text>
+      </RunLayout>
+    );
+
+    const bottomSheet = getByTestId("bottom-sheet");
+    expect(bottomSheet.props.snapPoints).toEqual(customSnapPoints);
   });
 });
