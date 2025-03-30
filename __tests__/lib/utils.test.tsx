@@ -65,7 +65,7 @@ describe("formatDate", () => {
     jest.spyOn(utils, "getIsraelTimezoneOffset").mockReturnValue(3);
     const dateStr = "2025-12-31T22:00:00Z";
     const originalTime = new Date(dateStr).getTime();
-    const offsetInMs = 2 * 60 * 60 * 1000;
+    const offsetInMs = 3 * 60 * 60 * 1000;
     const dateObj = new Date(originalTime + offsetInMs);
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const month = monthNames[dateObj.getMonth()];

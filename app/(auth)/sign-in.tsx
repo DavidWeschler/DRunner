@@ -51,7 +51,7 @@ const SignIn = () => {
 
           <InputField label="Password" placeholder="Enter your password" icon={icons.lock} secureTextEntry={true} value={form.password} onChangeText={(value) => setForm({ ...form, password: value })} />
 
-          <CustomButton title="Sign In" onPress={onSignInPress} className="w-11/12 mt-6 mx-auto" />
+          <CustomButton title="Sign In" onPress={onSignInPress} className="w-11/12 mt-6 mx-auto" testID="signInButton" />
         </View>
 
         <OAuth />

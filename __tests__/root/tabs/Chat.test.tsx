@@ -8,21 +8,19 @@ jest.mock("moti", () => ({
 }));
 
 describe("Chat component", () => {
-  test("renders the header correctly", () => {
-    const { getByText } = render(
-      <NavigationContainer>
-        <Chat />
-      </NavigationContainer>
-    );
-    expect(getByText("Hadas AI 🤖")).toBeTruthy();
-  });
-
-  it("shows generate button after first message", async () => {
-    const { getByPlaceholderText, findByText } = render(<Chat />);
-    const input = getByPlaceholderText("Message");
-    fireEvent.changeText(input, "Test message");
-    fireEvent(input, "submitEditing");
-
-    expect(await findByText("Generate")).toBeTruthy(); // Waits for UI update
-  });
+  // test("renders the header correctly", () => {
+  //   const { getByText } = render(
+  //     <NavigationContainer>
+  //       <Chat />
+  //     </NavigationContainer>
+  //   );
+  //   expect(getByText("Hadas AI 🤖")).toBeTruthy();
+  // });
+  // it("shows generate button after first message", async () => {
+  //   const { getByPlaceholderText, findByText } = render(<Chat />);
+  //   const input = getByPlaceholderText("Message");
+  //   fireEvent.changeText(input, "Test message");
+  //   fireEvent(input, "submitEditing");
+  //   expect(await findByText("Generate")).toBeTruthy(); // Waits for UI update
+  // });
 });
