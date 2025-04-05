@@ -3,11 +3,13 @@
 <img src="https://img.shields.io/badge/platform-android-green"/>
 
 ## About the App
-This app helps runners find the best routes based on their needs. Whether you’re looking for a specific distance, difficulty level, or starting point, the smart chatbot—powered by six AI APIs—creates optimized routes for you. Integrated with Google Maps, it ensures accurate and easy-to-follow paths, making every run more enjoyable. You can also ask the chatbot for advice on where to run, how long, or anything else related to running. Additionally, you can **save and schedule routes** and **view your running history** to track past runs.
+
+This app helps runners find the best routes based on their preferences. Whether you’re looking for a specific distance, difficulty level, or starting point, the smart chatbot—powered by six AI APIs—creates optimized routes for you. Integrated with Google Maps, it ensures accurate and easy-to-follow paths, making every run more enjoyable. You can also ask the chatbot for advice on where to run, how long, or anything else related to running. Additionally, you can **save and schedule routes** and **view your running history** to track past runs.
 
 This project is our final project as 3rd-year computer science students.
 
 ## Why Use This App?
+
 - **Personalized Routes** – Get paths based on your distance, difficulty, and location.
 - **Smart Chatbot** – Ask for running tips and advice.
 - **Accurate & Reliable** – Routes adjust to real roads with Google Maps.
@@ -16,6 +18,7 @@ This project is our final project as 3rd-year computer science students.
 - **Easy to Use** – Simple design for quick route planning.
 
 ## Features
+
 - AI-powered chatbot for personalized running routes
 - Google Maps integration for real-road accuracy
 - Save and schedule routes for future runs
@@ -25,6 +28,7 @@ This project is our final project as 3rd-year computer science students.
 - Database powered by Neon
 
 ## Screenshots
+
 ![Home Screen](screenshots/home.png)
 ![Route Generation](screenshots/route.png)
 ![Chatbot Interaction](screenshots/chatbot.png)
@@ -32,6 +36,7 @@ This project is our final project as 3rd-year computer science students.
 ## Installation
 
 ### Prerequisites
+
 - [Node.js](https://nodejs.org/) installed on your machine
 - [Expo Go](https://expo.dev/client) installed on your mobile device
 - API keys for:
@@ -41,6 +46,7 @@ This project is our final project as 3rd-year computer science students.
   - Neon database connection
 
 ### Steps
+
 1. Clone this repository:
    ```sh
    git clone https://github.com/ron-avital29/run_app.git
@@ -67,6 +73,7 @@ This project is our final project as 3rd-year computer science students.
 5. Scan the QR code using Expo Go on your mobile device to run the app.
 
 ## Technologies Used
+
 - **React Native & Expo** – For cross-platform mobile development
 - **TypeScript** – For type-safe coding
 - **Google Maps API** – For accurate route adjustments
@@ -76,12 +83,15 @@ This project is our final project as 3rd-year computer science students.
 - **Jest** - For Unitests
 
 ## Contributing
+
 We welcome contributions! Feel free to fork the repository and submit a pull request with your improvements.
 
 ## License
+
 This project is open-source and licensed under the **MIT License**.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Contact
+
 For any questions or suggestions, reach out to us.
