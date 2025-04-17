@@ -305,6 +305,7 @@ const Chat = () => {
             router.push("/home");
           }}
           className="justify-center items-center w-10 h-10 rounded-full"
+          testID="back-button"
         >
           <Image source={icons.backArrow} className="w-6 h-6" />
         </TouchableOpacity>

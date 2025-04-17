@@ -194,54 +194,54 @@ describe("ChooseRun Component", () => {
     expect(getByText("Select a route 🏃‍♂️‍➡️")).toBeTruthy();
   });
 
-  // // Test straight route behavior by overriding the store temporarily.
-  // it("handles straight route when endPoint is provided", async () => {
-  //   // Override store to simulate a straight route (endPoint provided)
-  //   const defaultStore = {
-  //     length: 5,
-  //     startPoint: { latitude: 37.0, longitude: -122.0 },
-  //     endPoint: null,
-  //     difficulty: "easy",
-  //     setLengthInput: jest.fn(),
-  //     setStartPointInput: jest.fn(),
-  //     setEndPointInput: jest.fn(),
-  //     setDifficultyInput: jest.fn(),
-  //     callReset: false,
-  //     setCallReset: jest.fn(),
-  //     mapTheme: "standard",
-  //     setRouteDetails: jest.fn(),
-  //     mode: "walking",
-  //   };
-  //   const straightStore = {
-  //     ...defaultStore,
-  //     endPoint: { latitude: 38.0, longitude: -123.0 },
-  //   };
+  // Test straight route behavior by overriding the store temporarily.
+  it("handles straight route when endPoint is provided", async () => {
+    // Override store to simulate a straight route (endPoint provided)
+    const defaultStore = {
+      length: 5,
+      startPoint: { latitude: 37.0, longitude: -122.0 },
+      endPoint: null,
+      difficulty: "easy",
+      setLengthInput: jest.fn(),
+      setStartPointInput: jest.fn(),
+      setEndPointInput: jest.fn(),
+      setDifficultyInput: jest.fn(),
+      callReset: false,
+      setCallReset: jest.fn(),
+      mapTheme: "standard",
+      setRouteDetails: jest.fn(),
+      mode: "walking",
+    };
+    const straightStore = {
+      ...defaultStore,
+      endPoint: { latitude: 38.0, longitude: -123.0 },
+    };
 
-  //   // Override the store temporarily
-  //   require("@/store").useLocationStore.mockImplementation((selector: (store: any) => any) => {
-  //     return selector ? selector(straightStore) : straightStore;
-  //   });
+    // Override the store temporarily
+    require("@/store").useLocationStore.mockImplementation((selector: (store: any) => any) => {
+      return selector ? selector(straightStore) : straightStore;
+    });
 
-  //   // Simulate fetch for getAddressFromPoint
-  //   (global.fetch as jest.Mock).mockResolvedValueOnce({
-  //     ok: true,
-  //     json: async () => ({ address: { road: "Main St", city: "Test City" } }),
-  //   });
+    // Simulate fetch for getAddressFromPoint
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ address: { road: "Main St", city: "Test City" } }),
+    });
 
-  //   // Render the component and wait for asynchronous updates
-  //   const rendered = render(<ChooseRun />);
-  //   await waitFor(() => {
-  //     // Check that the spinner is gone, indicating that loading is finished.
-  //     expect(rendered.queryByText("Spinner")).toBeNull();
-  //   });
+    // Render the component and wait for asynchronous updates
+    const rendered = render(<ChooseRun />);
+    await waitFor(() => {
+      // Check that the spinner is gone, indicating that loading is finished.
+      expect(rendered.queryByText("Spinner")).toBeNull();
+    });
 
-  //   // (Optionally, add more assertions about how the component rendered for a straight route.)
+    // (Optionally, add more assertions about how the component rendered for a straight route.)
 
-  //   // Reset store to default after this test.
-  //   require("@/store").useLocationStore.mockImplementation((selector: (store: any) => any) => {
-  //     return selector ? selector(defaultStore) : defaultStore;
-  //   });
-  // });
+    // Reset store to default after this test.
+    require("@/store").useLocationStore.mockImplementation((selector: (store: any) => any) => {
+      return selector ? selector(defaultStore) : defaultStore;
+    });
+  });
 
   it("handles back button press", async () => {
     // The back button is the first TouchableOpacity (with an Image inside)
@@ -320,7 +320,11 @@ describe("ChooseRun Component", () => {
   //     ok: true,
   //     json: async () => ({}),
   //   });
-  //   const datePicker = getByTestId("dateTimePicker");
+  //   const datePicker = getByTestId("dateTimePicker-medium");
+  //   // Mock the DATE property to avoid undefined errors
+  //   jest.spyOn(global, "Date").mockImplementation(() => ({
+  //     toISOString: () => "2023-01-01T00:00:00Z",
+  //   }));
   //   await act(async () => {
   //     fireEvent.press(datePicker);
   //   });
