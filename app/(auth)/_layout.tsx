@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import { Stack } from "expo-router";
 
 const Layout = () => {

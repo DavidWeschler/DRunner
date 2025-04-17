@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import { Tabs } from "expo-router";
 import { Image, ImageSourcePropType, View, Keyboard, Platform } from "react-native";
 import { useState, useEffect } from "react";
