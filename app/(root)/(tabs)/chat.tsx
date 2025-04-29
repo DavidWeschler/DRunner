@@ -126,6 +126,7 @@ const Chat = () => {
   }, [chatReset]);
 
   const askAi = async (instructions: string, message: string) => {
+    console.log(`fetrching response from the api with model: ${model.host}`);
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -149,10 +150,12 @@ const Chat = () => {
       }),
     });
     if (!response.ok) {
+      console.log(JSON.stringify(response));
       throw new Error(`Error: ${response.statusText}`);
     }
 
     const data = await response.json();
+    console.log("AI response:", JSON.stringify(data));
     const messageContent = data.choices[0].message.content;
     return messageContent;
   };

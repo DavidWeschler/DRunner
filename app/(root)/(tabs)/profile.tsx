@@ -32,7 +32,7 @@ const Profile = () => {
       "deepSeek": "deepseek/deepseek-r1-distill-llama-70b:free",
       "Qwen QwQ 32B": "qwen/qwq-32b:free",
       "Nous DeepHermes 3 Llama 3 8B": "nousresearch/deephermes-3-llama-3-8b-preview:free",
-      "Google Gemini Flash Lite 2.0": "google/gemini-2.0-flash-lite-preview-02-05:free",
+      "Google Gemini Flash Lite 2.0": "google/gemini-2.0-flash-exp:free",
       "Meta Llama 3.3 70B": "meta-llama/llama-3.3-70b-instruct:free",
     };
 
