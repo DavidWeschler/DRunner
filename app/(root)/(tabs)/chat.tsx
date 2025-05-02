@@ -273,7 +273,8 @@ const Chat = () => {
         startCoords = await getLatLngFromAddress(s);
         setStartPointInput(startCoords);
       } else {
-        return;
+        startCoords = await getLatLngFromAddress(userLocationStr);
+        setStartPointInput(startCoords);
       }
       if (e) {
         endCoords = await getLatLngFromAddress(e);
