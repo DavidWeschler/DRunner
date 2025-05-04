@@ -1,3 +1,7 @@
+/**
+ * @description This file contains an about modal component that provides information about the app.
+ * It includes a title, a description of the app's features, instructions on how to use it, and information about the developers.
+ */
 import React, { useState } from "react";
 import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import { AboutModalProps } from "@/types/type";

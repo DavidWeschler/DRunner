@@ -1,3 +1,8 @@
+/**
+ * @description This file contains a component that provides OAuth login functionality using Google.
+ * It allows users to log in with their Google account and handles the session state.
+ * The component uses the Clerk library for authentication and Expo Router for navigation.
+ */
 import { useSSO } from "@clerk/clerk-expo";
 import { router } from "expo-router";
 import { Alert, Image, Text, View } from "react-native";

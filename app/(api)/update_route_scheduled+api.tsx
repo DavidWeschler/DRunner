@@ -1,3 +1,7 @@
+/**
+ * @description This API route updates the scheduled status of a running route in the database.
+ * It handles the POST request to set the is_scheduled field for a specific route based on the provided clerkId and difficulty.
+ */
 import { neon } from "@neondatabase/serverless";
 import { getIsraelTimezoneOffset } from "@/lib/utils";
 

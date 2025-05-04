@@ -1,3 +1,7 @@
+/**
+ * This component is a custom date and time picker using react-native-modal-datetime-picker.
+ * It allows users to select a date and time, and it displays a button with a calendar icon.
+ */
 import React, { useState } from "react";
 import { View, Button, TouchableOpacity, StyleSheet } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -5,7 +9,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 interface MyDateTimePickerProps {
   alreadyChoseDate: boolean;
-  onDateTimeSelected: (dateTime: Date) => void; // Callback function
+  onDateTimeSelected: (dateTime: Date) => void;
   testID?: string;
 }
 
@@ -16,8 +20,8 @@ const MyDateTimePicker: React.FC<MyDateTimePickerProps> = ({ alreadyChoseDate, o
   const hideDatePicker = () => setDatePickerVisibility(false);
 
   const handleConfirm = (date: Date) => {
-    onDateTimeSelected(date); // Send date back to parent
-    hideDatePicker(); // Close picker
+    onDateTimeSelected(date);
+    hideDatePicker();
   };
 
   return (

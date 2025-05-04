@@ -1,3 +1,6 @@
+/**
+ * @description This file contains a component that displays a typing indicator with three dots.
+ */
 import React from "react";
 import { View, Text } from "react-native";
 import { MotiView } from "moti";

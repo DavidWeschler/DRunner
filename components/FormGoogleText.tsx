@@ -1,10 +1,15 @@
+/**
+ * @description This file contains a component that provides an input field for selecting a point using Google Places Autocomplete.
+ * It allows users to enter a location and fetches details about the selected place.
+ * The component uses the Google Places API to provide suggestions and details about the selected location.
+ */
 import { View, Text } from "react-native";
 import React, { useState, useEffect, useRef } from "react";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import { GoogleTextInputs } from "@/types/type"; // Ensure this type includes required props
+import { GoogleTextInputs } from "@/types/type";
 import { useLocationStore } from "../store/index";
 
-const googlePlacesApiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY; // Ensure this key is set
+const googlePlacesApiKey = process.env.EXPO_PUBLIC_GOOGLE_API_KEY;
 
 const PointInput = ({ label, placeholder, setAddress, setPointInput, setPoint }: GoogleTextInputs) => {
   const start = useLocationStore((state) => state.startAddress);

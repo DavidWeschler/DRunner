@@ -1,3 +1,7 @@
+/**
+ * @description This file contains a custom button component that can be used throughout the app.
+ * It allows for customization of background and text colors, icons, and other properties.
+ */
 import { TouchableOpacity, Text } from "react-native";
 import { ButtonProps } from "@/types/type";
 
@@ -31,18 +35,7 @@ const getTextVariantStyle = (variant: ButtonProps["textVariant"]) => {
   }
 };
 
-const CustomButton = ({
-  onPress,
-  title,
-  bgVariant = "primary",
-  textVariant = "default",
-  IconLeft,
-  IconRight,
-  className,
-  textClassName = "", // New prop for text styling
-  width = "full",
-  ...props
-}: ButtonProps) => {
+const CustomButton = ({ onPress, title, bgVariant = "primary", textVariant = "default", IconLeft, IconRight, className, textClassName = "", width = "full", ...props }: ButtonProps) => {
   return (
     <TouchableOpacity testID="custom-button" onPress={onPress} className={`w-${width} rounded-full p-3 flex flex-row justify-center items-center shadow-md shadow-neutral-400/70 ${getBgVariantStyle(bgVariant)} ${className}`} {...props}>
       {IconLeft && <IconLeft />}

@@ -1,3 +1,7 @@
+/**
+ * @description This API route fetches the most recent running route for a given clerkId from the database.
+ * It handles the POST request to retrieve the route from the running_routes table based on the provided clerkId.
+ */
 import { neon } from "@neondatabase/serverless";
 
 export async function POST(request: Request) {

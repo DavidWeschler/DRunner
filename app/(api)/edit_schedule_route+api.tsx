@@ -1,3 +1,7 @@
+/**
+ * @description This API route is used to update the schedule of a route in the database.
+ * It handles the POST request to set the is_scheduled field for a specific route based on the provided clerkId and routeId.
+ */
 import { neon } from "@neondatabase/serverless";
 
 export async function POST(request: Request) {

@@ -1,3 +1,7 @@
+/**
+ * This component displays a card with information about a run, including the route title, address, date, difficulty, length, and elevation gain.
+ * It also shows a map image of the route and uses icons from the Expo Icons library.
+ */
 import { Image, Text, View } from "react-native";
 import { icons } from "@/constants";
 import { formatDate, formatTime } from "@/lib/utils";

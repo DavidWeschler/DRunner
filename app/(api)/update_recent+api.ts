@@ -1,3 +1,7 @@
+/**
+ * @description This API route updates the 'is_recent' status of a running route in the database.
+ * It handles the POST request to update the route based on the provided clerkId, difficulty, and routeId.
+ */
 import { neon } from "@neondatabase/serverless";
 import { getIsraelTimezoneOffset } from "@/lib/utils";
 

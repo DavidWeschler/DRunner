@@ -1,3 +1,7 @@
+/**
+ * @description This API route is responsible for deleting a running route from the database.
+ * It handles the POST request to mark a route as deleted based on the provided clerkId and routeId.
+ */
 import { neon } from "@neondatabase/serverless";
 
 export async function POST(request: Request) {

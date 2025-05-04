@@ -1,3 +1,6 @@
+/**
+ * This file contains the API route for fetching recent routes from the database.
+ */
 import { neon } from "@neondatabase/serverless";
 
 export async function POST(request: Request) {

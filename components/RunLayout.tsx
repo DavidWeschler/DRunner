@@ -1,3 +1,7 @@
+/**
+ * This component is used to create a layout for the run screen.
+ * It includes a map view and a bottom sheet for additional options or information.
+ */
 import BottomSheet, { BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import React, { useRef } from "react";

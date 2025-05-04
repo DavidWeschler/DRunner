@@ -1,6 +1,9 @@
+/**
+ * This component is a wrapper around the Google Places Autocomplete input field.
+ * It allows users to search for locations and select them.
+ */
 import { View, Image } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-
 import { icons } from "@/constants";
 import { GoogleInputProps } from "@/types/type";
 

@@ -1,3 +1,7 @@
+/**
+ * @description This file contains the API route for creating a new user and adding routes to the database.
+ * It handles the POST request to insert a new user into the users table and their routes into the running_routes table.
+ */
 import { neon } from "@neondatabase/serverless";
 
 const routes = [

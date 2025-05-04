@@ -1,4 +1,7 @@
-// CustomAlert.js
+/**
+ * This component is a modal alert that allows users to select a location as either the start or end location.
+ * It includes options to set the location, a cancel button, and styles for the alert.
+ */
 import { AlertProps } from "@/types/type";
 import React from "react";
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";

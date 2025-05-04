@@ -1,3 +1,6 @@
+/**
+ * Spinner component for displaying a loading indicator.
+ */
 import React from "react";
 import { View, ActivityIndicator, Modal, StyleSheet } from "react-native";
 
@@ -20,7 +23,7 @@ const Spinner: React.FC<SpinnerProps> = ({ visible }) => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)", // Semi-transparent background
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "center",
     alignItems: "center",
   },

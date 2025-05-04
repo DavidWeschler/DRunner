@@ -1,6 +1,9 @@
+/**
+ * @description This file contains a component that provides an input field for the Hadas AI assistant.
+ * It allows users to enter text and submit it to the Hadas AI for processing.
+ */
 import { View, Image, TextInput, TouchableOpacity } from "react-native";
 import { useState } from "react";
-
 import { icons } from "@/constants";
 import { HadasInputProps } from "@/types/type";
 

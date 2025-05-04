@@ -1,3 +1,7 @@
+/**
+ * @description This file contains a component that displays a map using the react-native-maps library.
+ * It allows users to set start and end points by long-pressing on the map, and it fetches the address of the selected location using the Google Places API.
+ */
 import { icons } from "@/constants";
 import { useLocationStore } from "@/store";
 import React, { useEffect, useRef, useState } from "react";
@@ -127,7 +131,7 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
 
       const addressData = await getGoogleGeocode(latitude, longitude);
       setLocationData({ latitude, longitude, address: addressData });
-      setAlertVisible(true); // Show the custom alert modal
+      setAlertVisible(true);
     } catch (error) {
       console.log("Error fetching address:", error);
     }
@@ -167,8 +171,8 @@ const Map: React.FC<MapProps> = ({ theme, pins, directions }) => {
             ? {
                 latitude: pins[0].latitude,
                 longitude: pins[0].longitude,
-                latitudeDelta: 0.00002, // Zoom level
-                longitudeDelta: 0.00002, // Zoom level
+                latitudeDelta: 0.00002,
+                longitudeDelta: 0.00002,
               }
             : undefined
         }

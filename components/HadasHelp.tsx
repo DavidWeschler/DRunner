@@ -1,3 +1,7 @@
+/**
+ * @description This file contains a component that provides help and instructions for using the Hadas AI assistant.
+ * It includes information on how to interact with Hadas, the current model being used, and the current features set by the user.
+ */
 import React, { useEffect, useState } from "react";
 import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import { AboutModalProps } from "@/types/type";

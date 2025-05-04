@@ -1,3 +1,6 @@
+/**
+ * @description This API route is responsible for saving or unsaving a running route in the database.
+ */
 import { neon } from "@neondatabase/serverless";
 
 export async function POST(request: Request) {

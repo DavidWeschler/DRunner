@@ -1,3 +1,9 @@
+/**
+ * @file add_route.ts
+ * @description This file contains the API route for adding a new running route to the database.
+ * It handles the POST request to insert a new route into the running_routes table.
+ */
+
 import { neon } from "@neondatabase/serverless";
 
 export async function POST(request: Request) {
