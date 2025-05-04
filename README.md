@@ -8,6 +8,11 @@ This app helps runners find the best routes based on their preferences. Whether 
 
 This project is our final project as 3rd-year computer science students.
 
+### Authors:
+
+Ron Avital - ronav@edu.jmc.ac.il<br>
+David Weschler - davidwes@edu.jmc.ac.il
+
 ## Why Use This App?
 
 - **Personalized Routes** – Get paths based on your distance, difficulty, and location.
@@ -27,8 +32,29 @@ This project is our final project as 3rd-year computer science students.
 - Secure authentication with Clerk
 - Database powered by Neon
 
-## Screenshots
+## Create Your Own Account
 
+here ron
+
+## Choose Your Preferences Manually or Chat with Hadas AI
+
+here ron
+
+## Generate Unique Routes Every Time
+
+here ron
+
+## Save, Edit, or Schedule Your Routes
+
+here ron
+
+## Switch Between Different AI Models and Map Themes
+
+here ron
+
+##
+
+erase these..<br>
 ![Home Screen](screenshots/home.png)
 ![Route Generation](screenshots/route.png)
 ![Chatbot Interaction](screenshots/chatbot.png)
@@ -80,7 +106,7 @@ This project is our final project as 3rd-year computer science students.
 - **AI Chatbot (6 APIs)** – For generating optimized running routes
 - **Clerk** – For secure authentication
 - **Neon** – For database management
-- **Jest** - For Unitests
+- **Jest** - For Unit tests
 
 ## Contributing
 
