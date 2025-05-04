@@ -34,13 +34,13 @@ David Weschler - davidwes@edu.jmc.ac.il
 
 ## App Preview
 
-| Account Creation                                        | Preferences (Manual & Chatbot)                                                                                | Route Generation                                                         |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| <img src="assets/screenshots/account.jpg" width="120"/> | <img src="assets/screenshots/manuall.jpg" width="120"/> <img src="assets/screenshots/hadas.jpg" width="120"/> | <video src="assets/screenshots/routes.gif" width="120" controls></video> |
+| Account Creation                                        | Preferences (Manual & Chatbot)                                                                                | Route Generation                                                     |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| <img src="assets/screenshots/account.jpg" width="120"/> | <img src="assets/screenshots/manuall.jpg" width="120"/> <img src="assets/screenshots/hadas.jpg" width="120"/> | <img src="assets/screenshots/routes.gif" width="120" controls></img> |
 
-| Route Management                                       | Map & AI Customization                                 |     |
-| ------------------------------------------------------ | ------------------------------------------------------ | --- |
-| <img src="assets/screenshots/manage.jpg" width="120"/> | <img src="assets/screenshots/themes.jpg" width="120"/> |     |
+| Route Management                                       | Map & AI Customization                                 |
+| ------------------------------------------------------ | ------------------------------------------------------ |
+| <img src="assets/screenshots/manage.jpg" width="120"/> | <img src="assets/screenshots/themes.jpg" width="120"/> |
 
 ##
 
