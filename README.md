@@ -32,32 +32,17 @@ David Weschler - davidwes@edu.jmc.ac.il
 - Secure authentication with Clerk
 - Database powered by Neon
 
-## Create Your Own Account
+## App Preview
 
-here ron
+| Account Creation                                        | Preferences (Manual & Chatbot)                                                                                | Route Generation                                                         |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| <img src="assets/screenshots/account.jpg" width="120"/> | <img src="assets/screenshots/manuall.jpg" width="120"/> <img src="assets/screenshots/hadas.jpg" width="120"/> | <video src="assets/screenshots/routes.gif" width="120" controls></video> |
 
-## Choose Your Preferences Manually or Chat with Hadas AI
-
-here ron
-
-## Generate Unique Routes Every Time
-
-here ron
-
-## Save, Edit, or Schedule Your Routes
-
-here ron
-
-## Switch Between Different AI Models and Map Themes
-
-here ron
+| Route Management                                       | Map & AI Customization                                 |     |
+| ------------------------------------------------------ | ------------------------------------------------------ | --- |
+| <img src="assets/screenshots/manage.jpg" width="120"/> | <img src="assets/screenshots/themes.jpg" width="120"/> |     |
 
 ##
-
-erase these..<br>
-![Home Screen](screenshots/home.png)
-![Route Generation](screenshots/route.png)
-![Chatbot Interaction](screenshots/chatbot.png)
 
 ## Installation
 
