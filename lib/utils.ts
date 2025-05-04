@@ -1,3 +1,7 @@
+/**
+ * utils.ts
+ * This module provides utility functions for formatting time and date, and calculating the timezone offset
+ */
 export function getIsraelTimezoneOffset(): number {
   const ISRAEL_TIMEZONE_OFFSET = 2;
   const ISRAEL_TIMEZONE_OFFSET_DURING_DAYLIGHT_SAVING = 3;

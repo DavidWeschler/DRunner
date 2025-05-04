@@ -1,3 +1,8 @@
+/**
+ * RunRoute.tsx
+ * @description This file contains the RunRoute component, which is responsible for displaying the run route screen. It includes a map, a timer, and lap functionality.
+ * It also includes a bottom sheet for displaying lap times and a button to end the run.
+ */
 import React, { useState, useRef, useEffect } from "react";
 import { View, Image, Text, TouchableOpacity, ScrollView } from "react-native";
 import { useLocationStore } from "@/store";

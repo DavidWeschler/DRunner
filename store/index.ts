@@ -1,3 +1,12 @@
+/**
+ * @file store/index.ts
+ * This file contains the Zustand store for managing the application's state.
+ * It includes the location store, AI model store, and Hadas store.
+ * The location store manages the user's location, destination location, map theme, route details, and other related states.
+ * The AI model store manages the selected AI model for the application.
+ * The Hadas store manages the chat reset state for the application.
+ * The stores are created using the Zustand library, which provides a simple and efficient way to manage state in React applications.
+ */
 import { LocationStore, aiModelStore, MapThemeType, aiModel, hadasStore } from "@/types/type";
 import { create } from "zustand";
 

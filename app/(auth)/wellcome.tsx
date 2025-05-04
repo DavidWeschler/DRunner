@@ -1,3 +1,10 @@
+/**
+ * @wellcome.tsx
+ * This file contains the Onboarding component which is used for user onboarding.
+ * It uses the Expo Router for navigation and a Swiper component for the onboarding slides.
+ * It also includes a custom button for navigation between slides and to the sign-up page.
+ * The component displays a series of onboarding slides with images, titles, and descriptions.
+ */
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";

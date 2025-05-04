@@ -1,3 +1,12 @@
+/**
+ * @description This file contains the authentication logic for the app.
+ * It uses the Expo SecureStore to store the authentication token securely.
+ * It also uses the Expo Linking API to handle deep linking for OAuth authentication.
+ * It uses the fetchAPI function to make API calls to the backend.
+ * The googleOAuth function handles the OAuth authentication flow with Google.
+ * It uses the startSSOFlow function to initiate the OAuth flow and handle the response.
+ * It also handles the case where the user is signing up for the first time and creates a new user in the backend.
+ */
 import * as Linking from "expo-linking";
 import * as SecureStore from "expo-secure-store";
 

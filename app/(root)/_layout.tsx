@@ -1,5 +1,8 @@
 /* istanbul ignore file */
-
+/**
+ * @file _layout.tsx
+ * @description This file is the root layout for the app. It contains the stack navigator for the app.
+ */
 import { Stack } from "expo-router";
 
 const Layout = () => {

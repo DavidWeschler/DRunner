@@ -1,3 +1,9 @@
+/**
+ * @file constants/index.ts
+ * @description This file contains the constants for the application.
+ * It includes the images and icons used in the application.
+ * It also includes the onboarding data for the application.
+ */
 import backArrow from "@/assets/icons/back-arrow.png";
 import chat from "@/assets/icons/chat.png";
 import close from "@/assets/icons/close.png";

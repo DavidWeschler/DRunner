@@ -1,3 +1,10 @@
+/**
+ * @file types/type.d.ts
+ * This file contains TypeScript type declarations for various components and interfaces used in the application.
+ * It includes type definitions for API messages, modal props, map props, button props, input field props, and more.
+ * It also defines the structure of the Zustand store for managing application state, including user location, AI model, and Hadas chat reset state.
+ * The types are used throughout the application to ensure type safety and improve code readability.
+ */
 import { TextInputProps, TouchableOpacityProps } from "react-native";
 
 type MapThemeType = "standard" | "dark" | "aubergine" | "night" | "retro" | "silver";

@@ -1,3 +1,11 @@
+/**
+ * SignUp.tsx
+ * This file contains the SignUp component which is used for user registration.
+ * It uses the Clerk library for authentication and Expo Router for navigation.
+ * It also includes custom components for input fields and buttons.
+ * The component allows users to sign up using their email, name, and password.
+ * After signing up, users receive a verification code via email to verify their account.
+ */
 import { Alert, Image, ScrollView, Text, View } from "react-native";
 import { icons, images } from "@/constants";
 import InputField from "@/components/InputField";

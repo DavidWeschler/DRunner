@@ -1,3 +1,7 @@
+/**
+ * @file Profile.tsx
+ * @description This file contains the Profile component, which displays the user's profile information, including their name, email, and AI model preferences. It also allows the user to select a map theme and provides an "About" button that opens a modal with additional information.
+ */
 import { useUser } from "@clerk/clerk-expo";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

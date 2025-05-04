@@ -1,5 +1,12 @@
 /* istanbul ignore file */
-
+/**
+ * @file _layout.tsx
+ * @description This file is the root layout for the app. It contains the stack navigator for the app.
+ * It also includes the ClerkProvider for authentication and the Expo Router for navigation.
+ * The app uses Expo Router for navigation and Clerk for authentication.
+ * It also includes a splash screen that is displayed while the app is loading.
+ * The app uses Expo Font for custom fonts and Expo Splash Screen for the splash screen.
+ */
 import { ClerkLoaded, ClerkProvider } from "@clerk/clerk-expo";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";

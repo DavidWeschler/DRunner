@@ -1,3 +1,8 @@
+/**
+ * Runs.tsx
+ * This file contains the Runs component, which is responsible for displaying and managing the user's running routes.
+ * It includes functionalities such as viewing recent, saved, and future routes, editing route titles, scheduling notifications, and deleting routes.
+ */
 import RunCard from "@/components/RunCard";
 import { icons, images } from "@/constants";
 import { Run } from "@/types/type";

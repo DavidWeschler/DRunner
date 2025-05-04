@@ -1,5 +1,9 @@
 /* istanbul ignore file */
-
+/**
+ * @file _layout.tsx
+ * @description This file defines the layout for the authentication screens in the app.
+ * It uses the Expo Router to create a stack navigator for the authentication screens.
+ */
 import { Stack } from "expo-router";
 
 const Layout = () => {

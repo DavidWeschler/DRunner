@@ -20,7 +20,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/notification-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.ronavital29.runroutegenerator"
     },
     "web": {
       "bundler": "metro",
@@ -41,6 +42,14 @@
     "notification": {
       "icon": "./assets/images/icon.png",
       "color": "#ffffff"
+    },
+    "extra": {
+      "router": {
+        "origin": "https://asdfnsgfhsty.com/"
+      },
+      "eas": {
+        "projectId": "2af6d49a-8e59-4047-865c-27c6bacfa39e"
+      }
     }
   }
 }

@@ -1,5 +1,9 @@
 /* istanbul ignore file */
-
+/**
+ * @file _layout.tsx
+ * @description This file contains the layout for the app. It uses the Tabs component from expo-router to create a tabbed navigation system.
+ * It also contains a custom TabIcon component that is used to render the icons for each tab.
+ */
 import { Tabs } from "expo-router";
 import { Image, ImageSourcePropType, View, Keyboard, Platform } from "react-native";
 import { useState, useEffect } from "react";

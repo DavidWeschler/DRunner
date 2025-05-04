@@ -1,3 +1,10 @@
+/**
+ * SignIn.tsx
+ * This file contains the SignIn component which is used for user authentication.
+ * It uses the Clerk library for authentication and Expo Router for navigation.
+ * It also includes custom components for input fields and buttons.
+ * The component allows users to sign in using their email and password.
+ */
 import { useSignIn } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import { useCallback, useState } from "react";

@@ -1,3 +1,7 @@
+/**
+ * @file Chat.tsx
+ * @description This file contains the Chat component, which is responsible for rendering the chat interface of the Hadas AI application. It includes the chat messages, user input, and handles interactions with the AI model to generate responses based on user input.
+ */
 import { useState, useEffect, useRef } from "react";
 import { View, Text, FlatList, Keyboard, Platform, Button, TouchableOpacity, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";

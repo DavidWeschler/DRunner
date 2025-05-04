@@ -1,3 +1,8 @@
+/**
+ * @expo/next-adapter
+ * This is the entry point for the app. It is used to set up the app and configure the router.
+ * It is also used to set up the app's navigation and authentication.
+ */
 import { useAuth } from "@clerk/clerk-expo";
 import { Redirect } from "expo-router";
 

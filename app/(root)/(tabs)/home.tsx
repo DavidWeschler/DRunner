@@ -1,3 +1,7 @@
+/**
+ * @file Home.tsx
+ * @description This file contains the Home component, which is the main screen of the app. It displays the user's location, weather, and a list of recent, saved, and future runs. It also allows the user to generate a new run based on their input.
+ */
 import { useUser, useAuth } from "@clerk/clerk-expo";
 import * as Location from "expo-location";
 import { router } from "expo-router";

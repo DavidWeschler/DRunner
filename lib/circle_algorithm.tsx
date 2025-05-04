@@ -1,3 +1,11 @@
+/**
+ * CircularAlgorithm.tsx
+ * This module generates circular routes based on a given starting point and desired route length.
+ * It uses the Google Maps API to adjust coordinates to the nearest road and to fetch route details.
+ * It also calculates the elevation gain for each route and assigns a difficulty level (easy, medium, hard) based on the elevation gain.
+ * The routes are generated in a circular manner, ensuring that the start and end points are the same.
+ * The module exports a single function, CircularAlgorithm, which takes in parameters for route length, starting point, and mode of travel (walking or cycling).
+ */
 import { circle, destination, lineIntersect, distance, Coord, Units } from "@turf/turf";
 import axios from "axios";
 import polyline from "polyline";

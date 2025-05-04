@@ -1,3 +1,8 @@
+/**
+ * @file ChooseRun.tsx
+ * @description This file contains the ChooseRun component, which is responsible for displaying the route selection screen.
+ * It allows the user to select a route based on difficulty and view the route on a map.
+ */
 import React, { useState, useEffect } from "react";
 import { View, Image, Text, TouchableOpacity, ScrollView, Alert, StyleSheet } from "react-native";
 import Swiper from "react-native-swiper";

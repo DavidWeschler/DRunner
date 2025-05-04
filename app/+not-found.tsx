@@ -1,3 +1,8 @@
+/**
+ * NotFoundScreen.tsx
+ * This is the screen that is displayed when a user tries to access a route that does not exist.
+ * It is a fallback screen that provides a link back to the home screen.
+ */
 import { Link, Stack } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
