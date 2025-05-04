@@ -34,7 +34,7 @@ David Weschler - davidwes@edu.jmc.ac.il
 
 ## App Preview
 
-| Account Creation                                        | Preferences (Manual & Chatbot)                                                                                | Route Generation                                                     |
+| Account Creation                                        | Preferences (Manual or Chatbot)                                                                               | Route Generation                                                     |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | <img src="assets/screenshots/account.jpg" width="120"/> | <img src="assets/screenshots/manuall.jpg" width="120"/> <img src="assets/screenshots/hadas.jpg" width="120"/> | <img src="assets/screenshots/routes.gif" width="120" controls></img> |
 
