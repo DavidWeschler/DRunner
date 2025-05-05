@@ -49,7 +49,7 @@ David Weschler - davidwes@edu.jmc.ac.il
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) installed on your machine
-- [Expo Go](https://expo.dev/client) installed on your mobile device
+- [Expo Go](https://expo.dev/client) installed on your mobile device (SDK 52)
 - API keys for:
   - Google Maps
   - AI chatbot services
@@ -106,3 +106,9 @@ This project is open-source and licensed under the **MIT License**.
 ## Contact
 
 For any questions or suggestions, reach out to us.
+
+[![Ron Avital](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ron-avital/)
+[![David weschler](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/david-weschler/)
+
+
+
