@@ -1,6 +1,6 @@
 # Running Route App
 
-<img src="https://img.shields.io/badge/platform-android-green"/>
+<img src="https://img.shields.io/badge/platform-android-green"/> <img src="https://img.shields.io/badge/framework-react%20native-blue"/> <img src="https://img.shields.io/badge/language-typescript-lightblue"/>
 
 ## About the App
 
