@@ -1,4 +1,4 @@
-# Running Route App
+# DRunner
 
 <img src="https://img.shields.io/badge/platform-android-green"/> <img src="https://img.shields.io/badge/framework-react%20native-blue"/> <img src="https://img.shields.io/badge/language-typescript-lightblue"/>
 
@@ -8,10 +8,13 @@ This app helps runners find the best routes based on their preferences. Whether 
 
 This project is our final project as 3rd-year computer science students.
 
+[![Demo on YouTube](https://img.shields.io/badge/YouTube-FF0000?style=flat&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=4LcknZpmIZA)
+
 ### Authors:
 
-Ron Avital - ronav@edu.jmc.ac.il<br>
-David Weschler - davidwes@edu.jmc.ac.il
+[![Ron Avital](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ron-avital/) Ron Avital - ronav@edu.jmc.ac.il <br>
+
+[![David weschler](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/david-weschler/) David Weschler - davidwes@edu.jmc.ac.il
 
 ## Why Use This App?
 
@@ -102,13 +105,3 @@ We welcome contributions! Feel free to fork the repository and submit a pull req
 This project is open-source and licensed under the **MIT License**.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-## Contact
-
-For any questions or suggestions, reach out to us.
-
-[![Ron Avital](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ron-avital/)
-[![David weschler](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/david-weschler/)
-
-
-
