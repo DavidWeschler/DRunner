@@ -27,6 +27,7 @@ import onboarding1 from "@/assets/images/onboarding1.png";
 import onboarding2 from "@/assets/images/onboarding2.png";
 import onboarding3 from "@/assets/images/onboarding3.png";
 import signUpCar from "@/assets/images/signup-car.png";
+import aiChat from "@/assets/images/aichat.png";
 
 export const images = {
   onboarding1,
@@ -55,6 +56,7 @@ export const icons = {
   profile,
   search,
   to,
+  aiChat,
 };
 
 export const onboarding = [

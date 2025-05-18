@@ -273,7 +273,7 @@ const Home = () => {
               <Text className="text-xl font-JakartaBold text-blue-500">{weather}</Text>
             </View>
 
-            <HadasTextInput icon={icons.search} containerStyle="bg-white shadow-md shadow-neutral-300" placeholder="Use Hadas to find your next running route" handleString={hadasInit} editable={true} />
+            <HadasTextInput icon={icons.aiChat} containerStyle="bg-white shadow-md shadow-neutral-300" placeholder="Chat with Hadas AI to plan your next run" handleString={hadasInit} editable={true} />
 
             <>
               <View className="flex flex-row items-center bg-transparent h-[490px] mt-4">
