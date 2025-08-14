@@ -8,7 +8,7 @@ This app helps runners find the best routes based on their preferences. Whether 
 
 This project is our final project as 3rd-year computer science students.
 
-[![Demo on YouTube](https://img.shields.io/badge/YouTube-FF0000?style=flat&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=4LcknZpmIZA)
+[![Demo on YouTube](https://img.shields.io/badge/YouTube-FF0000?style=flat&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=VXHc2Vox4I4)
 
 ### Authors:
 
